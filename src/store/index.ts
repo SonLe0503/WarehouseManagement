@@ -1,0 +1,30 @@
+import { persistReducer, persistStore } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+
+
+import authSlide from "./authSlide";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
+
+const persistConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["infoLogin", "isLogin"],
+};
+
+const reducers = {
+    auth: persistReducer(persistConfig, authSlide),
+}
+const rootReducer = combineReducers(reducers);
+export const store = configureStore({
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({ serializableCheck: false }),
+});
+
+export const persistor = persistStore(store);
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
