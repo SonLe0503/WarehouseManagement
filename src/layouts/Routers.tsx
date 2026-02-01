@@ -8,6 +8,7 @@ import PrivateLayout from "../layouts/PrivateLayout"
 
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
+const ManageUser = lazy(() => import("../app/pages/manageUser"))
 const DashboardStaff = lazy(() => import("../app/pages/dashboard/DashboardStaff"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const DashboardPurchase = lazy(() => import("../app/pages/dashboard/DashboardPurchase"))
@@ -25,6 +26,12 @@ const privateResourceItem = [
     {
         key: URL.DashboardAdmin,
         element: <DashboardAdmin />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageUser,
+        element: <ManageUser />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
@@ -61,13 +68,9 @@ export default function Routers() {
             {menus.map((menu: any) => {
                 let element = menu.element;
                 element = <Suspense fallback={null}>{element}</Suspense>;
-
-                // Wrap with PrivateLayout if private is true
                 if (menu.private) {
                     element = <PrivateLayout>{element}</PrivateLayout>;
                 }
-
-                // Wrap with DashboardLayout if specified
                 if (menu.layout === DASHBOARD_LAYOUT) {
                     return <Route key={menu.key} path={menu.key} element={<DashboardLayout>{element}</DashboardLayout>} />;
                 }

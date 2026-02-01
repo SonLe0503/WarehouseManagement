@@ -11,7 +11,7 @@ interface DefaultLayoutProps {
 
 const DashboardLayout = ({ children }: DefaultLayoutProps) => {
     return (
-        <Layout className="min-h-screen">
+        <Layout className="h-screen">
             <Sidebar />
             <Layout>
                 <HeaderBar />

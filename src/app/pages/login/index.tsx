@@ -1,48 +1,50 @@
 import { Button, Form, Input, Card, message } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
 import imgkho from "../../../assets/images/login.jpg";
 import { useAppDispatch } from "../../../store";
 // import { useSelector } from "react-redux";
 import { actionLogin } from "../../../store/authSlide";
 import URL from "../../../constants/url";
 import { EUserRole } from "../../../interface/app";
-
+import { useAppSelector } from "../../../store";
+import { selectInfoLogin } from "../../../store/authSlide";
+import { useEffect } from "react";
 
 const LoginPage = () => {
     const dispathch = useAppDispatch();
     const navigate = useNavigate();
-    // const isLogin = useSelector(selectIsLogin);
+    const infoLogin = useAppSelector(selectInfoLogin);
+    console.log(infoLogin);
+
+    useEffect(() => {
+        if (infoLogin?.accessToken) {
+            const role = infoLogin.role;
+            switch (role) {
+                case EUserRole.ADMIN:
+                    navigate(URL.DashboardAdmin);
+                    break;
+                case EUserRole.STAFF:
+                    navigate(URL.DashboardStaff);
+                    break;
+                case EUserRole.MANAGE:
+                    navigate(URL.DashboardManage);
+                    break;
+                case EUserRole.PURCHASE:
+                    navigate(URL.DashboardPurchase);
+                    break;
+                case EUserRole.SALE:
+                    navigate(URL.DashboardSale);
+                    break;
+            }
+        }
+    }, [infoLogin, navigate]);
 
     const onFinish = async (values: any) => {
         try {
             const res: any = await dispathch(actionLogin(values));
             if (actionLogin.fulfilled.match(res)) {
-                const token = res.payload?.data?.token;
-                if (token) {
-                    const decodedToken: any = jwtDecode(token);
-                    const role = decodedToken["role"];
-                    message.success("Đăng nhập thành công!");
-
-                    switch (role) {
-                        case EUserRole.ADMIN:
-                            navigate(URL.DashboardAdmin);
-                            break;
-                        case EUserRole.STAFF:
-                            navigate(URL.DashboardStaff);
-                            break;
-                        case EUserRole.MANAGE:
-                            navigate(URL.DashboardManage);
-                            break;
-                        case EUserRole.PURCHASE:
-                            navigate(URL.DashboardPurchase);
-                            break;
-                        case EUserRole.SALE:
-                            navigate(URL.DashboardSale);
-                            break;
-                    }
-                }
+                message.success("Đăng nhập thành công!");
             } else {
                 message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
             }
