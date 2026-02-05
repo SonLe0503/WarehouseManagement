@@ -62,7 +62,7 @@ const Sidebar = () => {
                     }
                     onClick={({ key }) => navigate(key)}
                 />
-                <div className="flex justify-center items-center p-3 border-t">
+                <div className="flex justify-center items-center p-3 border-t border-gray-300">
                     <button
                         onClick={() => setCollapsed(!collapsed)}
                         className="p-2 rounded-full hover:bg-gray-100 transition"

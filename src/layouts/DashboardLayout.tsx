@@ -15,7 +15,7 @@ const DashboardLayout = ({ children }: DefaultLayoutProps) => {
             <Sidebar />
             <Layout>
                 <HeaderBar />
-                <Content className="m-4 p-6 bg-white rounded-xl shadow">
+                <Content className="m-2 bg-white shadow">
                     {children}
                 </Content>
             </Layout>
