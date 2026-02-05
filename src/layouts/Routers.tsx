@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react"
 import URL from "../constants/url"
 import { DASHBOARD_LAYOUT, NONE_LAYOUT } from "../constants/layout"
-import { Route, Routes } from "react-router-dom"
+import { Navigate, Route, Routes } from "react-router-dom"
 import DashboardLayout from "../layouts/DashboardLayout"
 import PrivateLayout from "../layouts/PrivateLayout"
 
@@ -63,8 +63,9 @@ const privateResourceItem = [
 const menus = [...shareResourceItem, ...privateResourceItem]
 
 export default function Routers() {
-     return (
+    return (
         <Routes>
+            <Route path="/" element={<Navigate to={URL.Login} replace />} />
             {menus.map((menu: any) => {
                 let element = menu.element;
                 element = <Suspense fallback={null}>{element}</Suspense>;
