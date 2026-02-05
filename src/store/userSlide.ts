@@ -40,11 +40,16 @@ const initialState: UserState = {
 
 export const getAllUsers = createAsyncThunk(
   "user/get-all-users",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: `/user`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
       return res.data as IUser[];
     } catch (err) {
@@ -55,12 +60,17 @@ export const getAllUsers = createAsyncThunk(
 
 export const createUser = createAsyncThunk(
   "user/create-user",
-  async (data: CreateUserDTO, { rejectWithValue }) => {
+  async (data: CreateUserDTO, { rejectWithValue, getState }) => {
     try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: "/user",
         method: "POST",
         data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       return res.data;
     } catch (err: any) {
@@ -73,13 +83,18 @@ export const updateUser = createAsyncThunk(
   "user/update-user",
   async (
     { id, data }: { id: number; data: UpdateUserDTO },
-    { rejectWithValue }
+    { rejectWithValue, getState }
   ) => {
     try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.token;
       await request({
         url: `/user/${id}`,
         method: "PUT",
         data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       return { id, data };
     } catch (err: any) {
@@ -90,11 +105,16 @@ export const updateUser = createAsyncThunk(
 
 export const deleteUser = createAsyncThunk(
   "user/delete-user",
-  async (id: number, { rejectWithValue }) => {
+  async (id: number, { rejectWithValue, getState }) => {
     try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.token;
       await request({
         url: `/user/${id}`,
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       return id;
     } catch (err: any) {

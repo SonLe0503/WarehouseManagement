@@ -21,11 +21,16 @@ const initialState: RoleState = {
 
 export const getAllRoles = createAsyncThunk(
   "role/get-all-roles",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
     try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: "/role",
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       return res.data as IRole[];
     } catch (err: any) {
