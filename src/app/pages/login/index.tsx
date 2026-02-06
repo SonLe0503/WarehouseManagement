@@ -15,7 +15,6 @@ const LoginPage = () => {
     const dispathch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    console.log(infoLogin);
 
     useEffect(() => {
         if (infoLogin?.accessToken) {

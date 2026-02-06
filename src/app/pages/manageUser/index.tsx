@@ -8,8 +8,6 @@ import Condition from "./Condition";
 import AddUserModal from "../../components/modal/AddUserModal";
 import EditUserModal from "../../components/modal/EditUserModal";
 
-
-
 const ManageUser = () => {
     const dispatch = useAppDispatch();
     const users = useSelector(selectUsers);
@@ -52,7 +50,6 @@ const ManageUser = () => {
     useEffect(() => {
         dispatch(getAllUsers());
     }, [dispatch]);
-    console.log(users);
     return (
         <div className="p-2">
             <Condition

@@ -49,6 +49,7 @@ const AddUserModal = (props: AddUserModalProps) => {
             confirmLoading={loading}
             okText="Thêm mới"
             cancelText="Hủy"
+            destroyOnHidden
         >
             <Form
                 form={form}
