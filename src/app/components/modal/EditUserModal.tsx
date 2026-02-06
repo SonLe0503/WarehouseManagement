@@ -38,8 +38,6 @@ const EditUserModal = (props: EditUserModalProps) => {
                 status: userData.status,
                 roleIds: userRoleIds.length > 0 ? userRoleIds[0] : undefined, // Assuming single role selection for now as per AddUserModal context
             });
-        } else {
-            form.resetFields();
         }
     }, [userData, open, roles, form]);
 
@@ -81,6 +79,7 @@ const EditUserModal = (props: EditUserModalProps) => {
             confirmLoading={loading}
             okText="Cập nhật"
             cancelText="Hủy"
+            destroyOnHidden
         >
             <Form
                 form={form}
