@@ -3,7 +3,6 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import imgkho from "../../../assets/images/login.jpg";
 import { useAppDispatch } from "../../../store";
-// import { useSelector } from "react-redux";
 import { actionLogin } from "../../../store/authSlide";
 import URL from "../../../constants/url";
 import { EUserRole } from "../../../interface/app";

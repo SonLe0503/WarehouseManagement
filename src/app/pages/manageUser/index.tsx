@@ -119,7 +119,7 @@ const ManageUser = () => {
                                 onClick={() => handleEdit(u.id)}
                                 size="small"
                             >
-                                Edit
+                                Sửa
                             </Button>
                             <Button
                                 className={`${u.roles.some((role) => role.toUpperCase() === "ADMIN") ? "!bg-gray-300" : "!bg-red-500"} !text-white px-3 py-1 rounded`}
@@ -127,7 +127,7 @@ const ManageUser = () => {
                                 size="small"
                                 disabled={u.roles.some((role) => role.toUpperCase() === "ADMIN")}
                             >
-                                Delete
+                                Xóa
                             </Button>
                         </div>
                     </div>

@@ -4,6 +4,7 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     UserOutlined,
+    InboxOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,6 +26,20 @@ const Sidebar = () => {
         ADMIN: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
+            {
+                key: "sub-catalog", icon: <InboxOutlined />,
+                label: "Danh mục & Sản phẩm",
+                children: [
+                    {
+                        key: URL.ManageCategory,
+                        label: "Danh mục",
+                    },
+                    {
+                        key: URL.ManageProduct,
+                        label: "Sản phẩm",
+                    },
+                ],
+            },
         ],
         MANAGER: [{ key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         STAFF: [{ key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" }],
@@ -60,7 +75,11 @@ const Sidebar = () => {
                             }))
                             : []
                     }
-                    onClick={({ key }) => navigate(key)}
+                    onClick={({ key }) => {
+                        if (key.startsWith("/")) {
+                            navigate(key);
+                        }
+                    }}
                 />
                 <div className="flex justify-center items-center p-3 border-t border-gray-300">
                     <button

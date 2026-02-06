@@ -8,5 +8,7 @@ const URL = {
     DashboardManage: '/dashboard-manage',
     DashboardPurchase: '/dashboard-purchase',
     DashboardSale: '/dashboard-sale',
+    ManageProduct: '/admin/manage-product',
+    ManageCategory: '/admin/manage-category',
 }
 export default URL;
