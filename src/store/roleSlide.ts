@@ -1,65 +1,201 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
-import type { RootState } from ".";
+import type { RootState } from "./index";
 
-
-export interface IRole {
+// interface/user.ts
+export interface IUser {
   id: number;
-  name: string;
+  username: string;
+  email: string;
+  status: string;
+  roles: string[];
+  createdAt: string;
 }
 
-type RoleState = {
-  roles: IRole[];
+export interface CreateUserDTO {
+  username: string;
+  password: string;
+  email?: string;
+  status?: string;
+  roleIds?: number[];
+}
+
+export interface UpdateUserDTO {
+  username?: string;
+  email?: string;
+  status?: string;
+  roleIds?: number[];
+}
+
+type UserState = {
+  users: IUser[];
   loading: boolean;
   error?: string;
 };
 
-const initialState: RoleState = {
-  roles: [],
+const initialState: UserState = {
+  users: [],
   loading: false,
 };
 
-export const getAllRoles = createAsyncThunk(
-  "role/get-all-roles",
+export const getAllUsers = createAsyncThunk(
+  "user/get-all-users",
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.token;
+      // ✅ SỬA: Lấy từ accessToken thay vì token
+      const token = state.auth.infoLogin?.accessToken;
       const res = await request({
-        url: "/role",
+        url: `/user`,
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
+      })
+      return res.data as IUser[];
+    } catch (err) {
+      return rejectWithValue(err);
+    }
+  }
+);
+
+export const createUser = createAsyncThunk(
+  "user/create-user",
+  async (data: CreateUserDTO, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      // ✅ SỬA: Lấy từ accessToken thay vì token
+      const token = state.auth.infoLogin?.accessToken;
+      const res = await request({
+        url: "/user",
+        method: "POST",
+        data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      return res.data as IRole[];
+      return res.data;
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-const roleSlice = createSlice({
-  name: "role",
+export const updateUser = createAsyncThunk(
+  "user/update-user",
+  async (
+    { id, data }: { id: number; data: UpdateUserDTO },
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state: any = getState();
+      // ✅ SỬA: Lấy từ accessToken thay vì token
+      const token = state.auth.infoLogin?.accessToken;
+      await request({
+        url: `/user/${id}`,
+        method: "PUT",
+        data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return { id, data };
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const deleteUser = createAsyncThunk(
+  "user/delete-user",
+  async (id: number, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      // ✅ SỬA: Lấy từ accessToken thay vì token
+      const token = state.auth.infoLogin?.accessToken;
+      await request({
+        url: `/user/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return id;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+const userSlice = createSlice({
+  name: "user",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAllRoles.pending, (state) => {
+      .addCase(getAllUsers.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getAllRoles.fulfilled, (state, action) => {
-        state.roles = action.payload;
+      .addCase(getAllUsers.fulfilled, (state, action) => {
+        state.users = action.payload;
         state.loading = false;
       })
-      .addCase(getAllRoles.rejected, (state, action) => {
+      .addCase(getAllUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(createUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      /* ===== UPDATE ===== */
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        const index = state.users.findIndex(
+          (u) => u.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.users[index] = {
+            ...state.users[index],
+            ...action.payload.data,
+          };
+        }
+        state.loading = false;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      /* ===== DELETE (SOFT DELETE) ===== */
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        const user = state.users.find((u) => u.id === action.payload);
+        if (user) {
+          user.status = "Deleted";
+        }
+        state.loading = false;
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export const selectRoles = (state: RootState) => state.role.roles;
-export const selectRoleLoading = (state: RootState) => state.role.loading;
+export const selectUsers = (state: RootState) => state.user.users;
+export const selectUserLoading = (state: RootState) => state.user.loading;
 
-export default roleSlice.reducer;
+export default userSlice.reducer;
