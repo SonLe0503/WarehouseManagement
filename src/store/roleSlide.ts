@@ -1,201 +1,65 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
-import type { RootState } from "./index";
+import type { RootState } from ".";
 
-// interface/user.ts
-export interface IUser {
+
+export interface IRole {
   id: number;
-  username: string;
-  email: string;
-  status: string;
-  roles: string[];
-  createdAt: string;
+  name: string;
 }
 
-export interface CreateUserDTO {
-  username: string;
-  password: string;
-  email?: string;
-  status?: string;
-  roleIds?: number[];
-}
-
-export interface UpdateUserDTO {
-  username?: string;
-  email?: string;
-  status?: string;
-  roleIds?: number[];
-}
-
-type UserState = {
-  users: IUser[];
+type RoleState = {
+  roles: IRole[];
   loading: boolean;
   error?: string;
 };
 
-const initialState: UserState = {
-  users: [],
+const initialState: RoleState = {
+  roles: [],
   loading: false,
 };
 
-export const getAllUsers = createAsyncThunk(
-  "user/get-all-users",
+export const getAllRoles = createAsyncThunk(
+  "role/get-all-roles",
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
       const token = state.auth.infoLogin?.accessToken;
       const res = await request({
-        url: `/user`,
+        url: "/role",
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      return res.data as IUser[];
-    } catch (err) {
-      return rejectWithValue(err);
-    }
-  }
-);
-
-export const createUser = createAsyncThunk(
-  "user/create-user",
-  async (data: CreateUserDTO, { rejectWithValue, getState }) => {
-    try {
-      const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
-      const token = state.auth.infoLogin?.accessToken;
-      const res = await request({
-        url: "/user",
-        method: "POST",
-        data,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
-      return res.data;
+      return res.data as IRole[];
     } catch (err: any) {
       return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
 
-export const updateUser = createAsyncThunk(
-  "user/update-user",
-  async (
-    { id, data }: { id: number; data: UpdateUserDTO },
-    { rejectWithValue, getState }
-  ) => {
-    try {
-      const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
-      const token = state.auth.infoLogin?.accessToken;
-      await request({
-        url: `/user/${id}`,
-        method: "PUT",
-        data,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return { id, data };
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data || err.message);
-    }
-  }
-);
-
-export const deleteUser = createAsyncThunk(
-  "user/delete-user",
-  async (id: number, { rejectWithValue, getState }) => {
-    try {
-      const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
-      const token = state.auth.infoLogin?.accessToken;
-      await request({
-        url: `/user/${id}`,
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return id;
-    } catch (err: any) {
-      return rejectWithValue(err.response?.data || err.message);
-    }
-  }
-);
-
-const userSlice = createSlice({
-  name: "user",
+const roleSlice = createSlice({
+  name: "role",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getAllUsers.pending, (state) => {
+      .addCase(getAllRoles.pending, (state) => {
         state.loading = true;
       })
-      .addCase(getAllUsers.fulfilled, (state, action) => {
-        state.users = action.payload;
+      .addCase(getAllRoles.fulfilled, (state, action) => {
+        state.roles = action.payload;
         state.loading = false;
       })
-      .addCase(getAllUsers.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      .addCase(createUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(createUser.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(createUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      /* ===== UPDATE ===== */
-      .addCase(updateUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(updateUser.fulfilled, (state, action) => {
-        const index = state.users.findIndex(
-          (u) => u.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.users[index] = {
-            ...state.users[index],
-            ...action.payload.data,
-          };
-        }
-        state.loading = false;
-      })
-      .addCase(updateUser.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      })
-
-      /* ===== DELETE (SOFT DELETE) ===== */
-      .addCase(deleteUser.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(deleteUser.fulfilled, (state, action) => {
-        const user = state.users.find((u) => u.id === action.payload);
-        if (user) {
-          user.status = "Deleted";
-        }
-        state.loading = false;
-      })
-      .addCase(deleteUser.rejected, (state, action) => {
+      .addCase(getAllRoles.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
   },
 });
 
-export const selectUsers = (state: RootState) => state.user.users;
-export const selectUserLoading = (state: RootState) => state.user.loading;
+export const selectRoles = (state: RootState) => state.role.roles;
+export const selectRoleLoading = (state: RootState) => state.role.loading;
 
-export default userSlice.reducer;
+export default roleSlice.reducer;

@@ -49,8 +49,6 @@ export const slice = createSlice({
     logout: (state) => {
       state.infoLogin = initialState.infoLogin;
       state.isLogin = false;
-      // ✅ Xóa token khỏi localStorage khi logout
-      localStorage.removeItem("token");
     },
   },
   extraReducers: (builder) => {
@@ -66,21 +64,11 @@ export const slice = createSlice({
           expiresTime: decodedToken["exp"],
         };
         state.isLogin = true;
-
-        // ✅ LƯU TOKEN VÀO LOCALSTORAGE
-        localStorage.setItem("token", token);
-
-        // ✅ DEBUG LOG
-        console.log("✅ Token saved to localStorage:", token.substring(0, 50) + "...");
-        console.log("👤 User role:", decodedToken["role"]);
-        console.log("🆔 User ID:", decodedToken["nameid"]);
       }
     })
       .addCase(actionLogin.rejected, (state) => {
         state.infoLogin = initialState.infoLogin;
         state.isLogin = false;
-        // ✅ Xóa token khi login thất bại
-        localStorage.removeItem("token");
       });
   }
 })

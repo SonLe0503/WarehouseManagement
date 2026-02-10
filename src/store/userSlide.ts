@@ -43,7 +43,6 @@ export const getAllUsers = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
       const token = state.auth.infoLogin?.accessToken;
       const res = await request({
         url: `/user`,
@@ -64,7 +63,6 @@ export const createUser = createAsyncThunk(
   async (data: CreateUserDTO, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
       const token = state.auth.infoLogin?.accessToken;
       const res = await request({
         url: "/user",
@@ -89,7 +87,6 @@ export const updateUser = createAsyncThunk(
   ) => {
     try {
       const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
       const token = state.auth.infoLogin?.accessToken;
       await request({
         url: `/user/${id}`,
@@ -111,7 +108,6 @@ export const deleteUser = createAsyncThunk(
   async (id: number, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      // ✅ SỬA: Lấy từ accessToken thay vì token
       const token = state.auth.infoLogin?.accessToken;
       await request({
         url: `/user/${id}`,

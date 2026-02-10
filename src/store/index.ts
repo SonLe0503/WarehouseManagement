@@ -15,9 +15,9 @@ const persistConfig = {
 };
 
 const reducers = {
-    auth: persistReducer(persistConfig, authSlide),
-    user: userSlide,
-    role: roleSlide,
+  auth: persistReducer(persistConfig, authSlide),
+  user: userSlide,
+  role: roleSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
