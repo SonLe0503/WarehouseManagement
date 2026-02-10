@@ -15,6 +15,19 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
 
+    const onFinish = async (values: any) => {
+        try {
+            const res: any = await dispathch(actionLogin(values));
+            if (actionLogin.fulfilled.match(res)) {
+                message.success("Đăng nhập thành công!");
+            } else {
+                message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+            }
+        } catch (error: any) {
+            message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+        }
+    }
+
     useEffect(() => {
         if (infoLogin?.accessToken) {
             const role = infoLogin.role;
@@ -37,19 +50,6 @@ const LoginPage = () => {
             }
         }
     }, [infoLogin, navigate]);
-
-    const onFinish = async (values: any) => {
-        try {
-            const res: any = await dispathch(actionLogin(values));
-            if (actionLogin.fulfilled.match(res)) {
-                message.success("Đăng nhập thành công!");
-            } else {
-                message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
-            }
-        } catch (error: any) {
-            message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
-        }
-    }
 
     return (
         <>

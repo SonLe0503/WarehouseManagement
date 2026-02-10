@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../../../store";
 import { deleteCategory, getAllCategories, selectCategories, type ICategory } from "../../../store/categorySlide";
 import AddCategoryModal from "../../components/modal/AddCategoryModal";
 import EditCategoryModal from "../../components/modal/EditCategoryModal";
+import Condition from "./Condition";
 
 const ManageCategory = () => {
     const dispatch = useAppDispatch();
@@ -11,6 +12,7 @@ const ManageCategory = () => {
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState<ICategory | undefined>(undefined);
+    const [searchName, setSearchName] = useState("");
 
     useEffect(() => {
         dispatch(getAllCategories());
@@ -29,6 +31,12 @@ const ManageCategory = () => {
         flatten(categories);
         return result;
     }, [categories]);
+
+    const filteredCategories = useMemo(() => {
+        return flattenedCategories.filter(cat =>
+            cat.name.toLowerCase().includes(searchName.toLowerCase())
+        );
+    }, [flattenedCategories, searchName]);
 
 
     const getParentName = (parentId?: number | null) => {
@@ -63,6 +71,10 @@ const ManageCategory = () => {
 
     return (
         <div className="p-2">
+            <Condition
+                searchName={searchName}
+                setSearchName={setSearchName}
+            />
             <h2 className="text-xl font-bold mb-4">Quản lý danh mục</h2>
             <div className="mb-4 flex justify-end">
                 <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
@@ -92,7 +104,7 @@ const ManageCategory = () => {
                     <div className="px-3 py-2">Hành động</div>
                 </div>
 
-                {flattenedCategories.map((cat: ICategory & { level: number }) => (
+                {filteredCategories.map((cat: ICategory & { level: number }) => (
                     <div
                         key={cat.id}
                         className="grid grid-cols-4 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
@@ -124,7 +136,7 @@ const ManageCategory = () => {
                         </div>
                     </div>
                 ))}
-                {flattenedCategories.length === 0 && (
+                {filteredCategories.length === 0 && (
                     <div className="p-4 text-center text-gray-400">Không có dữ liệu</div>
                 )}
             </div>

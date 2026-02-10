@@ -10,5 +10,6 @@ const URL = {
     DashboardSale: '/dashboard-sale',
     ManageProduct: '/admin/manage-product',
     ManageCategory: '/admin/manage-category',
+    ManageUnit: '/admin/manage-unit',
 }
 export default URL;

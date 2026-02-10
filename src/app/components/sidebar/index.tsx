@@ -38,6 +38,10 @@ const Sidebar = () => {
                         key: URL.ManageProduct,
                         label: "Sản phẩm",
                     },
+                    {
+                        key: URL.ManageUnit,
+                        label: "Đơn vị tính",
+                    },
                 ],
             },
         ],
