@@ -4,6 +4,7 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     UserOutlined,
+    FileTextOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -25,6 +26,7 @@ const Sidebar = () => {
         ADMIN: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
         ],
         MANAGER: [{ key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         STAFF: [{ key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" }],
