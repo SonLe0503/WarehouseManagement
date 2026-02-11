@@ -5,6 +5,7 @@ import { Navigate, Route, Routes } from "react-router-dom"
 import DashboardLayout from "../layouts/DashboardLayout"
 import PrivateLayout from "../layouts/PrivateLayout"
 import ManagePurchaseRequest from "../app/pages/purchase"
+import CreatePurchaseRequest from "../app/pages/purchase/create"
 
 
 const Login = lazy(() => import("../app/pages/login"))
@@ -68,6 +69,7 @@ export default function Routers() {
         <Routes>
             <Route path="/" element={<Navigate to={URL.Login} replace />} />
             <Route path="purchase" element={<ManagePurchaseRequest />} />
+            <Route path="/purchase/create" element={<CreatePurchaseRequest />} />
             {menus.map((menu: any) => {
                 let element = menu.element;
                 element = <Suspense fallback={null}>{element}</Suspense>;
