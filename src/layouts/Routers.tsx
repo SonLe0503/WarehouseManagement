@@ -17,6 +17,8 @@ const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
+const InboundRequest = lazy(() => import("../app/pages/purchase"))
+const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
 
 const shareResourceItem = [
     {
@@ -80,7 +82,19 @@ const privateResourceItem = [
         element: <ManageUnit />,
         layout: DASHBOARD_LAYOUT,
         private: true,
-    }
+    },
+    {
+        key: URL.InboundRequest,
+        element: <InboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CreatePurchaseRequest,
+        element: <CreatePurchaseRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
 ]
 const menus = [...shareResourceItem, ...privateResourceItem]
 

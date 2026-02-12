@@ -38,12 +38,16 @@ const initialState: InboundState = {
 export const getMyInboundRequests = createAsyncThunk(
     "inbound/get-my-requests",
     async (_, { rejectWithValue, getState }) => {
-
         try {
-            const state: any = getState();
-            const token = state.auth.infoLogin?.token;
+            const state = getState() as RootState;
+            const token = state.auth.infoLogin?.accessToken;
+
+            if (!token) {
+                return rejectWithValue("No authentication token found");
+            }
+
             const res = await request({
-                url: `inbound-requests/my`,
+                url: `/inbound-requests/my`,
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -54,18 +58,21 @@ export const getMyInboundRequests = createAsyncThunk(
             return rejectWithValue(err.response?.data || err.message);
         }
     }
-
 );
 
 export const createInboundRequest = createAsyncThunk(
     "inbound/create-request",
     async (data: InboundRequestCreateDTO, { rejectWithValue, getState }) => {
-
         try {
-            const state: any = getState();
-            const token = state.auth.infoLogin?.token;
+            const state = getState() as RootState;
+            const token = state.auth.infoLogin?.accessToken;
+
+            if (!token) {
+                return rejectWithValue("No authentication token found");
+            }
+
             const res = await request({
-                url: `inbound-requests`,
+                url: `/inbound-requests`,
                 method: "POST",
                 data,
                 headers: {
@@ -73,12 +80,10 @@ export const createInboundRequest = createAsyncThunk(
                 },
             });
             return res.data;
-
         } catch (err: any) {
             return rejectWithValue(err.response?.data || err.message);
         }
     }
-
 );
 
 const inboundSlice = createSlice({
@@ -87,12 +92,24 @@ const inboundSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            .addCase(getMyInboundRequests.pending, (state) => { state.loading = true; })
+            .addCase(getMyInboundRequests.pending, (state) => {
+                state.loading = true;
+            })
             .addCase(getMyInboundRequests.fulfilled, (state, action) => {
                 state.requests = action.payload;
                 state.loading = false;
             })
             .addCase(getMyInboundRequests.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(createInboundRequest.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(createInboundRequest.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(createInboundRequest.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

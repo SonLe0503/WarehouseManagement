@@ -1,204 +1,100 @@
-import { Button, Form, Input, InputNumber, Select, Space, message, Card, Spin } from "antd";
-import { MinusCircleOutlined, PlusOutlined, LeftOutlined } from "@ant-design/icons";
-import axios from "axios";
+import { Button, Form, Input, InputNumber, Select, message, Card, Spin, Divider } from "antd";
+import { PlusOutlined, DeleteOutlined, LeftOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppSelector } from "../../../store";
-import { selectInfoLogin } from "../../../store/authSlide";
-
-const { Option } = Select;
+import { useAppDispatch, useAppSelector } from "../../../store";
+import { createInboundRequest } from "../../../store/inboundSlice";
+import { getAllProducts, selectProducts } from "../../../store/productSlice";
+import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
+import type { DividerProps } from 'antd';
 
 const CreatePurchaseRequest = () => {
     const [form] = Form.useForm();
-    const [loading, setLoading] = useState(false);
-    const [fetching, setFetching] = useState(true);
-    const [products, setProducts] = useState<any[]>([]);
-    const [warehouses, setWarehouses] = useState<any[]>([]);
     const navigate = useNavigate();
-    const infoLogin = useAppSelector(selectInfoLogin);
+    const dispatch = useAppDispatch();
+
+    const products = useAppSelector(selectProducts);
+    const warehouses = useAppSelector(selectWarehouses);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        const fetchData = async () => {
-            const token = infoLogin?.accessToken;
-            if (!token) return;
-
-            try {
-                setFetching(true);
-
-                const [prodRes, whRes] = await Promise.all([
-                    axios.get("https://localhost:7069/api/Product", {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }),
-                    axios.get("https://localhost:7069/api/Warehouse", {
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
-                ]);
-
-                setProducts(prodRes.data);
-                setWarehouses(whRes.data || []);
-            } catch (error) {
-                message.error("Lỗi khi tải dữ liệu khởi tạo");
-                console.error(error);
-            } finally {
-                setFetching(false);
-            }
-        };
-        fetchData();
-    }, [infoLogin]);
+        dispatch(getAllProducts());
+        dispatch(getActiveWarehouses());
+    }, [dispatch]);
 
     const onFinish = async (values: any) => {
-        const token = infoLogin?.accessToken;
         setLoading(true);
         try {
-            const payload = {
-                supplierName: values.supplierName,
-                warehouseId: values.warehouseId,
-                note: values.note,
-                items: values.items.map((item: any) => ({
-                    productId: item.productId,
-                    quantity: item.quantity,
-                    storagePosition: item.storagePosition,
-                    lineNote: item.lineNote
-                }))
-            };
-
-            await axios.post(
-                "https://localhost:7069/api/PurchaseStaff/create",
-                payload,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
+            await dispatch(createInboundRequest(values)).unwrap();
             message.success("Tạo phiếu nhập hàng thành công!");
             navigate("/purchase-management");
         } catch (error: any) {
-            message.error(error.response?.data?.Message || "Không thể tạo phiếu");
+            message.error(error || "Không thể tạo phiếu");
         } finally {
             setLoading(false);
         }
     };
 
-    if (fetching) return <div className="p-10 text-center"><Spin size="large" /></div>;
-
     return (
         <div className="p-6">
-            <Button icon={<LeftOutlined />} onClick={() => navigate(-1)} className="mb-4">
-                Quay lại
-            </Button>
+            <Button icon={<LeftOutlined />} onClick={() => navigate(-1)} className="mb-4">Quay lại</Button>
 
-            <Card title="TẠO PHIẾU YÊU CẦU NHẬP HÀNG (PURCHASE STAFF)">
-                <Form
-                    form={form}
-                    layout="vertical"
-                    onFinish={onFinish}
-                    initialValues={{ items: [{}] }}
-                >
+            <Card title={<span className="text-blue-700">TẠO PHIẾU YÊU CẦU NHẬP HÀNG</span>}>
+                <Form form={form} layout="vertical" onFinish={onFinish} initialValues={{ items: [{}] }}>
                     <div className="grid grid-cols-3 gap-4">
-                        <Form.Item
-                            label="Nhà cung cấp"
-                            name="supplierName"
-                            rules={[{ required: true, message: "Vui lòng nhập tên nhà cung cấp" }]}
-                        >
-                            <Input placeholder="Tên công ty ABC..." />
+                        <Form.Item label="Nhà cung cấp" name="supplierName" rules={[{ required: true }]}>
+                            <Input placeholder="Tên công ty..." />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Kho nhập"
-                            name="warehouseId"
-                            rules={[{ required: true, message: "Vui lòng chọn kho" }]}
-                        >
-                            <Select placeholder="Chọn kho nhận hàng">
+                        <Form.Item label="Kho nhập" name="warehouseId" rules={[{ required: true }]}>
+                            <Select placeholder="Chọn kho">
                                 {warehouses.map(wh => (
-                                    <Option key={wh.id} value={wh.id}>{wh.name} ({wh.code})</Option>
+                                    <Select.Option key={wh.id} value={wh.id}>{wh.name}</Select.Option>
                                 ))}
                             </Select>
                         </Form.Item>
 
                         <Form.Item label="Ghi chú chung" name="note">
-                            <Input placeholder="Ghi chú cho cả phiếu nhập" />
+                            <Input placeholder="Ghi chú chung..." />
                         </Form.Item>
                     </div>
 
-                    <h3 className="text-lg font-medium mb-4 border-b pb-2">Danh sách sản phẩm</h3>
-
+                    <Divider plain>Danh sách sản phẩm</Divider>
 
                     <Form.List name="items">
                         {(fields, { add, remove }) => (
                             <>
                                 {fields.map(({ key, name, ...restField }) => (
-                                    <div key={key} className="flex flex-wrap gap-4 items-end bg-gray-50 p-4 mb-4 rounded border border-dashed">
-                                        <Form.Item
-                                            {...restField}
-                                            label="Sản phẩm"
-                                            name={[name, "productId"]}
-                                            rules={[{ required: true, message: "Chọn sản phẩm" }]}
-                                            style={{ width: 350, marginBottom: 0 }}
-                                        >
-                                            <Select
-                                                showSearch
-                                                placeholder="Tìm theo mã SKU hoặc tên"
-                                                optionFilterProp="children"
-                                            >
+                                    <div key={key} className="flex gap-4 items-end bg-gray-50 p-4 mb-4 rounded border border-dashed">
+                                        <Form.Item {...restField} label="Sản phẩm" name={[name, "productId"]} rules={[{ required: true }]} className="flex-1">
+                                            <Select showSearch optionFilterProp="label">
                                                 {products.map(p => (
-                                                    <Option key={p.id} value={p.id}>
-                                                        <span className="font-bold text-blue-600">[{p.sku}]</span> {p.name}
-                                                    </Option>
+                                                    <Select.Option key={p.id} value={p.id} label={`${p.sku} ${p.name}`}>
+                                                        <span className="font-bold">[{p.sku}]</span> {p.name}
+                                                    </Select.Option>
                                                 ))}
                                             </Select>
                                         </Form.Item>
 
-                                        <Form.Item
-                                            {...restField}
-                                            label="Số lượng"
-                                            name={[name, "quantity"]}
-                                            rules={[{ required: true, message: "Nhập số lượng" }]}
-                                            style={{ marginBottom: 0 }}
-                                        >
-                                            <InputNumber min={1} placeholder="SL" />
+                                        <Form.Item {...restField} label="Số lượng" name={[name, "quantity"]} rules={[{ required: true }]}>
+                                            <InputNumber min={1} className="w-full" />
                                         </Form.Item>
 
-                                        <Form.Item
-                                            {...restField}
-                                            label="Vị trí (Gợi ý)"
-                                            name={[name, "storagePosition"]}
-                                            style={{ marginBottom: 0 }}
-                                        >
-                                            <Input placeholder="Ví dụ: A1-01" />
+                                        <Form.Item {...restField} label="Ghi chú dòng" name={[name, "lineNote"]} className="flex-1">
+                                            <Input placeholder="Ghi chú..." />
                                         </Form.Item>
 
-                                        <Form.Item
-                                            {...restField}
-                                            label="Ghi chú dòng"
-                                            name={[name, "lineNote"]}
-                                            style={{ marginBottom: 0, flex: 1 }}
-                                        >
-                                            <Input placeholder="Hàng dễ vỡ, giao gấp..." />
-                                        </Form.Item>
-
-                                        {fields.length > 1 && (
-                                            <Button
-                                                type="text"
-                                                danger
-                                                icon={<MinusCircleOutlined />}
-                                                onClick={() => remove(name)}
-                                                className="mb-1"
-                                            />
-                                        )}
+                                        {fields.length > 1 && <Button type="text" danger icon={<DeleteOutlined />} onClick={() => remove(name)} className="mb-1" />}
                                     </div>
                                 ))}
-                                <Form.Item>
-                                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                                        Thêm dòng sản phẩm mới
-                                    </Button>
-                                </Form.Item>
+                                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>Thêm sản phẩm</Button>
                             </>
                         )}
                     </Form.List>
 
-                    <Form.Item className="mt-8">
-                        <Button type="primary" htmlType="submit" loading={loading} size="large" block style={{ height: '50px', fontSize: '18px' }}>
-                            TẠO & GỬI PHIẾU CHỜ DUYỆT
-                        </Button>
-                    </Form.Item>
+                    <Button type="primary" htmlType="submit" loading={loading} block size="large" className="mt-6 h-12 text-lg">
+                        GỬI PHIẾU CHỜ DUYỆT
+                    </Button>
                 </Form>
             </Card>
         </div>

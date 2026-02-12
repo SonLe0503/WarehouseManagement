@@ -9,6 +9,7 @@ import categorySlide from "./categorySlide";
 import unitSlide from "./unitSlide";
 import productSlide from "./productSlice";
 import inboundSlide from "./inboundSlice";
+import warehouseSlide from "./warehouseslide";
 
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
@@ -27,6 +28,7 @@ const reducers = {
   unit: unitSlide,
   product: productSlide,
   inbound: inboundSlide,
+  warehouse: warehouseSlide,
 
 }
 const rootReducer = combineReducers(reducers);
