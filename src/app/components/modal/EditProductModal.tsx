@@ -94,7 +94,7 @@ const EditProductModal = (props: EditProductModalProps) => {
                 >
                     <TreeSelect
                         style={{ width: '100%' }}
-                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
                         placeholder="Chọn danh mục"
                         allowClear
                         treeDataSimpleMode
