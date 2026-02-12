@@ -7,13 +7,18 @@ import { PersistGate } from 'redux-persist/integration/react'
 import { Provider } from 'react-redux'
 import { persistor, store } from './store'
 
+import { ConfigProvider } from 'antd'
+import theme from './styles/theme'
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <Routers />
-        </BrowserRouter>
+        <ConfigProvider theme={theme}>
+          <BrowserRouter>
+            <Routers />
+          </BrowserRouter>
+        </ConfigProvider>
       </PersistGate>
     </Provider>
   </StrictMode>,

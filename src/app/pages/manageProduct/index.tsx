@@ -1,4 +1,4 @@
-import { Button, Tag, Modal, message } from "antd";
+import { Button, Tag, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { deleteProduct, getAllProducts, selectProducts, type IProduct } from "../../../store/productSlice";
@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import Condition from "./Condition";
 import AddProductModal from "../../components/modal/AddProductModal";
 import EditProductModal from "../../components/modal/EditProductModal";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageProduct = () => {
     const dispatch = useAppDispatch();
@@ -64,9 +66,7 @@ const ManageProduct = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý sản phẩm</h2>
             <div className="mb-4 flex justify-end">
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Thêm sản phẩm
-                </Button>
+                <ButtonAdd onClick={() => setIsAddModalOpen(true)} />
             </div>
 
             <AddProductModal
@@ -101,7 +101,7 @@ const ManageProduct = () => {
                             className="grid grid-cols-7 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
                         >
                             <div className="px-3 py-2 font-medium">{p.sku}</div>
-                            <div className="px-3 py-2 text-left px-4">{p.name}</div>
+                            <div className="px-3 py-2">{p.name}</div>
                             <div className="px-3 py-2">{p.categoryName}</div>
                             <div className="px-3 py-2">
                                 <Tag color="blue">{p.baseUnitCode}</Tag>
@@ -117,21 +117,24 @@ const ManageProduct = () => {
                                 {dayjs(p.createdAt).format("DD/MM/YYYY")}
                             </div>
                             <div className="px-3 py-2 flex gap-2 justify-center">
-                                <Button
-                                    className="!bg-blue-500 !text-white px-3 py-1 rounded"
-                                    onClick={() => handleEdit(p)}
-                                    size="small"
-                                >
-                                    Sửa
-                                </Button>
-                                <Button
-                                    className="!bg-red-500 !text-white px-3 py-1 rounded"
-                                    onClick={() => handleDelete(p.id)}
-                                    size="small"
-                                    disabled={p.status === "INACTIVE"}
-                                >
-                                    Xóa
-                                </Button>
+                                <Tooltip title="Sửa">
+                                    <Button
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                        onClick={() => handleEdit(p)}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Xóa">
+                                    <Button
+                                        danger
+                                        type="primary"
+                                        icon={<DeleteOutlined />}
+                                        onClick={() => handleDelete(p.id)}
+                                        disabled={p.status === "INACTIVE"}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
                             </div>
                         </div>
                     ))

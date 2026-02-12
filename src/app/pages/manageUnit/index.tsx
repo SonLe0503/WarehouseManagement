@@ -1,4 +1,4 @@
-import { Button, Tag, Modal, message } from "antd";
+import { Button, Tag, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { deleteUnit, getAllUnits, selectUnits, type IUnit } from "../../../store/unitSlide";
@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import Condition from "./Condition";
 import AddUnitModal from "../../components/modal/AddUnitModal";
 import EditUnitModal from "../../components/modal/EditUnitModal";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageUnit = () => {
     const dispatch = useAppDispatch();
@@ -64,9 +66,7 @@ const ManageUnit = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý đơn vị tính</h2>
             <div className="mb-4 flex justify-end">
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Thêm mới
-                </Button>
+                <ButtonAdd onClick={() => setIsAddModalOpen(true)} />
             </div>
 
             <AddUnitModal
@@ -101,7 +101,7 @@ const ManageUnit = () => {
                         >
                             <div className="px-3 py-2 font-medium">{u.code}</div>
                             <div className="px-3 py-2">{u.name}</div>
-                            <div className="px-3 py-2 truncate text-gray-500 italic">
+                            <div className="px-3 py-2 truncate text-gray-500">
                                 {u.description || "—"}
                             </div>
                             <div className="px-3 py-2 flex justify-center items-center">
@@ -115,20 +115,23 @@ const ManageUnit = () => {
                                 {dayjs(u.createdAt).format("DD/MM/YYYY")}
                             </div>
                             <div className="px-3 py-2 flex gap-2 justify-center">
-                                <Button
-                                    className="!bg-blue-500 !text-white px-3 py-1 rounded"
-                                    onClick={() => handleEdit(u.id)}
-                                    size="small"
-                                >
-                                    Sửa
-                                </Button>
-                                <Button
-                                    className="!bg-red-500 !text-white px-3 py-1 rounded"
-                                    onClick={() => handleDelete(u.id)}
-                                    size="small"
-                                >
-                                    Xóa
-                                </Button>
+                                <Tooltip title="Sửa">
+                                    <Button
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                        onClick={() => handleEdit(u.id)}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Xóa">
+                                    <Button
+                                        danger
+                                        type="primary"
+                                        icon={<DeleteOutlined />}
+                                        onClick={() => handleDelete(u.id)}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
                             </div>
                         </div>
                     ))
