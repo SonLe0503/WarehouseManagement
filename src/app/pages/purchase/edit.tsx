@@ -1,60 +1,113 @@
-// pages/purchase/create.tsx
-import { Button, Form, Input, InputNumber, Select, message, Card, Divider } from "antd";
+// pages/purchase/edit.tsx
+import { Button, Form, Input, InputNumber, Select, Card, Spin, Divider, message } from "antd";
 import { PlusOutlined, DeleteOutlined, LeftOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { createInboundRequest } from "../../../store/inboundSlice";
+import { getInboundRequestById, updateInboundRequest, selectCurrentRequest, selectInboundLoading, clearCurrentRequest } from "../../../store/inboundSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
+import URL from "../../../constants/url";
 
-const CreatePurchaseRequest = () => {
+const EditInboundRequest = () => {
+    const [searchParams] = useSearchParams();
+    const id = searchParams.get('id');
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
+    const request = useAppSelector(selectCurrentRequest);
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
-    const [loading, setLoading] = useState(false);
+    const loading = useAppSelector(selectInboundLoading);
+    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         dispatch(getAllProducts());
         dispatch(getActiveWarehouses());
-    }, [dispatch]);
+        if (id) {
+            dispatch(getInboundRequestById(parseInt(id)));
+        }
+        return () => {
+            dispatch(clearCurrentRequest());
+        };
+    }, [dispatch, id]);
+
+    useEffect(() => {
+        if (request) {
+            form.setFieldsValue({
+                supplierName: request.supplierName,
+                warehouseId: request.warehouseId,
+                note: request.note,
+                items: request.items?.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    lineNote: item.lineNote,
+                })) || [{}],
+            });
+        }
+    }, [request, form]);
 
     const onFinish = async (values: any) => {
-        setLoading(true);
+        if (!id) return;
+        setSubmitting(true);
         try {
-            await dispatch(createInboundRequest(values)).unwrap();
-            message.success("Tạo phiếu nhập hàng thành công!");
-            navigate("/purchase-management");
+            await dispatch(updateInboundRequest({ id: parseInt(id), data: values })).unwrap();
+            message.success("Cập nhật phiếu nhập hàng thành công!");
+            navigate(URL.InboundRequest);
         } catch (error: any) {
-            message.error(error || "Không thể tạo phiếu");
+            message.error(error || "Không thể cập nhật phiếu");
         } finally {
-            setLoading(false);
+            setSubmitting(false);
         }
     };
+
+    if (loading && !request) {
+        return (
+            <div className="p-6 flex justify-center items-center h-96">
+                <Spin size="large" />
+            </div>
+        );
+    }
+
+    if (!request && !loading) {
+        return (
+            <div className="p-6">
+                <Card>
+                    <p>Không tìm thấy phiếu nhập hàng</p>
+                    <Button onClick={() => navigate(-1)} className="mt-4">Quay lại</Button>
+                </Card>
+            </div>
+        );
+    }
+
+    if (!request) {
+        return null;
+    }
+
+    if (request.status !== "Pending") {
+        return (
+            <div className="p-6">
+                <Card>
+                    <p>Không thể chỉnh sửa phiếu đã được duyệt hoặc hoàn thành</p>
+                    <Button onClick={() => navigate(-1)} className="mt-4">Quay lại</Button>
+                </Card>
+            </div>
+        );
+    }
 
     return (
         <div className="p-6">
             <Button icon={<LeftOutlined />} onClick={() => navigate(-1)} className="mb-4">Quay lại</Button>
 
-            <Card title={<span className="text-blue-700">TẠO PHIẾU YÊU CẦU NHẬP HÀNG</span>}>
-                <Form form={form} layout="vertical" onFinish={onFinish} initialValues={{ items: [{}] }}>
+            <Card title={<span className="text-blue-700">CHỈNH SỬA PHIẾU NHẬP HÀNG</span>}>
+                <Form form={form} layout="vertical" onFinish={onFinish}>
                     <div className="grid grid-cols-3 gap-4">
-                        <Form.Item
-                            label="Nhà cung cấp"
-                            name="supplierName"
-                            rules={[{ required: true, message: "Vui lòng nhập tên nhà cung cấp" }]}
-                        >
+                        <Form.Item label="Nhà cung cấp" name="supplierName" rules={[{ required: true, message: "Vui lòng nhập tên nhà cung cấp" }]}>
                             <Input placeholder="Tên công ty..." />
                         </Form.Item>
 
-                        <Form.Item
-                            label="Kho nhập"
-                            name="warehouseId"
-                            rules={[{ required: true, message: "Vui lòng chọn kho" }]}
-                        >
+                        <Form.Item label="Kho nhập" name="warehouseId" rules={[{ required: true, message: "Vui lòng chọn kho" }]}>
                             <Select placeholder="Chọn kho">
                                 {warehouses.map(wh => (
                                     <Select.Option key={wh.id} value={wh.id}>{wh.name}</Select.Option>
@@ -138,8 +191,8 @@ const CreatePurchaseRequest = () => {
                         )}
                     </Form.List>
 
-                    <Button type="primary" htmlType="submit" loading={loading} block size="large" className="mt-6 h-12 text-lg">
-                        GỬI PHIẾU CHỜ DUYỆT
+                    <Button type="primary" htmlType="submit" loading={submitting} block size="large" className="mt-6 h-12 text-lg">
+                        CẬP NHẬT PHIẾU
                     </Button>
                 </Form>
             </Card>
@@ -147,4 +200,4 @@ const CreatePurchaseRequest = () => {
     );
 };
 
-export default CreatePurchaseRequest;
+export default EditInboundRequest;

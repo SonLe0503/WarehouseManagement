@@ -1,4 +1,5 @@
-import { Modal, Form, Input, Select, Button, InputNumber, Divider, message } from "antd";
+// components/modal/AddInboundModal.tsx
+import { Modal, Form, Input, Select, Button, InputNumber, Divider, App } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
@@ -13,9 +14,9 @@ interface AddInboundModalProps {
 
 const AddInboundModal = (props: AddInboundModalProps) => {
     const { open, onClose } = props;
+    const { message } = App.useApp();
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
-
 
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
@@ -33,7 +34,6 @@ const AddInboundModal = (props: AddInboundModalProps) => {
             const values = await form.validateFields();
             setLoading(true);
 
-
             await dispatch(createInboundRequest(values)).unwrap();
 
             message.success("Tạo phiếu nhập kho thành công");
@@ -50,7 +50,10 @@ const AddInboundModal = (props: AddInboundModalProps) => {
         <Modal
             title="Tạo yêu cầu nhập kho"
             open={open}
-            onCancel={() => { form.resetFields(); onClose(); }}
+            onCancel={() => {
+                form.resetFields();
+                onClose();
+            }}
             onOk={handleSubmit}
             confirmLoading={loading}
             width={900}

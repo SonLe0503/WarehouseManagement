@@ -13,5 +13,7 @@ const URL = {
     ManageUnit: '/admin/manage-unit',
     CreatePurchaseRequest: '/purchase/create',
     InboundRequest: '/purchase',
+    ViewInboundRequest: '/purchase/view',
+    EditInboundRequest: '/purchase/edit',
 }
 export default URL;
