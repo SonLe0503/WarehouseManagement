@@ -19,6 +19,7 @@ const { Sider } = Layout;
 const Sidebar = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     const role = infoLogin?.role;
+    console.log(role);
     const navigate = useNavigate();
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
@@ -38,7 +39,7 @@ const Sidebar = () => {
                 ],
             },
         ],
-        MANAGER: [
+        MANAGE: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
         ],
