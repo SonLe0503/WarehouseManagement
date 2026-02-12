@@ -1,4 +1,4 @@
-import { Button, Tag, Table } from "antd";
+import { Button, Tag, Table, Modal, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../../store"; // Adjust path if needed
@@ -6,7 +6,13 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import RequestDetailModal from "./RequestDetailModal";
-import { getInboundRequests, selectInboundRequests, selectInboundRequestLoading, type InboundRequest } from "../../../../store/inboundRequestSlide";
+import {
+    getInboundRequests,
+    approveRejectRequest,
+    selectInboundRequests,
+    selectInboundRequestLoading,
+    type InboundRequest
+} from "../../../../store/inboundRequestSlide";
 
 const ManageOrder = () => {
     const dispatch = useAppDispatch();
@@ -36,6 +42,23 @@ const ManageOrder = () => {
         setIsDetailModalOpen(true);
     };
 
+    const handleApproveReject = (id: number, action: "Approve" | "Reject") => {
+        Modal.confirm({
+            title: `Xác nhận ${action === "Approve" ? "Duyệt" : "Từ chối"}`,
+            content: `Bạn có chắc muốn ${action === "Approve" ? "duyệt" : "từ chối"} phiếu này không?`,
+            okText: "Đồng ý",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await dispatch(approveRejectRequest({ id, action })).unwrap();
+                    message.success(`${action === "Approve" ? "Duyệt" : "Từ chối"} phiếu thành công!`);
+                } catch (error: any) {
+                    message.error(error || "Có lỗi xảy ra");
+                }
+            }
+        });
+    };
+
     const columns: ColumnsType<InboundRequest> = [
         {
             title: "Request No",
@@ -56,6 +79,7 @@ const ManageOrder = () => {
                 let color = "blue";
                 if (status === "Approved") color = "green";
                 if (status === "Rejected") color = "red";
+                if (status === "Pending") color = "orange";
                 return <Tag color={color}>{status}</Tag>;
             }
         },
@@ -68,6 +92,7 @@ const ManageOrder = () => {
             title: "Approved By",
             dataIndex: "approvedBy",
             key: "approvedBy",
+            render: (text) => text || "—"
         },
         {
             title: "Approved At",
@@ -85,9 +110,29 @@ const ManageOrder = () => {
             title: "Action",
             key: "action",
             render: (_, record) => (
-                <Button size="small" type="default" onClick={() => handleViewDetail(record)}>
-                    View Detail
-                </Button>
+                <div className="flex gap-2">
+                    <Button size="small" type="default" onClick={() => handleViewDetail(record)}>
+                        Detail
+                    </Button>
+                    {record.status === "Pending" && (
+                        <>
+                            <Button
+                                size="small"
+                                className="!bg-green-500 !text-white hover:!bg-green-600"
+                                onClick={() => handleApproveReject(record.id, "Approve")}
+                            >
+                                Approve
+                            </Button>
+                            <Button
+                                size="small"
+                                className="!bg-red-500 !text-white hover:!bg-red-600"
+                                onClick={() => handleApproveReject(record.id, "Reject")}
+                            >
+                                Reject
+                            </Button>
+                        </>
+                    )}
+                </div>
             )
         }
     ];

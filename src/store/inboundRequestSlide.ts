@@ -62,6 +62,32 @@ export const getInboundRequests = createAsyncThunk(
     }
 );
 
+// Async thunk để duyệt/từ chối Inbound Request
+export const approveRejectRequest = createAsyncThunk(
+    "inboundRequest/approve-reject",
+    async (
+        { id, action }: { id: number; action: "Approve" | "Reject" },
+        { rejectWithValue, getState }
+    ) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+
+            await request({
+                url: `/InboundRequest/${id}/approval`,
+                method: "POST",
+                data: { action },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { id, action };
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
 const inboundRequestSlice = createSlice({
     name: "inboundRequest",
     initialState,
@@ -77,6 +103,24 @@ const inboundRequestSlice = createSlice({
                 state.loading = false;
             })
             .addCase(getInboundRequests.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            /* ===== APPROVE / REJECT ===== */
+            .addCase(approveRejectRequest.pending, (state) => {
+                state.loading = true;
+                state.error = undefined;
+            })
+            .addCase(approveRejectRequest.fulfilled, (state, action) => {
+                state.loading = false;
+                const request = state.requests.find((r) => r.id === action.payload.id);
+                if (request) {
+                    request.status = action.payload.action === "Approve" ? "Approved" : "Rejected";
+                    request.approvedAt = new Date().toISOString();
+                }
+            })
+            .addCase(approveRejectRequest.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

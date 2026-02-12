@@ -26,10 +26,15 @@ const Sidebar = () => {
         ADMIN: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
         ],
-        MANAGER: [{ key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" }],
-        STAFF: [{ key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" }],
+        MANAGER: [
+            { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+        ],
+        STAFF: [
+            { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+        ],
         PURCHASE: [{ key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
     };
