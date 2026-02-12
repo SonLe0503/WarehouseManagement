@@ -1,14 +1,14 @@
-import { Button, Tag, Modal, message } from "antd";
+import { Button, Tag, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../store";
-import { deleteUser, getAllUsers, selectUsers, type IUser } from "../../../store/userSlide";
+import { activateUser, deactivateUser, getAllUsers, selectUsers, type IUser } from "../../../store/userSlide";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import AddUserModal from "../../components/modal/AddUserModal";
 import EditUserModal from "../../components/modal/EditUserModal";
-
-
+import { EditOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageUser = () => {
     const dispatch = useAppDispatch();
@@ -32,19 +32,27 @@ const ManageUser = () => {
         setSelectedUser(users.find((u) => u.id === user));
         setIsEditModalOpen(true);
     }
-    const handleDelete = (id: number) => {
+    const handleToggleStatus = (id: number, currentStatus: string) => {
+        const isActivating = currentStatus !== "Active";
         Modal.confirm({
-            title: "Xác nhận xóa tài khoản",
-            content: "Bạn có chắc chắn muốn xóa tài khoản này không? Hành động này không thể hoàn tác.",
-            okText: "Xóa",
-            okType: "danger",
+            title: isActivating ? "Xác nhận kích hoạt tài khoản" : "Xác nhận vô hiệu hóa tài khoản",
+            content: `Bạn có chắc chắn muốn ${isActivating ? "kích hoạt" : "vô hiệu hóa"} tài khoản này không?`,
+            okText: isActivating ? "Kích hoạt" : "Vô hiệu hóa",
+            okType: isActivating ? "primary" : "danger",
             cancelText: "Hủy",
             onOk: async () => {
                 try {
-                    await dispatch(deleteUser(id)).unwrap();
-                    message.success("Xóa tài khoản thành công");
+                    if (isActivating) {
+                        await dispatch(activateUser(id)).unwrap();
+                        message.success("Kích hoạt tài khoản thành công");
+                    } else {
+                        await dispatch(deactivateUser(id)).unwrap();
+                        message.success("Vô hiệu hóa tài khoản thành công");
+                    }
                 } catch (error: any) {
-                    message.error(error || "Có lỗi xảy ra khi xóa tài khoản");
+                    console.error("Toggle status error:", error);
+                    const errorMsg = typeof error === "string" ? error : (error?.message || error?.title || "Có lỗi xảy ra");
+                    message.error(errorMsg);
                 }
             },
         });
@@ -52,7 +60,6 @@ const ManageUser = () => {
     useEffect(() => {
         dispatch(getAllUsers());
     }, [dispatch]);
-    console.log(users);
     return (
         <div className="p-2">
             <Condition
@@ -64,9 +71,7 @@ const ManageUser = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý tài khoản</h2>
             <div className="mb-4 flex justify-end">
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Thêm mới
-                </Button>
+                <ButtonAdd onClick={() => setIsAddModalOpen(true)} />
             </div>
 
             <AddUserModal
@@ -99,39 +104,40 @@ const ManageUser = () => {
                     >
                         <div className="px-3 py-2 truncate">{u.username}</div>
                         <div className="px-3 py-2 truncate">{u.email ?? "—"}</div>
-                        <div className="px-3 py-2">
-                            {u.roles.map((role) => (
-                                <Tag key={role} color="blue">
+                        <div className="px-3 py-2 flex flex-wrap gap-1 justify-center items-center">
+                            {u.roles.map((role, idx) => (
+                                <Tag key={idx} color="blue">
                                     {role}
                                 </Tag>
                             ))}
                         </div>
                         <div className="px-3 py-2 flex justify-center items-center">
-                            {u.status === "ACTIVE" ? (
+                            {u.status === "Active" ? (
                                 <Tag color="green">Active</Tag>
                             ) : (
-                                <Tag color="red">Blocked</Tag>
+                                <Tag color="red">Inactive</Tag>
                             )}
                         </div>
                         <div className="px-3 py-2">
                             {dayjs(u.createdAt).format("DD/MM/YYYY")}
                         </div>
                         <div className="px-3 py-2 flex gap-2 justify-center">
-                            <Button
-                                className="!bg-blue-500 !text-white px-3 py-1 rounded"
-                                onClick={() => handleEdit(u.id)}
-                                size="small"
-                            >
-                                Edit
-                            </Button>
-                            <Button
-                                className={`${u.roles.some((role) => role.toUpperCase() === "ADMIN") ? "!bg-gray-300" : "!bg-red-500"} !text-white px-3 py-1 rounded`}
-                                onClick={() => handleDelete(u.id)}
-                                size="small"
-                                disabled={u.roles.some((role) => role.toUpperCase() === "ADMIN")}
-                            >
-                                Delete
-                            </Button>
+                            <Tooltip title="Sửa">
+                                <Button
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={() => handleEdit(u.id)}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
+                            <Tooltip title={u.status === "Active" ? "Vô hiệu" : "Kích hoạt"}>
+                                <Button
+                                    className={`${u.roles.some((role) => role.toUpperCase() === "ADMIN") ? "" : (u.status === "Active" ? "!bg-orange-500 hover:!bg-orange-400" : "!bg-green-500 hover:!bg-green-400")} !text-white !flex !items-center !justify-center`}
+                                    icon={u.status === "Active" ? <StopOutlined /> : <CheckCircleOutlined />}
+                                    onClick={() => handleToggleStatus(u.id, u.status)}
+                                    disabled={u.roles.some((role) => role.toUpperCase() === "ADMIN")}
+                                />
+                            </Tooltip>
                         </div>
                     </div>
                 ))}

@@ -3,7 +3,6 @@ import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import imgkho from "../../../assets/images/login.jpg";
 import { useAppDispatch } from "../../../store";
-// import { useSelector } from "react-redux";
 import { actionLogin } from "../../../store/authSlide";
 import URL from "../../../constants/url";
 import { EUserRole } from "../../../interface/app";
@@ -15,7 +14,19 @@ const LoginPage = () => {
     const dispathch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
-    console.log(infoLogin);
+
+    const onFinish = async (values: any) => {
+        try {
+            const res: any = await dispathch(actionLogin(values));
+            if (actionLogin.fulfilled.match(res)) {
+                message.success("Đăng nhập thành công!");
+            } else {
+                message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+            }
+        } catch (error: any) {
+            message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
+        }
+    }
 
     useEffect(() => {
         if (infoLogin?.accessToken) {
@@ -39,19 +50,6 @@ const LoginPage = () => {
             }
         }
     }, [infoLogin, navigate]);
-
-    const onFinish = async (values: any) => {
-        try {
-            const res: any = await dispathch(actionLogin(values));
-            if (actionLogin.fulfilled.match(res)) {
-                message.success("Đăng nhập thành công!");
-            } else {
-                message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
-            }
-        } catch (error: any) {
-            message.error("Đăng nhập thất bại! Vui lòng kiểm tra lại thông tin.");
-        }
-    }
 
     return (
         <>

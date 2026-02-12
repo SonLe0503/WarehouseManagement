@@ -14,14 +14,12 @@ export interface IUser {
 
 export interface CreateUserDTO {
   username: string;
-  password: string;
-  email?: string;
+  email: string;
   status?: string;
   roleIds?: number[];
 }
 
 export interface UpdateUserDTO {
-  username?: string;
   email?: string;
   status?: string;
   roleIds?: number[];
@@ -43,7 +41,7 @@ export const getAllUsers = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.token;
+      const token = state.auth.infoLogin?.accessToken;
       const res = await request({
         url: `/user`,
         method: "GET",
@@ -52,8 +50,8 @@ export const getAllUsers = createAsyncThunk(
         },
       })
       return res.data as IUser[];
-    } catch (err) {
-      return rejectWithValue(err);
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || err.message);
     }
   }
 );
@@ -63,7 +61,7 @@ export const createUser = createAsyncThunk(
   async (data: CreateUserDTO, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.token;
+      const token = state.auth.infoLogin?.accessToken;
       const res = await request({
         url: "/user",
         method: "POST",
@@ -87,7 +85,7 @@ export const updateUser = createAsyncThunk(
   ) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.token;
+      const token = state.auth.infoLogin?.accessToken;
       await request({
         url: `/user/${id}`,
         method: "PUT",
@@ -103,15 +101,35 @@ export const updateUser = createAsyncThunk(
   }
 );
 
-export const deleteUser = createAsyncThunk(
-  "user/delete-user",
+export const deactivateUser = createAsyncThunk(
+  "user/deactivate-user",
   async (id: number, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.token;
+      const token = state.auth.infoLogin?.accessToken;
       await request({
-        url: `/user/${id}`,
-        method: "DELETE",
+        url: `/user/deactivate/${id}`,
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return id;
+    } catch (err: any) {
+      return rejectWithValue(err.response?.data || err.message);
+    }
+  }
+);
+
+export const activateUser = createAsyncThunk(
+  "user/activate-user",
+  async (id: number, { rejectWithValue, getState }) => {
+    try {
+      const state: any = getState();
+      const token = state.auth.infoLogin?.accessToken;
+      await request({
+        url: `/user/activate/${id}`,
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -156,16 +174,7 @@ const userSlice = createSlice({
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
       })
-      .addCase(updateUser.fulfilled, (state, action) => {
-        const index = state.users.findIndex(
-          (u) => u.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.users[index] = {
-            ...state.users[index],
-            ...action.payload.data,
-          };
-        }
+      .addCase(updateUser.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(updateUser.rejected, (state, action) => {
@@ -174,17 +183,35 @@ const userSlice = createSlice({
       })
 
 
-      .addCase(deleteUser.pending, (state) => {
+      /* ===== DEACTIVATE ===== */
+      .addCase(deactivateUser.pending, (state) => {
+
         state.loading = true;
       })
-      .addCase(deleteUser.fulfilled, (state, action) => {
+      .addCase(deactivateUser.fulfilled, (state, action) => {
         const user = state.users.find((u) => u.id === action.payload);
         if (user) {
-          user.status = "Deleted";
+          user.status = "Inactive";
         }
         state.loading = false;
       })
-      .addCase(deleteUser.rejected, (state, action) => {
+      .addCase(deactivateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+
+      /* ===== ACTIVATE ===== */
+      .addCase(activateUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(activateUser.fulfilled, (state, action) => {
+        const user = state.users.find((u) => u.id === action.payload);
+        if (user) {
+          user.status = "Active";
+        }
+        state.loading = false;
+      })
+      .addCase(activateUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -14,6 +14,9 @@ const DashboardStaff = lazy(() => import("../app/pages/dashboard/DashboardStaff"
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
 const DashboardPurchase = lazy(() => import("../app/pages/dashboard/DashboardPurchase"))
 const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
+const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
+const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
+const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
 
 const shareResourceItem = [
     {
@@ -57,6 +60,24 @@ const privateResourceItem = [
     {
         key: URL.DashboardSale,
         element: <DashboardSale />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageCategory,
+        element: <ManageCategory />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageProduct,
+        element: <ManageProduct />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageUnit,
+        element: <ManageUnit />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     }
