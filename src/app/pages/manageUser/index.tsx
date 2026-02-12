@@ -1,4 +1,4 @@
-import { Button, Tag, Modal, message } from "antd";
+import { Button, Tag, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../store";
 import { activateUser, deactivateUser, getAllUsers, selectUsers, type IUser } from "../../../store/userSlide";
@@ -7,6 +7,8 @@ import dayjs from "dayjs";
 import Condition from "./Condition";
 import AddUserModal from "../../components/modal/AddUserModal";
 import EditUserModal from "../../components/modal/EditUserModal";
+import { EditOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/icons";
+import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageUser = () => {
     const dispatch = useAppDispatch();
@@ -69,9 +71,7 @@ const ManageUser = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý tài khoản</h2>
             <div className="mb-4 flex justify-end">
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Thêm mới
-                </Button>
+                <ButtonAdd onClick={() => setIsAddModalOpen(true)} />
             </div>
 
             <AddUserModal
@@ -104,7 +104,7 @@ const ManageUser = () => {
                     >
                         <div className="px-3 py-2 truncate">{u.username}</div>
                         <div className="px-3 py-2 truncate">{u.email ?? "—"}</div>
-                        <div className="px-3 py-2 flex flex-wrap gap-1 justify-center">
+                        <div className="px-3 py-2 flex flex-wrap gap-1 justify-center items-center">
                             {u.roles.map((role, idx) => (
                                 <Tag key={idx} color="blue">
                                     {role}
@@ -122,21 +122,22 @@ const ManageUser = () => {
                             {dayjs(u.createdAt).format("DD/MM/YYYY")}
                         </div>
                         <div className="px-3 py-2 flex gap-2 justify-center">
-                            <Button
-                                className="!bg-blue-500 !text-white px-3 py-1 rounded"
-                                onClick={() => handleEdit(u.id)}
-                                size="small"
-                            >
-                                Sửa
-                            </Button>
-                            <Button
-                                className={`${u.roles.some((role) => role.toUpperCase() === "ADMIN") ? "!bg-gray-300" : (u.status === "Active" ? "!bg-orange-500" : "!bg-green-500")} !text-white px-3 py-1 rounded`}
-                                onClick={() => handleToggleStatus(u.id, u.status)}
-                                size="small"
-                                disabled={u.roles.some((role) => role.toUpperCase() === "ADMIN")}
-                            >
-                                {u.status === "Active" ? "Vô hiệu" : "Kích hoạt"}
-                            </Button>
+                            <Tooltip title="Sửa">
+                                <Button
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={() => handleEdit(u.id)}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
+                            <Tooltip title={u.status === "Active" ? "Vô hiệu" : "Kích hoạt"}>
+                                <Button
+                                    className={`${u.roles.some((role) => role.toUpperCase() === "ADMIN") ? "" : (u.status === "Active" ? "!bg-orange-500 hover:!bg-orange-400" : "!bg-green-500 hover:!bg-green-400")} !text-white !flex !items-center !justify-center`}
+                                    icon={u.status === "Active" ? <StopOutlined /> : <CheckCircleOutlined />}
+                                    onClick={() => handleToggleStatus(u.id, u.status)}
+                                    disabled={u.roles.some((role) => role.toUpperCase() === "ADMIN")}
+                                />
+                            </Tooltip>
                         </div>
                     </div>
                 ))}
