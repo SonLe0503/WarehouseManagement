@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Select, message } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { updateUser } from "../../../store/userSlide";
+import { updateUser, getAllUsers } from "../../../store/userSlide";
 import { getAllRoles, selectRoles } from "../../../store/roleSlide";
 import type { IUser } from "../../../store/userSlide";
 
@@ -26,7 +26,7 @@ const EditUserModal = (props: EditUserModalProps) => {
 
     useEffect(() => {
         if (userData && open) {
-            // Map role names to role IDs
+            // Map role names from userData.roles back to IDs from the roles list
             const userRoleIds = userData.roles.map(roleName => {
                 const role = roles.find(r => r.name === roleName);
                 return role ? role.id : undefined;
@@ -36,7 +36,7 @@ const EditUserModal = (props: EditUserModalProps) => {
                 username: userData.username,
                 email: userData.email,
                 status: userData.status,
-                roleIds: userRoleIds.length > 0 ? userRoleIds[0] : undefined, // Assuming single role selection for now as per AddUserModal context
+                roleIds: userRoleIds,
             });
         }
     }, [userData, open, roles, form]);
@@ -49,17 +49,24 @@ const EditUserModal = (props: EditUserModalProps) => {
             setLoading(true);
             const payload = {
                 id: userData.id,
-                data: {
-                    ...values,
-                    roleIds: values.roleIds ? [values.roleIds] : [],
-                }
+                data: values
             };
 
             await dispatch(updateUser(payload)).unwrap();
             message.success("Cập nhật tài khoản thành công");
+            dispatch(getAllUsers());
             onClose();
         } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra khi cập nhật tài khoản");
+            console.error("Update user error:", error);
+            let errorMsg = "Có lỗi xảy ra khi cập nhật tài khoản";
+            if (typeof error === "string") {
+                errorMsg = error;
+            } else if (error?.errors) {
+                errorMsg = Object.values(error.errors).flat().join(", ");
+            } else if (error?.message || error?.title) {
+                errorMsg = error.message || error.title;
+            }
+            message.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -88,12 +95,8 @@ const EditUserModal = (props: EditUserModalProps) => {
                 <Form.Item
                     name="username"
                     label="Tên đăng nhập"
-                    rules={[
-                        { required: true, message: "Vui lòng nhập tên đăng nhập!" },
-                        { min: 4, message: "Tên đăng nhập phải có ít nhất 4 ký tự" }
-                    ]}
                 >
-                    <Input placeholder="Nhập tên đăng nhập" />
+                    <Input placeholder="Nhập tên đăng nhập" disabled />
                 </Form.Item>
 
                 <Form.Item
@@ -112,8 +115,8 @@ const EditUserModal = (props: EditUserModalProps) => {
                     label="Trạng thái"
                 >
                     <Select>
-                        <Select.Option value="ACTIVE">Active</Select.Option>
-                        <Select.Option value="BLOCKED">Blocked</Select.Option>
+                        <Select.Option value="Active">Active</Select.Option>
+                        <Select.Option value="Inactive">Inactive</Select.Option>
                     </Select>
                 </Form.Item>
 
@@ -125,6 +128,7 @@ const EditUserModal = (props: EditUserModalProps) => {
                     <Select
                         placeholder="Chọn vai trò"
                         allowClear
+                        mode="multiple"
                         disabled={userData?.roles.some((role) => role.toUpperCase() === "ADMIN")}
                     >
                         {roles.map((role) => (

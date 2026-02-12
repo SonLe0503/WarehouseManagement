@@ -28,8 +28,8 @@ const Condition = (props: ConditionProps) => {
                 onChange={handleChange}
                 options={[
                     { value: "", label: "Tất cả trạng thái" },
-                    { value: "ACTIVE", label: "Active" },
-                    { value: "BLOCKED", label: "Blocked" },
+                    { value: "Active", label: "Active" },
+                    { value: "Inactive", label: "Inactive" },
                 ]}
             />
         </div>
