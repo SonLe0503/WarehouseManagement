@@ -2,7 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
 
-// interface/user.ts
+
 export interface IUser {
   id: number;
   username: string;
@@ -43,7 +43,7 @@ export const getAllUsers = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.accessToken;
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: `/user`,
         method: "GET",
@@ -63,7 +63,7 @@ export const createUser = createAsyncThunk(
   async (data: CreateUserDTO, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.accessToken;
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: "/user",
         method: "POST",
@@ -87,7 +87,7 @@ export const updateUser = createAsyncThunk(
   ) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.accessToken;
+      const token = state.auth.infoLogin?.token;
       await request({
         url: `/user/${id}`,
         method: "PUT",
@@ -108,7 +108,7 @@ export const deleteUser = createAsyncThunk(
   async (id: number, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.accessToken;
+      const token = state.auth.infoLogin?.token;
       await request({
         url: `/user/${id}`,
         method: "DELETE",
@@ -152,7 +152,7 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      /* ===== UPDATE ===== */
+
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
       })
@@ -173,7 +173,7 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      /* ===== DELETE (SOFT DELETE) ===== */
+
       .addCase(deleteUser.pending, (state) => {
         state.loading = true;
       })

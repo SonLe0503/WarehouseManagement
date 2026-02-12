@@ -13,7 +13,7 @@ const CreatePurchaseRequest = () => {
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(true);
     const [products, setProducts] = useState<any[]>([]);
-    const [warehouses, setWarehouses] = useState<any[]>([]); // Thêm danh sách kho
+    const [warehouses, setWarehouses] = useState<any[]>([]);
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);
 
@@ -24,12 +24,12 @@ const CreatePurchaseRequest = () => {
 
             try {
                 setFetching(true);
-                // Lấy song song danh sách sản phẩm và kho
+
                 const [prodRes, whRes] = await Promise.all([
                     axios.get("https://localhost:7069/api/Product", {
                         headers: { Authorization: `Bearer ${token}` }
                     }),
-                    axios.get("https://localhost:7069/api/Warehouse", { // Giả sử bạn có endpoint này
+                    axios.get("https://localhost:7069/api/Warehouse", {
                         headers: { Authorization: `Bearer ${token}` }
                     })
                 ]);
@@ -52,12 +52,12 @@ const CreatePurchaseRequest = () => {
         try {
             const payload = {
                 supplierName: values.supplierName,
-                warehouseId: values.warehouseId, // Thêm theo yêu cầu thiết kế 4.3
+                warehouseId: values.warehouseId,
                 note: values.note,
                 items: values.items.map((item: any) => ({
                     productId: item.productId,
                     quantity: item.quantity,
-                    storagePosition: item.storagePosition, // Thêm theo yêu cầu 4.6
+                    storagePosition: item.storagePosition,
                     lineNote: item.lineNote
                 }))
             };
@@ -92,7 +92,6 @@ const CreatePurchaseRequest = () => {
                     onFinish={onFinish}
                     initialValues={{ items: [{}] }}
                 >
-                    {/* 1. Inbound Header */}
                     <div className="grid grid-cols-3 gap-4">
                         <Form.Item
                             label="Nhà cung cấp"
@@ -121,7 +120,7 @@ const CreatePurchaseRequest = () => {
 
                     <h3 className="text-lg font-medium mb-4 border-b pb-2">Danh sách sản phẩm</h3>
 
-                    {/* 2. Inbound Line Items */}
+
                     <Form.List name="items">
                         {(fields, { add, remove }) => (
                             <>

@@ -24,7 +24,7 @@ export const getAllRoles = createAsyncThunk(
   async (_, { rejectWithValue, getState }) => {
     try {
       const state: any = getState();
-      const token = state.auth.infoLogin?.accessToken;
+      const token = state.auth.infoLogin?.token;
       const res = await request({
         url: "/role",
         method: "GET",

@@ -6,7 +6,7 @@ import axios from "axios";
 import { useAppSelector } from "../../../store";
 import { selectInfoLogin } from "../../../store/authSlide";
 
-// Định nghĩa kiểu dữ liệu cho Request
+
 interface IPurchaseRequest {
     id: number;
     requestNo: string;
@@ -23,10 +23,9 @@ const ManagePurchaseRequest = () => {
     const [searchNo, setSearchNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
 
-    // ✅ Lấy token từ Redux store
     const infoLogin = useAppSelector(selectInfoLogin);
 
-    // ✅ Hàm lấy config với token từ Redux
+
     const getAxiosConfig = () => {
         const token = infoLogin?.accessToken;
 
@@ -43,7 +42,7 @@ const ManagePurchaseRequest = () => {
         };
     };
 
-    // Hàm gọi API
+
     const fetchRequests = async () => {
         const config = getAxiosConfig();
         if (!config) return;
@@ -69,12 +68,12 @@ const ManagePurchaseRequest = () => {
         }
     };
 
-    // Gọi API khi component mount
+
     useEffect(() => {
         fetchRequests();
     }, []);
 
-    // Logic lọc dữ liệu tại local
+
     const filteredRequests = useMemo(() => {
         return requests.filter((req) => {
             const noMatch = req.requestNo?.toLowerCase().includes(searchNo.toLowerCase());
@@ -83,7 +82,7 @@ const ManagePurchaseRequest = () => {
         });
     }, [requests, searchNo, searchStatus]);
 
-    // Hàm xóa
+
     const handleDelete = (id: number) => {
         Modal.confirm({
             title: "Xác nhận xóa phiếu",
@@ -116,7 +115,7 @@ const ManagePurchaseRequest = () => {
         });
     };
 
-    // Hàm xem chi tiết
+
     const handleViewDetail = async (id: number) => {
         const config = getAxiosConfig();
         if (!config) return;
@@ -129,7 +128,7 @@ const ManagePurchaseRequest = () => {
 
             console.log("Chi tiết:", response.data);
 
-            // TODO: Hiển thị modal chi tiết
+
             Modal.info({
                 title: "Chi tiết phiếu nhập",
                 width: 800,
@@ -149,9 +148,9 @@ const ManagePurchaseRequest = () => {
         }
     };
 
-    // Hàm chỉnh sửa
+
     const handleEdit = (id: number) => {
-        // TODO: Navigate to edit page
+
         console.log("Edit request:", id);
     };
 
@@ -167,7 +166,7 @@ const ManagePurchaseRequest = () => {
 
     return (
         <div className="p-2">
-            {/* ✅ ĐÃ XÓA DEBUG PANEL */}
+
 
             <Condition
                 searchNo={searchNo}
