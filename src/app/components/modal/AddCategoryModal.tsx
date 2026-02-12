@@ -75,7 +75,7 @@ const AddCategoryModal = (props: AddCategoryModalProps) => {
                 >
                     <TreeSelect
                         style={{ width: '100%' }}
-                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                        styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
                         placeholder="Chọn danh mục cha (không chọn nếu là danh mục gốc)"
                         allowClear
                         treeDataSimpleMode
