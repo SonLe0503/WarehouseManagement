@@ -10,6 +10,10 @@ interface ConditionProps {
 const Condition = (props: ConditionProps) => {
     const { searchNo, searchStatus, setSearchNo, setSearchStatus } = props;
 
+    const handleChange = (value: string) => {
+        setSearchStatus(value);
+    };
+
     return (
         <div className="flex gap-2 mb-4">
             <Input
@@ -21,14 +25,15 @@ const Condition = (props: ConditionProps) => {
             />
             <Select
                 className="w-full"
-                placeholder="Tất cả trạng thái"
+                defaultValue=""
                 value={searchStatus}
-                onChange={(value) => setSearchStatus(value)}
+                onChange={handleChange}
                 options={[
                     { value: "", label: "Tất cả trạng thái" },
                     { value: "Pending", label: "Pending" },
                     { value: "Approved", label: "Approved" },
                     { value: "Rejected", label: "Rejected" },
+
                 ]}
             />
         </div>
