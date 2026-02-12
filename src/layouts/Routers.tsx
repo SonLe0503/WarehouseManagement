@@ -16,6 +16,7 @@ const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
+const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 
 const shareResourceItem = [
     {
@@ -77,6 +78,12 @@ const privateResourceItem = [
     {
         key: URL.ManageUnit,
         element: <ManageUnit />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageOrder,
+        element: <ManageOrder />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     }

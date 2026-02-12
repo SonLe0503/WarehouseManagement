@@ -4,6 +4,7 @@ import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
     UserOutlined,
+    FileTextOutlined,
     InboxOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
@@ -18,6 +19,7 @@ const { Sider } = Layout;
 const Sidebar = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     const role = infoLogin?.role;
+    console.log(role);
     const navigate = useNavigate();
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
@@ -37,8 +39,14 @@ const Sidebar = () => {
                 ],
             },
         ],
-        MANAGER: [{ key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" }],
-        STAFF: [{ key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" }],
+        MANAGE: [
+            { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+        ],
+        STAFF: [
+            { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+        ],
         PURCHASE: [{ key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
     };
