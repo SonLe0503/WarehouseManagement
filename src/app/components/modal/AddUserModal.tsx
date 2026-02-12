@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Select, message } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { createUser } from "../../../store/userSlide";
+import { createUser, getAllUsers } from "../../../store/userSlide";
 import { getAllRoles, selectRoles } from "../../../store/roleSlide";
 
 interface AddUserModalProps {
@@ -26,10 +26,20 @@ const AddUserModal = (props: AddUserModalProps) => {
             setLoading(true);
             await dispatch(createUser(values)).unwrap();
             message.success("Thêm tài khoản thành công");
+            dispatch(getAllUsers());
             form.resetFields();
             onClose();
         } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra khi thêm tài khoản");
+            console.error("Create user error:", error);
+            let errorMsg = "Có lỗi xảy ra khi thêm tài khoản";
+            if (typeof error === "string") {
+                errorMsg = error;
+            } else if (error?.errors) {
+                errorMsg = Object.values(error.errors).flat().join(", ");
+            } else if (error?.message || error?.title) {
+                errorMsg = error.message || error.title;
+            }
+            message.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -55,7 +65,7 @@ const AddUserModal = (props: AddUserModalProps) => {
                 form={form}
                 layout="vertical"
                 initialValues={{
-                    status: "ACTIVE",
+                    status: "Active",
                 }}
             >
                 <Form.Item
@@ -67,17 +77,6 @@ const AddUserModal = (props: AddUserModalProps) => {
                     ]}
                 >
                     <Input placeholder="Nhập tên đăng nhập" />
-                </Form.Item>
-
-                <Form.Item
-                    name="password"
-                    label="Mật khẩu"
-                    rules={[
-                        { required: true, message: "Vui lòng nhập mật khẩu!" },
-                        { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" }
-                    ]}
-                >
-                    <Input.Password placeholder="Nhập mật khẩu" />
                 </Form.Item>
 
                 <Form.Item
@@ -96,8 +95,8 @@ const AddUserModal = (props: AddUserModalProps) => {
                     label="Trạng thái"
                 >
                     <Select>
-                        <Select.Option value="ACTIVE">Active</Select.Option>
-                        <Select.Option value="BLOCKED">Blocked</Select.Option>
+                        <Select.Option value="Active">Active</Select.Option>
+                        <Select.Option value="Inactive">Inactive</Select.Option>
                     </Select>
                 </Form.Item>
 
@@ -109,6 +108,7 @@ const AddUserModal = (props: AddUserModalProps) => {
                     <Select
                         placeholder="Chọn vai trò"
                         allowClear
+                        mode="multiple"
                     >
                         {roles
                             .filter((role) => role.name.toUpperCase() !== "ADMIN")
