@@ -1,38 +1,38 @@
 import { Button, Tag, Table, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch } from "../../../../store"; // Adjust path if needed
+import { useAppDispatch } from "../../../../store";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import RequestDetailModal from "./RequestDetailModal";
-import {
-    getInboundRequests,
-    approveRejectRequest,
-    selectInboundRequests,
-    selectInboundRequestLoading,
-    type InboundRequest
-} from "../../../../store/inboundRequestSlide";
 import ApproveRejectModal from "./ApproveRejectModal";
+import {
+    getOutboundRequests,
+    approveRejectOutboundRequest,
+    selectOutboundRequests,
+    selectOutboundRequestLoading,
+    type OutboundRequest
+} from "../../../../store/outboundRequestSlide";
 
-const ManageOrder = () => {
+const ManageOutbound = () => {
     const dispatch = useAppDispatch();
-    const requests = useSelector(selectInboundRequests);
-    const loading = useSelector(selectInboundRequestLoading);
+    const requests = useSelector(selectOutboundRequests);
+    const loading = useSelector(selectOutboundRequestLoading);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
 
-    const [selectedRequest, setSelectedRequest] = useState<InboundRequest | undefined>(undefined);
+    const [selectedRequest, setSelectedRequest] = useState<OutboundRequest | undefined>(undefined);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
     // State for Approve/Reject Modal
     const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
     const [currentAction, setCurrentAction] = useState<"Approve" | "Reject">("Approve");
-    const [requestToProcess, setRequestToProcess] = useState<InboundRequest | undefined>(undefined);
+    const [requestToProcess, setRequestToProcess] = useState<OutboundRequest | undefined>(undefined);
 
     useEffect(() => {
-        dispatch(getInboundRequests());
+        dispatch(getOutboundRequests());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -43,12 +43,12 @@ const ManageOrder = () => {
         });
     }, [requests, searchRequestNo, searchStatus]);
 
-    const handleViewDetail = (record: InboundRequest) => {
+    const handleViewDetail = (record: OutboundRequest) => {
         setSelectedRequest(record);
         setIsDetailModalOpen(true);
     };
 
-    const handleApproveReject = (record: InboundRequest, action: "Approve" | "Reject") => {
+    const handleApproveReject = (record: OutboundRequest, action: "Approve" | "Reject") => {
         setRequestToProcess(record);
         setCurrentAction(action);
         setIsApproveModalOpen(true);
@@ -58,7 +58,7 @@ const ManageOrder = () => {
         if (!requestToProcess) return;
 
         try {
-            await dispatch(approveRejectRequest({
+            await dispatch(approveRejectOutboundRequest({
                 id: requestToProcess.id,
                 ...data
             })).unwrap();
@@ -70,7 +70,7 @@ const ManageOrder = () => {
         }
     };
 
-    const columns: ColumnsType<InboundRequest> = [
+    const columns: ColumnsType<OutboundRequest> = [
         {
             title: "Request No",
             dataIndex: "requestNo",
@@ -78,9 +78,9 @@ const ManageOrder = () => {
             render: (text) => <span className="font-semibold text-blue-600">{text}</span>
         },
         {
-            title: "Supplier",
-            dataIndex: "supplierName",
-            key: "supplierName",
+            title: "Customer", // Changed from Supplier
+            dataIndex: "customerName", // Changed from supplierName
+            key: "customerName",
         },
         {
             title: "Status",
@@ -157,7 +157,7 @@ const ManageOrder = () => {
                 setSearchStatus={setSearchStatus}
             />
 
-            <h2 className="text-xl font-bold mb-4">Quản lý nhập kho (Inbound Requests)</h2>
+            <h2 className="text-xl font-bold mb-4">Quản lý xuất kho (Outbound Requests)</h2>
 
             <Table
                 dataSource={filteredRequests}
@@ -184,4 +184,4 @@ const ManageOrder = () => {
     );
 }
 
-export default ManageOrder;
+export default ManageOutbound;

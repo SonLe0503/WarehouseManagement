@@ -5,7 +5,6 @@ import {
     MenuFoldOutlined,
     UserOutlined,
     FileTextOutlined,
-    InboxOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -27,8 +26,8 @@ const Sidebar = () => {
         ADMIN: [
             { key: URL.DashboardAdmin, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageUser, icon: <UserOutlined />, label: "Quản lý người dùng" },
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             {
-                key: "sub-catalog", icon: <InboxOutlined />,
                 label: "Danh mục & Sản phẩm",
                 children: [
                     {
@@ -48,11 +47,13 @@ const Sidebar = () => {
         ],
         MANAGER: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
+            { key: URL.ManageOutbound, icon: <FileTextOutlined />, label: "Quản lý xuất kho" }
         ],
         STAFF: [
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
+            { key: URL.ManageOutbound, icon: <FileTextOutlined />, label: "Quản lý xuất kho" }
         ],
         PURCHASE: [{ key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
