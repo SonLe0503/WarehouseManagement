@@ -12,5 +12,6 @@ const URL = {
     ManageProduct: '/admin/manage-product',
     ManageCategory: '/admin/manage-category',
     ManageUnit: '/admin/manage-unit',
+    ManageOutbound: '/manage-outbound',
 }
 export default URL;
