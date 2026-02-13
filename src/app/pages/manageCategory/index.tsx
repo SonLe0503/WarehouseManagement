@@ -1,10 +1,12 @@
-import { Button, Modal, message } from "antd";
+import { Button, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { deleteCategory, getAllCategories, selectCategories, type ICategory } from "../../../store/categorySlide";
 import AddCategoryModal from "../../components/modal/AddCategoryModal";
 import EditCategoryModal from "../../components/modal/EditCategoryModal";
 import Condition from "./Condition";
+import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageCategory = () => {
     const dispatch = useAppDispatch();
@@ -77,9 +79,7 @@ const ManageCategory = () => {
             />
             <h2 className="text-xl font-bold mb-4">Quản lý danh mục</h2>
             <div className="mb-4 flex justify-end">
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Thêm mới
-                </Button>
+                <ButtonAdd onClick={() => setIsAddModalOpen(true)} />
             </div>
 
             <AddCategoryModal
@@ -110,7 +110,7 @@ const ManageCategory = () => {
                         className="grid grid-cols-4 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
                     >
                         <div className="px-3 py-2">{cat.id}</div>
-                        <div className="px-3 py-2 text-left flex items-center">
+                        <div className="px-3 py-2">
                             <span style={{ marginLeft: `${cat.level * 20}px` }}>
                                 {cat.name}
                             </span>
@@ -119,20 +119,23 @@ const ManageCategory = () => {
                             {getParentName(cat.parentId)}
                         </div>
                         <div className="px-3 py-2 flex gap-2 justify-center">
-                            <Button
-                                className="!bg-blue-500 !text-white px-3 py-1 rounded"
-                                onClick={() => handleEdit(cat)}
-                                size="small"
-                            >
-                                Sửa
-                            </Button>
-                            <Button
-                                className="!bg-red-500 !text-white px-3 py-1 rounded"
-                                onClick={() => handleDelete(cat.id)}
-                                size="small"
-                            >
-                                Xóa
-                            </Button>
+                            <Tooltip title="Sửa">
+                                <Button
+                                    type="primary"
+                                    icon={<EditOutlined />}
+                                    onClick={() => handleEdit(cat)}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
+                            <Tooltip title="Xóa">
+                                <Button
+                                    danger
+                                    type="primary"
+                                    icon={<DeleteOutlined />}
+                                    onClick={() => handleDelete(cat.id)}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
                         </div>
                     </div>
                 ))}
