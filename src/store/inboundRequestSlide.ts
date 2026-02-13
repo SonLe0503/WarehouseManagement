@@ -66,7 +66,7 @@ export const getInboundRequests = createAsyncThunk(
 export const approveRejectRequest = createAsyncThunk(
     "inboundRequest/approve-reject",
     async (
-        { id, action, comment, rejectReason }: { id: number; action: "Approve" | "Reject"; comment?: string; rejectReason?: string },
+        { id, action }: { id: number; action: "Approve" | "Reject" },
         { rejectWithValue, getState }
     ) => {
         try {
@@ -76,7 +76,7 @@ export const approveRejectRequest = createAsyncThunk(
             await request({
                 url: `/InboundRequest/${id}/approval`,
                 method: "POST",
-                data: { action, comment, rejectReason },
+                data: { action },
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

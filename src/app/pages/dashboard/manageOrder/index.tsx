@@ -1,4 +1,4 @@
-import { Button, Tag, Table, message } from "antd";
+import { Button, Tag, Table, Modal, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../../store"; // Adjust path if needed
@@ -13,7 +13,6 @@ import {
     selectInboundRequestLoading,
     type InboundRequest
 } from "../../../../store/inboundRequestSlide";
-import ApproveRejectModal from "./ApproveRejectModal";
 
 const ManageOrder = () => {
     const dispatch = useAppDispatch();
@@ -25,11 +24,6 @@ const ManageOrder = () => {
 
     const [selectedRequest, setSelectedRequest] = useState<InboundRequest | undefined>(undefined);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-    // State for Approve/Reject Modal
-    const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-    const [currentAction, setCurrentAction] = useState<"Approve" | "Reject">("Approve");
-    const [requestToProcess, setRequestToProcess] = useState<InboundRequest | undefined>(undefined);
 
     useEffect(() => {
         dispatch(getInboundRequests());
@@ -48,26 +42,21 @@ const ManageOrder = () => {
         setIsDetailModalOpen(true);
     };
 
-    const handleApproveReject = (record: InboundRequest, action: "Approve" | "Reject") => {
-        setRequestToProcess(record);
-        setCurrentAction(action);
-        setIsApproveModalOpen(true);
-    };
-
-    const handleProcessRequest = async (data: { action: "Approve" | "Reject"; comment?: string; rejectReason?: string }) => {
-        if (!requestToProcess) return;
-
-        try {
-            await dispatch(approveRejectRequest({
-                id: requestToProcess.id,
-                ...data
-            })).unwrap();
-            message.success(`${data.action === "Approve" ? "Duyệt" : "Từ chối"} phiếu thành công!`);
-            setIsApproveModalOpen(false);
-            setRequestToProcess(undefined);
-        } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra");
-        }
+    const handleApproveReject = (id: number, action: "Approve" | "Reject") => {
+        Modal.confirm({
+            title: `Xác nhận ${action === "Approve" ? "Duyệt" : "Từ chối"}`,
+            content: `Bạn có chắc muốn ${action === "Approve" ? "duyệt" : "từ chối"} phiếu này không?`,
+            okText: "Đồng ý",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await dispatch(approveRejectRequest({ id, action })).unwrap();
+                    message.success(`${action === "Approve" ? "Duyệt" : "Từ chối"} phiếu thành công!`);
+                } catch (error: any) {
+                    message.error(error || "Có lỗi xảy ra");
+                }
+            }
+        });
     };
 
     const columns: ColumnsType<InboundRequest> = [
@@ -130,14 +119,14 @@ const ManageOrder = () => {
                             <Button
                                 size="small"
                                 className="!bg-green-500 !text-white hover:!bg-green-600"
-                                onClick={() => handleApproveReject(record, "Approve")}
+                                onClick={() => handleApproveReject(record.id, "Approve")}
                             >
                                 Approve
                             </Button>
                             <Button
                                 size="small"
                                 className="!bg-red-500 !text-white hover:!bg-red-600"
-                                onClick={() => handleApproveReject(record, "Reject")}
+                                onClick={() => handleApproveReject(record.id, "Reject")}
                             >
                                 Reject
                             </Button>
@@ -171,14 +160,6 @@ const ManageOrder = () => {
                 open={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
                 request={selectedRequest}
-            />
-
-            <ApproveRejectModal
-                open={isApproveModalOpen}
-                onClose={() => setIsApproveModalOpen(false)}
-                onOk={handleProcessRequest}
-                action={currentAction}
-                loading={loading}
             />
         </div>
     );
