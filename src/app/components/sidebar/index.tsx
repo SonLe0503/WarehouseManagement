@@ -41,13 +41,11 @@ const Sidebar = () => {
         ],
         MANAGE: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
-            { key: URL.ManageOutbound, icon: <FileTextOutlined />, label: "Quản lý xuất kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
         ],
         STAFF: [
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
-            { key: URL.ManageOutbound, icon: <FileTextOutlined />, label: "Quản lý xuất kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
         ],
         PURCHASE: [{ key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" }],
         SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
