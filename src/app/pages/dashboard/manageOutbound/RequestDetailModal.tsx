@@ -49,7 +49,7 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
             footer={null}
         >
             <Descriptions bordered column={2} className="mb-4">
-                <Descriptions.Item label="Customer">{request.customerName}</Descriptions.Item> {/* Changed from Supplier */}
+                <Descriptions.Item label="Customer">{request.customerName}</Descriptions.Item>
                 <Descriptions.Item label="Status">
                     <Tag color={request.status === "Pending" ? "orange" : request.status === "Approved" ? "green" : "red"}>
                         {request.status}
