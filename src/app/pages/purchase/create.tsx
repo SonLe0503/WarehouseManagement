@@ -1,5 +1,5 @@
 // pages/purchase/create.tsx
-import { Button, Form, Input, InputNumber, Select, message, Card, Divider } from "antd";
+import { Button, Form, Input, InputNumber, Select, Card, Divider, App } from "antd";
 import { PlusOutlined, DeleteOutlined, LeftOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 
 const CreatePurchaseRequest = () => {
+    const { message } = App.useApp();
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();

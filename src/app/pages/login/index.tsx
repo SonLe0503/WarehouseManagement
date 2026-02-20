@@ -1,4 +1,4 @@
-import { Button, Form, Input, Card, message } from "antd";
+import { Button, Form, Input, Card, App } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import imgkho from "../../../assets/images/login.jpg";
@@ -11,6 +11,7 @@ import { selectInfoLogin } from "../../../store/authSlide";
 import { useEffect } from "react";
 
 const LoginPage = () => {
+    const { message } = App.useApp();
     const dispathch = useAppDispatch();
     const navigate = useNavigate();
     const infoLogin = useAppSelector(selectInfoLogin);

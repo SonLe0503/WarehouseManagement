@@ -19,7 +19,6 @@ const { Sider } = Layout;
 const Sidebar = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     const role = infoLogin?.role;
-    console.log(role);
     const navigate = useNavigate();
     const location = useLocation();
     const [collapsed, setCollapsed] = useState(false);
@@ -47,7 +46,10 @@ const Sidebar = () => {
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
         ],
-        PURCHASE: [{ key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" }],
+        PURCHASE: [
+            { key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.InboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu nhập hàng" }
+        ],
         SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
     };
 
@@ -80,7 +82,7 @@ const Sidebar = () => {
                                 <span className="font-bold text-gray-800 text-lg leading-tight tracking-tight">
                                     WMS System
                                 </span>
-                                <span className="text-[10px] text-blue-500 font-medium uppercase tracking-[0.1em]">
+                                <span className="text-[8px] text-blue-500 font-medium uppercase tracking-[0.1em]">
                                     Warehouse Management
                                 </span>
                             </motion.div>

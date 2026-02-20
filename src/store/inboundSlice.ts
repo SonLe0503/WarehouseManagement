@@ -95,8 +95,6 @@ export const getInboundRequestById = createAsyncThunk(
                 },
             });
 
-            console.log("API Response:", res.data);
-
             if (res.data.Data) {
                 return res.data.Data as IInboundRequest;
             }
@@ -107,7 +105,6 @@ export const getInboundRequestById = createAsyncThunk(
 
             return res.data as IInboundRequest;
         } catch (err: any) {
-            console.error("API Error:", err);
             return rejectWithValue(err.response?.data || err.message);
         }
     }
@@ -216,7 +213,6 @@ const inboundSlice = createSlice({
                 state.currentRequest = null;
             })
             .addCase(getInboundRequestById.fulfilled, (state, action) => {
-                console.log("Payload received:", action.payload);
                 state.currentRequest = action.payload;
                 state.loading = false;
             })

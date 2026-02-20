@@ -87,6 +87,24 @@ const privateResourceItem = [
         private: true,
     },
     {
+        key: URL.EditInboundRequest,
+        element: <EditInboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+]
+
+const manageResourceItem = [
+    {
+        key: URL.ManageOrder,
+        element: <ManageOrder />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    }
+]
+
+const purchaseResourceItem = [
+    {
         key: URL.InboundRequest,
         element: <InboundRequest />,
         layout: DASHBOARD_LAYOUT,
@@ -104,20 +122,11 @@ const privateResourceItem = [
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
-    {
-        key: URL.EditInboundRequest,
-        element: <EditInboundRequest />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.ManageOrder,
-        element: <ManageOrder />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    }
 ]
-const menus = [...shareResourceItem, ...privateResourceItem]
+const menus = [...shareResourceItem, 
+    ...privateResourceItem, 
+    ...manageResourceItem, 
+    ...purchaseResourceItem]
 
 export default function Routers() {
     return (
