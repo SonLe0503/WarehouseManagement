@@ -51,7 +51,7 @@ export const slice = createSlice({
       state.isLogin = false;
     },
   },
-   extraReducers: (builder) => {
+  extraReducers: (builder) => {
     builder.addCase(actionLogin.fulfilled, (state, action) => {
       const token = action.payload?.data?.token ?? "";
       if (token) {
@@ -59,7 +59,7 @@ export const slice = createSlice({
         state.infoLogin = {
           ...state.infoLogin,
           accessToken: token,
-          role: decodedToken["role"],  
+          role: decodedToken["role"],
           userId: decodedToken["nameid"],
           expiresTime: decodedToken["exp"],
         };

@@ -6,6 +6,7 @@ import DashboardLayout from "../layouts/DashboardLayout"
 import PrivateLayout from "../layouts/PrivateLayout"
 
 
+
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
 const ManageUser = lazy(() => import("../app/pages/manageUser"))
@@ -16,6 +17,10 @@ const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
+const InboundRequest = lazy(() => import("../app/pages/purchase"))
+const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
+const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
+const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 
 const shareResourceItem = [
@@ -78,6 +83,30 @@ const privateResourceItem = [
     {
         key: URL.ManageUnit,
         element: <ManageUnit />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.InboundRequest,
+        element: <InboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CreatePurchaseRequest,
+        element: <CreatePurchaseRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewInboundRequest,
+        element: <ViewInboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditInboundRequest,
+        element: <EditInboundRequest />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },

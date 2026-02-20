@@ -7,6 +7,9 @@ import roleSlide from "./roleSlide";
 import categorySlide from "./categorySlide";
 import unitSlide from "./unitSlide";
 import productSlide from "./productSlice";
+import inboundSlide from "./inboundSlice";
+import warehouseSlide from "./warehouseslide";
+
 import inboundRequestSlide from "./inboundRequestSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
@@ -24,6 +27,9 @@ const reducers = {
   category: categorySlide,
   unit: unitSlide,
   product: productSlide,
+  inbound: inboundSlide,
+  warehouse: warehouseSlide,
+
   inboundRequest: inboundRequestSlide,
 }
 const rootReducer = combineReducers(reducers);

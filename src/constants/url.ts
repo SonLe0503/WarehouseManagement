@@ -12,5 +12,9 @@ const URL = {
     ManageProduct: '/admin/manage-product',
     ManageCategory: '/admin/manage-category',
     ManageUnit: '/admin/manage-unit',
+    CreatePurchaseRequest: '/purchase/create',
+    InboundRequest: '/purchase',
+    ViewInboundRequest: '/purchase/view',
+    EditInboundRequest: '/purchase/edit',
 }
 export default URL;
