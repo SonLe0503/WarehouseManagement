@@ -21,6 +21,7 @@ const InboundRequest = lazy(() => import("../app/pages/purchase"))
 const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
 const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
+const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 
 const shareResourceItem = [
     {
@@ -109,6 +110,12 @@ const privateResourceItem = [
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
+    {
+        key: URL.ManageOrder,
+        element: <ManageOrder />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    }
 ]
 const menus = [...shareResourceItem, ...privateResourceItem]
 

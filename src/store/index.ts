@@ -1,7 +1,6 @@
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-
 import authSlide from "./authSlide";
 import userSlide from "./userSlide";
 import roleSlide from "./roleSlide";
@@ -11,6 +10,7 @@ import productSlide from "./productSlice";
 import inboundSlide from "./inboundSlice";
 import warehouseSlide from "./warehouseslide";
 
+import inboundRequestSlide from "./inboundRequestSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -30,6 +30,7 @@ const reducers = {
   inbound: inboundSlide,
   warehouse: warehouseSlide,
 
+  inboundRequest: inboundRequestSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

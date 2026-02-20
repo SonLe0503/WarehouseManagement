@@ -1,5 +1,4 @@
-// pages/purchase/view.tsx
-import { Button, Card, Descriptions, Table, Tag, Spin, App } from "antd";
+import { Button, Card, Descriptions, Table, Tag, Spin } from "antd";
 import { LeftOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";

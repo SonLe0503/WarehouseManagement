@@ -1,4 +1,3 @@
-// pages/purchase/index.tsx
 import { Button, Tag, Modal, message } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";

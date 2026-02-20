@@ -1,4 +1,3 @@
-// pages/purchase/edit.tsx
 import { Button, Form, Input, InputNumber, Select, Card, Spin, Divider, message } from "antd";
 import { PlusOutlined, DeleteOutlined, LeftOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
