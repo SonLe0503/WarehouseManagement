@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Select, message } from "antd";
+import { Modal, Form, Input, Select, App } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { updateUser, getAllUsers } from "../../../store/userSlide";
@@ -12,6 +12,7 @@ interface EditUserModalProps {
 }
 
 const EditUserModal = (props: EditUserModalProps) => {
+    const { message } = App.useApp();
     const { open, onClose, userData } = props;
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
@@ -57,7 +58,6 @@ const EditUserModal = (props: EditUserModalProps) => {
             dispatch(getAllUsers());
             onClose();
         } catch (error: any) {
-            console.error("Update user error:", error);
             let errorMsg = "Có lỗi xảy ra khi cập nhật tài khoản";
             if (typeof error === "string") {
                 errorMsg = error;

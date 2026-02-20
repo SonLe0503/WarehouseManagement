@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Select, message } from "antd";
+import { Modal, Form, Input, Select, App } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { createUser, getAllUsers } from "../../../store/userSlide";
@@ -10,6 +10,7 @@ interface AddUserModalProps {
 }
 
 const AddUserModal = (props: AddUserModalProps) => {
+    const { message } = App.useApp();
     const { open, onClose } = props;
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
@@ -30,7 +31,6 @@ const AddUserModal = (props: AddUserModalProps) => {
             form.resetFields();
             onClose();
         } catch (error: any) {
-            console.error("Create user error:", error);
             let errorMsg = "Có lỗi xảy ra khi thêm tài khoản";
             if (typeof error === "string") {
                 errorMsg = error;
