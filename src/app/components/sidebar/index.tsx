@@ -38,6 +38,7 @@ const Sidebar = () => {
                     { key: URL.ManageUnit, label: "Đơn vị tính" },
                 ],
             },
+            { key: URL.ManageWarehouse, icon: <DatabaseOutlined />, label: "Kho hàng" },
         ],
         MANAGE: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },

@@ -12,6 +12,7 @@ const URL = {
     ManageProduct: '/admin/manage-product',
     ManageCategory: '/admin/manage-category',
     ManageUnit: '/admin/manage-unit',
+    ManageWarehouse: '/admin/manage-warehouse',
     ManageInventory: '/manage-inventory',
     CreatePurchaseRequest: '/purchase/create',
     InboundRequest: '/purchase',

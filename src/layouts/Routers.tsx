@@ -23,6 +23,7 @@ const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 const ManageInventory = lazy(() => import("../app/pages/manageInventory"))
+const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
 
 const shareResourceItem = [
     {
@@ -84,6 +85,12 @@ const privateResourceItem = [
     {
         key: URL.ManageUnit,
         element: <ManageUnit />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageWarehouse,
+        element: <ManageWarehouse />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
