@@ -11,6 +11,7 @@ import inboundSlide from "./inboundSlice";
 import warehouseSlide from "./warehouseslide";
 
 import inboundRequestSlide from "./inboundRequestSlide";
+import inventorySlide from "./inventorySlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -29,6 +30,7 @@ const reducers = {
   product: productSlide,
   inbound: inboundSlide,
   warehouse: warehouseSlide,
+  inventory: inventorySlide,
 
   inboundRequest: inboundRequestSlide,
 }

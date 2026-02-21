@@ -22,6 +22,7 @@ const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
 const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
+const ManageInventory = lazy(() => import("../app/pages/manageInventory"))
 
 const shareResourceItem = [
     {
@@ -92,6 +93,12 @@ const privateResourceItem = [
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
+    {
+        key: URL.ManageInventory,
+        element: <ManageInventory />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
 ]
 
 const manageResourceItem = [
@@ -123,10 +130,10 @@ const purchaseResourceItem = [
         private: true,
     },
 ]
-const menus = [...shareResourceItem, 
-    ...privateResourceItem, 
-    ...manageResourceItem, 
-    ...purchaseResourceItem]
+const menus = [...shareResourceItem,
+...privateResourceItem,
+...manageResourceItem,
+...purchaseResourceItem]
 
 export default function Routers() {
     return (
