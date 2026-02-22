@@ -42,6 +42,26 @@ export const actionLogin = createAsyncThunk(
   }
 )
 
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (data: { CurrentPassword: string; NewPassword: string }, { rejectWithValue, getState }) => {
+    try {
+      const state = getState() as RootState;
+      const token = state.auth.infoLogin?.accessToken;
+      return await request({
+        url: `/Auth/change-password`,
+        method: "POST",
+        data,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 export const slice = createSlice({
   name: "auth",
   initialState,

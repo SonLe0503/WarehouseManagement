@@ -24,6 +24,8 @@ const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 const ManageInventory = lazy(() => import("../app/pages/manageInventory"))
 const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
+const Profile = lazy(() => import("../app/pages/profile"))
+const ChangePassword = lazy(() => import("../app/pages/profile/changePassword"))
 
 const shareResourceItem = [
     {
@@ -103,6 +105,18 @@ const privateResourceItem = [
     {
         key: URL.ManageInventory,
         element: <ManageInventory />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.Profile,
+        element: <Profile />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ChangePassword,
+        element: <ChangePassword />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },

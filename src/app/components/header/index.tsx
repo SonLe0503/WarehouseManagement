@@ -25,6 +25,10 @@ const HeaderBar = () => {
         if (path.includes("manage-category")) return "Quản lý danh mục";
         if (path.includes("manage-product")) return "Quản lý sản phẩm";
         if (path.includes("manage-unit")) return "Đơn vị tính";
+        if (path.includes("manage-warehouse")) return "Quản lý kho hàng";
+        if (path.includes("manage-inventory")) return "Quản lý tồn kho";
+        if (path.includes("profile")) return "Thông tin cá nhân";
+        if (path.includes("change-password")) return "Đổi mật khẩu";
         return "Dashboard";
     }, [location.pathname]);
 
@@ -103,7 +107,17 @@ const HeaderBar = () => {
                         className="flex items-center justify-center hover:bg-gray-100 rounded-full"
                     />
 
-                    <Dropdown menu={{ items: menuItems }} placement="bottomRight" arrow={{ pointAtCenter: true }}>
+                    <Dropdown
+                        menu={{
+                            items: menuItems,
+                            onClick: ({ key }) => {
+                                if (key === "profile") navigate(URL.Profile);
+                                if (key === "logout") handleLogout();
+                            }
+                        }}
+                        placement="bottomRight"
+                        arrow={{ pointAtCenter: true }}
+                    >
                         <Avatar
                             style={{ backgroundColor: "#2563eb", cursor: "pointer" }}
                             icon={<UserOutlined />}

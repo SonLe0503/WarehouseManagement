@@ -18,5 +18,7 @@ const URL = {
     InboundRequest: '/purchase',
     ViewInboundRequest: '/purchase/view',
     EditInboundRequest: '/purchase/edit',
+    Profile: '/profile',
+    ChangePassword: '/change-password',
 }
 export default URL;
