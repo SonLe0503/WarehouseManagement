@@ -102,8 +102,8 @@ const ManageWarehouse = () => {
                 warehouseData={selectedWarehouse}
             />
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="grid grid-cols-6 bg-gray-50/80 font-bold text-xs uppercase tracking-wider text-gray-600 border-b border-gray-200">
+            <div className="border-[0.05px] border-gray-300">
+                <div className="grid grid-cols-6 bg-gray-100 font-semibold text-sm">
                     <div className="px-6 py-4">Mã kho</div>
                     <div className="px-6 py-4 col-span-2">Tên & Địa chỉ</div>
                     <div className="px-6 py-4 text-center">Trạng thái</div>
@@ -115,7 +115,7 @@ const ManageWarehouse = () => {
                     filteredWarehouses.map((w) => (
                         <div
                             key={w.id}
-                            className="grid grid-cols-6 text-sm border-b border-gray-100 hover:bg-blue-50/30 transition-all duration-200"
+                            className="grid grid-cols-6 text-sm border-b border-gray-100 hover:bg-blue-50/30 transition-all duration-200 items-center"
                         >
                             <div className="px-6 py-4 font-mono font-bold text-blue-600 self-center">
                                 {w.code}

@@ -1,4 +1,5 @@
-import { Button, Tag, Modal, message } from "antd";
+import { Button, Tag, Modal, message, Tooltip } from "antd";
+import { ReloadOutlined, PlusOutlined, EyeOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
@@ -78,12 +79,21 @@ const ManagePurchaseRequest = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý phiếu nhập hàng</h2>
 
-            <div className="mb-4 flex justify-end gap-2">
-                <Button size="small" type="primary" onClick={() => dispatch(getMyInboundRequests())}>
-                    Làm mới
-                </Button>
-                <Button size="small" type="primary" onClick={() => setIsAddModalOpen(true)}>
-                    + Tạo phiếu mới
+            <div className="mb-4 flex justify-end gap-2 items-center">
+                <Tooltip title="Làm mới">
+                    <Button
+                        icon={<ReloadOutlined />}
+                        onClick={() => dispatch(getMyInboundRequests())}
+                        className="!flex !items-center !justify-center"
+                    />
+                </Tooltip>
+                <Button
+                    type="primary"
+                    icon={<PlusOutlined />}
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="!flex !items-center !justify-center h-10 px-6 font-semibold shadow-md"
+                >
+                    Tạo phiếu mới
                 </Button>
             </div>
 
@@ -113,34 +123,38 @@ const ManagePurchaseRequest = () => {
                     filteredRequests.map((req) => (
                         <div key={req.id} className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300 items-center hover:bg-gray-50 transition-all">
                             <div className="px-3 py-2 font-medium text-blue-600">{req.requestNo}</div>
-                            <div className="px-3 py-2 truncate text-left">{req.supplierName}</div>
+                            <div className="px-3 py-2 truncate">{req.supplierName}</div>
                             <div className="px-3 py-2">{getStatusTag(req.status)}</div>
                             <div className="px-3 py-2">{dayjs(req.createdAt).format("DD/MM/YYYY HH:mm")}</div>
-                            <div className="px-3 py-2 truncate italic text-gray-500">{req.note || "—"}</div>
+                            <div className="px-3 py-2 truncate text-gray-500">{req.note || "—"}</div>
                             <div className="px-3 py-2 flex gap-2 justify-center">
-                                <Button
-                                    size="small"
-                                    className="!bg-green-500 !text-white"
-                                    onClick={() => handleView(req.id)}
-                                >
-                                    View
-                                </Button>
-                                <Button
-                                    size="small"
-                                    className="!bg-blue-500 !text-white"
-                                    disabled={req.status !== "Pending"}
-                                    onClick={() => handleEdit(req.id)}
-                                >
-                                    Edit
-                                </Button>
-                                <Button
-                                    size="small"
-                                    danger
-                                    disabled={req.status === "Approved" || req.status === "Completed"}
-                                    onClick={() => handleDelete(req.id)}
-                                >
-                                    Delete
-                                </Button>
+                                <Tooltip title="Xem chi tiết">
+                                    <Button
+                                        type="primary"
+                                        icon={<EyeOutlined />}
+                                        onClick={() => handleView(req.id)}
+                                        className="!flex !items-center !justify-center !bg-green-500 hover:!bg-green-400"
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Chỉnh sửa">
+                                    <Button
+                                        type="primary"
+                                        icon={<EditOutlined />}
+                                        disabled={req.status !== "Pending"}
+                                        onClick={() => handleEdit(req.id)}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
+                                <Tooltip title="Xóa">
+                                    <Button
+                                        danger
+                                        type="primary"
+                                        icon={<DeleteOutlined />}
+                                        disabled={req.status === "Approved" || req.status === "Completed"}
+                                        onClick={() => handleDelete(req.id)}
+                                        className="!flex !items-center !justify-center"
+                                    />
+                                </Tooltip>
                             </div>
                         </div>
                     ))

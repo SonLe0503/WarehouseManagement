@@ -1,4 +1,5 @@
-import { Button, Tag, Table, Modal, message } from "antd";
+import { Button, Tag, Table, Modal, message, Tooltip } from "antd";
+import { EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../../store"; // Adjust path if needed
@@ -111,25 +112,33 @@ const ManageOrder = () => {
             key: "action",
             render: (_, record) => (
                 <div className="flex gap-2">
-                    <Button size="small" type="default" onClick={() => handleViewDetail(record)}>
-                        Detail
-                    </Button>
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="default"
+                            icon={<EyeOutlined />}
+                            onClick={() => handleViewDetail(record)}
+                            className="!flex !items-center !justify-center"
+                        />
+                    </Tooltip>
                     {record.status === "Pending" && (
                         <>
-                            <Button
-                                size="small"
-                                className="!bg-green-500 !text-white hover:!bg-green-600"
-                                onClick={() => handleApproveReject(record.id, "Approve")}
-                            >
-                                Approve
-                            </Button>
-                            <Button
-                                size="small"
-                                className="!bg-red-500 !text-white hover:!bg-red-600"
-                                onClick={() => handleApproveReject(record.id, "Reject")}
-                            >
-                                Reject
-                            </Button>
+                            <Tooltip title="Duyệt">
+                                <Button
+                                    type="primary"
+                                    icon={<CheckOutlined />}
+                                    onClick={() => handleApproveReject(record.id, "Approve")}
+                                    className="!flex !items-center !justify-center !bg-green-500 hover:!bg-green-400"
+                                />
+                            </Tooltip>
+                            <Tooltip title="Từ chối">
+                                <Button
+                                    danger
+                                    type="primary"
+                                    icon={<CloseOutlined />}
+                                    onClick={() => handleApproveReject(record.id, "Reject")}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
                         </>
                     )}
                 </div>

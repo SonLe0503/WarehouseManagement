@@ -100,7 +100,7 @@ const ManageUser = () => {
                 {filteredUsers.map((u) => (
                     <div
                         key={u.id}
-                        className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300"
+                        className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300 items-center"
                     >
                         <div className="px-3 py-2 truncate">{u.username}</div>
                         <div className="px-3 py-2 truncate">{u.email ?? "—"}</div>
