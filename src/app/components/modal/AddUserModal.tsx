@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { createUser, getAllUsers } from "../../../store/userSlide";
 import { getAllRoles, selectRoles } from "../../../store/roleSlide";
+import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 
 interface AddUserModalProps {
     open: boolean;
@@ -15,17 +16,31 @@ const AddUserModal = (props: AddUserModalProps) => {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const roles = useAppSelector(selectRoles);
+    const warehouses = useAppSelector(selectWarehouses);
     const [loading, setLoading] = useState(false);
 
+    const roleIds = Form.useWatch("roleIds", form);
+    const isAdmin = roleIds?.includes(1);
+
     useEffect(() => {
-        dispatch(getAllRoles());
-    }, [dispatch]);
+        if (open) {
+            dispatch(getAllRoles());
+            dispatch(getActiveWarehouses());
+        }
+    }, [dispatch, open]);
 
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
             setLoading(true);
-            await dispatch(createUser(values)).unwrap();
+
+            // Per backend logic: if Admin, WarehouseId is null
+            const payload = {
+                ...values,
+                warehouseId: isAdmin ? null : values.warehouseId
+            };
+
+            await dispatch(createUser(payload)).unwrap();
             message.success("Thêm tài khoản thành công");
             dispatch(getAllUsers());
             form.resetFields();
@@ -111,7 +126,6 @@ const AddUserModal = (props: AddUserModalProps) => {
                         mode="multiple"
                     >
                         {roles
-                            .filter((role) => role.name.toUpperCase() !== "ADMIN")
                             .map((role) => (
                                 <Select.Option key={role.id} value={role.id}>
                                     {role.name}
@@ -119,6 +133,25 @@ const AddUserModal = (props: AddUserModalProps) => {
                             ))}
                     </Select>
                 </Form.Item>
+
+                {!isAdmin && (
+                    <Form.Item
+                        name="warehouseId"
+                        label="Kho quản lý"
+                        rules={[{ required: true, message: "Vui lòng chọn kho!" }]}
+                    >
+                        <Select
+                            placeholder="Chọn kho quản lý"
+                            allowClear
+                        >
+                            {warehouses.map((w) => (
+                                <Select.Option key={w.id} value={w.id}>
+                                    {w.name}
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                )}
             </Form>
         </Modal>
     );

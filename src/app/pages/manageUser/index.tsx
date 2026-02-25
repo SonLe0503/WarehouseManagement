@@ -88,10 +88,11 @@ const ManageUser = () => {
                 userData={selectedUser}
             />
             <div className="border-[0.05px] border-gray-300">
-                <div className="grid grid-cols-6 bg-gray-100 font-semibold text-sm text-center">
+                <div className="grid grid-cols-7 bg-gray-100 font-semibold text-sm text-center">
                     <div className="px-3 py-2">Username</div>
                     <div className="px-3 py-2">Email</div>
                     <div className="px-3 py-2">Role</div>
+                    <div className="px-3 py-2">Kho</div>
                     <div className="px-3 py-2">Status</div>
                     <div className="px-3 py-2">Created At</div>
                     <div className="px-3 py-2">Action</div>
@@ -100,7 +101,7 @@ const ManageUser = () => {
                 {filteredUsers.map((u) => (
                     <div
                         key={u.id}
-                        className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300 items-center"
+                        className="grid grid-cols-7 text-center text-sm border-b-[0.05px] border-gray-300 items-center"
                     >
                         <div className="px-3 py-2 truncate">{u.username}</div>
                         <div className="px-3 py-2 truncate">{u.email ?? "—"}</div>
@@ -111,6 +112,7 @@ const ManageUser = () => {
                                 </Tag>
                             ))}
                         </div>
+                        <div className="px-3 py-2 truncate">{u.warehouseName ?? "—"}</div>
                         <div className="px-3 py-2 flex justify-center items-center">
                             {u.status === "Active" ? (
                                 <Tag color="green">Active</Tag>
