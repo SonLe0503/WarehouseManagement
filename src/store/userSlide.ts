@@ -9,20 +9,25 @@ export interface IUser {
   email: string;
   status: string;
   roles: string[];
+  warehouseId?: number | null;
+  warehouseName?: string | null;
   createdAt: string;
 }
 
 export interface CreateUserDTO {
   username: string;
   email: string;
-  status?: string;
-  roleIds?: number[];
+  status: string;
+  roleIds: number[];
+  warehouseId?: number | null;
 }
 
 export interface UpdateUserDTO {
-  email?: string;
-  status?: string;
-  roleIds?: number[];
+  username: string;
+  email: string;
+  status: string;
+  roleIds: number[];
+  warehouseId?: number | null;
 }
 
 type UserState = {
