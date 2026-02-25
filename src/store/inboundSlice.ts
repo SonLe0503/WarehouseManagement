@@ -24,6 +24,8 @@ export interface IInboundItem {
         id: number;
         name: string;
         sku: string;
+        baseUnitCode: string;
+        createdAt: string;
     };
 }
 

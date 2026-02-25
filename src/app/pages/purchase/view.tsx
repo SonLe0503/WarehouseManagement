@@ -51,9 +51,20 @@ const ViewInboundRequest = () => {
             key: "name",
         },
         {
+            title: "Đơn vị",
+            dataIndex: ["product", "baseUnitCode"],
+            key: "baseUnitCode",
+        },
+        {
             title: "Số lượng",
             dataIndex: "quantity",
             key: "quantity",
+        },
+        {
+            title: "Ngày tạo",
+            dataIndex: ["product", "createdAt"],
+            key: "createdAt",
+            render: (text: string) => text ? dayjs(text).format("DD/MM/YYYY HH:mm") : "—",
         },
         {
             title: "Ghi chú",
@@ -117,5 +128,19 @@ const ViewInboundRequest = () => {
         </div>
     );
 };
+
+export interface IInboundItem {
+    id: number;
+    productId: number;
+    quantity: number;
+    lineNote?: string;
+    product?: {
+        id: number;
+        name: string;
+        sku: string;
+        baseUnitCode: string;
+        createdAt: string;
+    };
+}
 
 export default ViewInboundRequest;
