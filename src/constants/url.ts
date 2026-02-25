@@ -18,6 +18,10 @@ const URL = {
     InboundRequest: '/purchase',
     ViewInboundRequest: '/purchase/view',
     EditInboundRequest: '/purchase/edit',
+    OutboundRequest: '/sale',
+    CreateOutboundRequest: '/sale/create',
+    ViewOutboundRequest: '/sale/view',
+    EditOutboundRequest: '/sale/edit',
     Profile: '/profile',
     ChangePassword: '/change-password',
 }

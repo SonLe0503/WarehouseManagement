@@ -54,7 +54,10 @@ const Sidebar = () => {
             { key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.InboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu nhập hàng" }
         ],
-        SALE: [{ key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" }],
+        SALE: [
+            { key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" },
+            { key: URL.OutboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu xuất hàng" }
+        ],
     };
 
     const currentMenu = role ? menuByRole[role] : [];

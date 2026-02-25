@@ -21,6 +21,10 @@ const InboundRequest = lazy(() => import("../app/pages/purchase"))
 const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
 const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
+const OutboundRequest = lazy(() => import("../app/pages/sale"))
+const CreateOutboundRequest = lazy(() => import("../app/pages/sale/create"))
+const ViewOutboundRequest = lazy(() => import("../app/pages/sale/view"))
+const EditOutboundRequest = lazy(() => import("../app/pages/sale/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
 const ManageInventory = lazy(() => import("../app/pages/manageInventory"))
 const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
@@ -151,10 +155,39 @@ const purchaseResourceItem = [
         private: true,
     },
 ]
+
+const saleResourceItem = [
+    {
+        key: URL.OutboundRequest,
+        element: <OutboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.CreateOutboundRequest,
+        element: <CreateOutboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewOutboundRequest,
+        element: <ViewOutboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditOutboundRequest,
+        element: <EditOutboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+]
+
 const menus = [...shareResourceItem,
 ...privateResourceItem,
 ...manageResourceItem,
-...purchaseResourceItem]
+...purchaseResourceItem,
+...saleResourceItem]
 
 export default function Routers() {
     return (
