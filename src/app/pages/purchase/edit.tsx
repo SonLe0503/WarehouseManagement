@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../store";
 import { getInboundRequestById, updateInboundRequest, selectCurrentRequest, selectInboundLoading, clearCurrentRequest } from "../../../store/inboundSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
+import { getAllUnits, selectUnits } from "../../../store/unitSlide";
 import URL from "../../../constants/url";
 
 const EditInboundRequest = () => {
@@ -18,12 +19,14 @@ const EditInboundRequest = () => {
     const request = useAppSelector(selectCurrentRequest);
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
+    const units = useAppSelector(selectUnits);
     const loading = useAppSelector(selectInboundLoading);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         dispatch(getAllProducts());
         dispatch(getActiveWarehouses());
+        dispatch(getAllUnits());
         if (id) {
             dispatch(getInboundRequestById(parseInt(id)));
         }
@@ -40,12 +43,14 @@ const EditInboundRequest = () => {
                 note: request.note,
                 items: request.items?.map(item => ({
                     productId: item.productId,
+                    unitId: item.unitId,
                     quantity: item.quantity,
                     lineNote: item.lineNote,
                 })) || [{}],
             });
         }
     }, [request, form]);
+    console.log(request)
 
     const onFinish = async (values: any) => {
         if (!id) return;
@@ -160,6 +165,21 @@ const EditInboundRequest = () => {
                                             rules={[{ required: true, message: "Vui lòng nhập số lượng" }]}
                                         >
                                             <InputNumber min={1} className="w-full" placeholder="Số lượng" />
+                                        </Form.Item>
+
+                                        <Form.Item
+                                            {...restField}
+                                            label="Đơn vị"
+                                            name={[name, "unitId"]}
+                                            rules={[{ required: true, message: "Vui long chon don vi" }]}
+                                        >
+                                            <Select placeholder="Chọn đơn vị">
+                                                {units.map(unit => (
+                                                    <Select.Option key={unit.id} value={unit.id}>
+                                                        {unit.name} ({unit.code})
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
                                         </Form.Item>
 
                                         <Form.Item

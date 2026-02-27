@@ -3,7 +3,7 @@ import { LeftOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { getOutboundRequestById, selectCurrentRequest, selectOutboundLoading, clearCurrentRequest } from "../../../store/outboundSlice";
+import { getOutboundRequestById, selectCurrentRequest, selectOutboundLoading, clearCurrentRequest, type IOutboundItem } from "../../../store/outboundSlice";
 import dayjs from "dayjs";
 
 const ViewOutboundRequest = () => {
@@ -52,8 +52,8 @@ const ViewOutboundRequest = () => {
         },
         {
             title: "Đơn vị",
-            dataIndex: ["product", "baseUnitCode"],
-            key: "baseUnitCode",
+            key: "unitCode",
+            render: (_: any, record: IOutboundItem) => record.unit?.code || record.product?.baseUnitCode || "-",
         },
         {
             title: "Số lượng",

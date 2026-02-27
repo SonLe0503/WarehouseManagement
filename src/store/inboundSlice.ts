@@ -18,8 +18,14 @@ export interface IInboundRequest {
 export interface IInboundItem {
     id: number;
     productId: number;
+    unitId?: number;
     quantity: number;
     lineNote?: string;
+    unit?: {
+        id: number;
+        code: string;
+        name: string;
+    };
     product?: {
         id: number;
         name: string;
@@ -35,6 +41,7 @@ export interface InboundRequestCreateDTO {
     warehouseId: number;
     items: {
         productId: number;
+        unitId: number;
         quantity: number;
         lineNote?: string;
     }[];

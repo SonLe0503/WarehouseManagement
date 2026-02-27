@@ -3,7 +3,7 @@ import { LeftOutlined } from "@ant-design/icons";
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { getInboundRequestById, selectCurrentRequest, selectInboundLoading, clearCurrentRequest } from "../../../store/inboundSlice";
+import { getInboundRequestById, selectCurrentRequest, selectInboundLoading, clearCurrentRequest, type IInboundItem } from "../../../store/inboundSlice";
 import dayjs from "dayjs";
 
 const ViewInboundRequest = () => {
@@ -52,8 +52,8 @@ const ViewInboundRequest = () => {
         },
         {
             title: "Đơn vị",
-            dataIndex: ["product", "baseUnitCode"],
-            key: "baseUnitCode",
+            key: "unitCode",
+            render: (_: any, record: IInboundItem) => record.unit?.code || record.product?.baseUnitCode || "-",
         },
         {
             title: "Số lượng",
@@ -128,19 +128,5 @@ const ViewInboundRequest = () => {
         </div>
     );
 };
-
-export interface IInboundItem {
-    id: number;
-    productId: number;
-    quantity: number;
-    lineNote?: string;
-    product?: {
-        id: number;
-        name: string;
-        sku: string;
-        baseUnitCode: string;
-        createdAt: string;
-    };
-}
 
 export default ViewInboundRequest;

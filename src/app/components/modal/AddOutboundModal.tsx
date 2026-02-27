@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../store";
 import { createOutboundRequest } from "../../../store/outboundSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
+import { getAllUnits, selectUnits } from "../../../store/unitSlide";
 
 interface AddOutboundModalProps {
     open: boolean;
@@ -20,12 +21,14 @@ const AddOutboundModal = (props: AddOutboundModalProps) => {
 
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
+    const units = useAppSelector(selectUnits);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (open) {
             dispatch(getAllProducts());
             dispatch(getActiveWarehouses());
+            dispatch(getAllUnits());
         }
     }, [dispatch, open]);
 
@@ -142,6 +145,22 @@ const AddOutboundModal = (props: AddOutboundModalProps) => {
                                         className="w-32 mb-0"
                                     >
                                         <InputNumber min={0.1} className="w-full" placeholder="Số lượng" />
+                                    </Form.Item>
+
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'unitId']}
+                                        label="Đơn vị"
+                                        rules={[{ required: true, message: 'Chọn đơn vị' }]}
+                                        className="w-40 mb-0"
+                                    >
+                                        <Select placeholder="Chọn đơn vị">
+                                            {units.map((unit) => (
+                                                <Select.Option key={unit.id} value={unit.id}>
+                                                    {unit.name} ({unit.code})
+                                                </Select.Option>
+                                            ))}
+                                        </Select>
                                     </Form.Item>
 
                                     <Form.Item

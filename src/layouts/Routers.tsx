@@ -18,11 +18,9 @@ const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
 const InboundRequest = lazy(() => import("../app/pages/purchase"))
-const CreatePurchaseRequest = lazy(() => import("../app/pages/purchase/create"))
 const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
 const OutboundRequest = lazy(() => import("../app/pages/sale"))
-const CreateOutboundRequest = lazy(() => import("../app/pages/sale/create"))
 const ViewOutboundRequest = lazy(() => import("../app/pages/sale/view"))
 const EditOutboundRequest = lazy(() => import("../app/pages/sale/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
@@ -143,12 +141,6 @@ const purchaseResourceItem = [
         private: true,
     },
     {
-        key: URL.CreatePurchaseRequest,
-        element: <CreatePurchaseRequest />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
         key: URL.ViewInboundRequest,
         element: <ViewInboundRequest />,
         layout: DASHBOARD_LAYOUT,
@@ -160,12 +152,6 @@ const saleResourceItem = [
     {
         key: URL.OutboundRequest,
         element: <OutboundRequest />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.CreateOutboundRequest,
-        element: <CreateOutboundRequest />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
