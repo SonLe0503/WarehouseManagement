@@ -10,10 +10,11 @@ export interface InboundRequestItem {
     quantity: number;
     receivedQuantity: number;
     storagePosition: string;
+    unitId: number;
     lineNote: string;
 }
 
-// Interface chính cho Inbound Request
+
 export interface InboundRequest {
     id: number;
     requestNo: string;
