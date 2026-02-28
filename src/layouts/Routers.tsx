@@ -17,6 +17,7 @@ const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
+const ManageUnitConversion = lazy(() => import("../app/pages/manageUnitConversion"))
 const InboundRequest = lazy(() => import("../app/pages/purchase"))
 const ViewInboundRequest = lazy(() => import("../app/pages/purchase/view"))
 const EditInboundRequest = lazy(() => import("../app/pages/purchase/edit"))
@@ -89,6 +90,12 @@ const privateResourceItem = [
     {
         key: URL.ManageUnit,
         element: <ManageUnit />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageUnitConversion,
+        element: <ManageUnitConversion />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },

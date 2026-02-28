@@ -36,6 +36,7 @@ const Sidebar = () => {
                     { key: URL.ManageCategory, label: "Danh mục" },
                     { key: URL.ManageProduct, label: "Sản phẩm" },
                     { key: URL.ManageUnit, label: "Đơn vị tính" },
+                    { key: URL.ManageUnitConversion, label: "Quy đổi đơn vị" },
                 ],
             },
             { key: URL.ManageWarehouse, icon: <DatabaseOutlined />, label: "Kho hàng" },
@@ -43,20 +44,20 @@ const Sidebar = () => {
         MANAGE: [
             { key: URL.DashboardManage, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageInventory, icon: <DatabaseOutlined />, label: "Tồn kho" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
         ],
         STAFF: [
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageInventory, icon: <DatabaseOutlined />, label: "Tồn kho" },
-            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" }
+            { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
         ],
         PURCHASE: [
             { key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.InboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu nhập hàng" }
+            { key: URL.InboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu nhập hàng" },
         ],
         SALE: [
             { key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" },
-            { key: URL.OutboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu xuất hàng" }
+            { key: URL.OutboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu xuất hàng" },
         ],
     };
 
@@ -72,7 +73,6 @@ const Sidebar = () => {
             trigger={null}
         >
             <div className="h-full flex flex-col">
-                {/* Logo area */}
                 <div className="h-16 px-4 flex items-center justify-start overflow-hidden border-b border-gray-50 bg-white">
                     <div className="min-w-[48px] h-10 flex items-center justify-center bg-blue-600 rounded-lg shadow-lg shadow-blue-200/50">
                         <span className="text-white font-black text-xl">W</span>
@@ -90,14 +90,13 @@ const Sidebar = () => {
                                     WMS System
                                 </span>
                                 <span className="text-[8px] text-blue-500 font-medium uppercase tracking-[0.1em]">
-                                    Warehouse Management
+                                    Hệ thống quản lý kho
                                 </span>
                             </motion.div>
                         )}
                     </AnimatePresence>
                 </div>
 
-                {/* Navigation Menu */}
                 <div className="flex-1 py-4 overflow-y-auto no-scrollbar active-menu-blue">
                     <Menu
                         mode="inline"
@@ -112,7 +111,6 @@ const Sidebar = () => {
                     />
                 </div>
 
-                {/* Sidebar Footer with Collapse Toggle */}
                 <div className="p-4 border-t border-gray-100 flex justify-center">
                     <Button
                         type="text"

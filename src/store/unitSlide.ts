@@ -34,7 +34,7 @@ export const getAllUnits = createAsyncThunk(
     "unit/get-all",
     async (_, { rejectWithValue, getState }) => {
         try {
-            const state: any = getState();
+            const state = getState() as RootState;
             const token = state.auth.infoLogin?.accessToken;
 
             const res = await request({
@@ -56,7 +56,7 @@ export const createUnit = createAsyncThunk(
     "unit/create",
     async (data: Unit, { rejectWithValue, getState }) => {
         try {
-            const state: any = getState();
+            const state = getState() as RootState;
             const token = state.auth.infoLogin?.accessToken;
 
             const res = await request({
@@ -82,7 +82,7 @@ export const updateUnit = createAsyncThunk(
         { rejectWithValue, getState }
     ) => {
         try {
-            const state: any = getState();
+            const state = getState() as RootState;
             const token = state.auth.infoLogin?.accessToken;
 
             const res = await request({
@@ -105,7 +105,7 @@ export const deleteUnit = createAsyncThunk(
     "unit/delete",
     async (id: number, { rejectWithValue, getState }) => {
         try {
-            const state: any = getState();
+            const state = getState() as RootState;
             const token = state.auth.infoLogin?.accessToken;
             await request({
                 url: `/unit/${id}`,
