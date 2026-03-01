@@ -1,7 +1,9 @@
 import { Modal, Table, InputNumber, Input, Tag, Typography, Alert, App } from "antd";
-import { useState } from "react";
-import { useAppDispatch } from "../../../../store";
+import { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "../../../../store";
 import { receiveGoods, type InboundRequest, type InboundRequestItem } from "../../../../store/inboundRequestSlide";
+import { getAllProducts, selectProducts } from "../../../../store/productSlice";
+import { selectWarehouses } from "../../../../store/warehouseslide";
 
 const { Text } = Typography;
 
@@ -23,6 +25,20 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
     const [rows, setRows] = useState<Record<number, ReceiveRow>>({});
+
+    const products = useAppSelector(selectProducts);
+    const warehouses = useAppSelector(selectWarehouses);
+
+    useEffect(() => {
+        if (open && products.length === 0) {
+            dispatch(getAllProducts());
+        }
+    }, [open, dispatch, products.length]);
+
+    const getProduct = (productId: number) =>
+        products.find((p) => p.id === productId);
+    const getWarehouse = (warehouseId: number) => warehouses.find((w) => w.id === warehouseId);
+
 
     const buildInitialRows = (): Record<number, ReceiveRow> => {
         if (!request) return {};
@@ -76,7 +92,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             items: request.inboundItems.map((item) => {
                 const row = mergedRows[item.id];
 
-                // Format LineNote: gộp ghi chú gốc + kết quả nhận hàng
                 let finalNote = "";
                 if (item.lineNote && row.noteResult) {
                     finalNote = `[YC: ${item.lineNote}] | [KQ: ${row.noteResult}]`;
@@ -118,41 +133,63 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             title: "Sản phẩm",
             dataIndex: "productId",
             key: "productId",
-            width: 100,
-            render: (productId: number) => (
-                <Tag color="blue" className="font-mono">#{productId}</Tag>
-            ),
+            width: 200,
+            render: (productId: number) => {
+                const product = getProduct(productId);
+                return product ? (
+                    <div>
+                        <div className="font-medium text-gray-800">{product.name}</div>
+                        <div className="text-xs text-gray-400 font-mono">{product.sku}</div>
+                    </div>
+                ) : (
+                    <Tag color="blue" className="font-mono">#{productId}</Tag>
+                );
+            },
         },
         {
             title: "SL đặt",
             dataIndex: "quantity",
             key: "quantity",
-            width: 80,
+            width: 100,
             align: "center" as const,
-            render: (qty: number) => (
-                <Text strong className="text-gray-700">{qty}</Text>
-            ),
+            render: (qty: number, record: InboundRequestItem) => {
+                const product = getProduct(record.productId);
+                return (
+                    <div className="text-center">
+                        <Text strong className="text-gray-700">{qty}</Text>
+                        {product && (
+                            <span className="ml-1 text-xs text-gray-400">{product.baseUnitCode}</span>
+                        )}
+                    </div>
+                );
+            },
         },
         {
             title: "SL thực nhận",
             key: "receivedQuantity",
-            width: 150,
+            width: 160,
             align: "center" as const,
             render: (_: any, record: InboundRequestItem) => {
                 const row = currentRows[record.id];
                 const received = row?.receivedQuantity;
                 const isDiff = received !== null && received !== undefined && received !== record.quantity;
+                const product = getProduct(record.productId);
 
                 return (
                     <div>
-                        <InputNumber
-                            min={0}
-                            value={row?.receivedQuantity ?? undefined}
-                            onChange={(val) => handleQuantityChange(record.id, val)}
-                            className="w-full"
-                            placeholder="Nhập SL"
-                            status={isDiff ? "warning" : undefined}
-                        />
+                        <div className="flex items-center gap-1">
+                            <InputNumber
+                                min={0}
+                                value={row?.receivedQuantity ?? undefined}
+                                onChange={(val) => handleQuantityChange(record.id, val)}
+                                className="flex-1"
+                                placeholder="Nhập SL"
+                                status={isDiff ? "warning" : undefined}
+                            />
+                            {product && (
+                                <span className="text-xs text-gray-400 whitespace-nowrap">{product.baseUnitCode}</span>
+                            )}
+                        </div>
                         {isDiff && (
                             <div className="text-[10px] text-orange-500 mt-0.5 text-center">
                                 Chênh {(received! - record.quantity) > 0 ? "+" : ""}
@@ -211,7 +248,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         >
             <div className="mb-4 grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg text-sm">
                 <div><span className="text-gray-500">Nhà cung cấp:</span> <strong>{request.supplierName}</strong></div>
-                <div><span className="text-gray-500">Kho nhập:</span> <strong>#{request.warehouseId}</strong></div>
+                <div><span className="text-gray-500">Kho nhập:</span> <strong>{(() => { const w = getWarehouse(request.warehouseId); return w ? `${w.name} (${w.code})` : `#${request.warehouseId}`; })()}</strong></div>
                 {request.note && (
                     <div className="col-span-2">
                         <span className="text-gray-500">Ghi chú đơn:</span> {request.note}
@@ -220,7 +257,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             </div>
 
             <Alert
-                message=' Nhập kết quả thực tế vào cột "Kết quả nhận hàng".'
+                message='Nhập kết quả thực tế vào cột "Kết quả nhận hàng".'
                 type="info"
                 showIcon
                 className="mb-4"
