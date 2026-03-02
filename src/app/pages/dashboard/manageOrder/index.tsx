@@ -19,6 +19,8 @@ import {
 
 } from "../../../../store/inboundRequestSlide";
 import { getActiveWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
+import { select } from "framer-motion/client";
+import { getAllRoles, selectRoleLoading } from "../../../../store/roleSlide";
 
 
 
@@ -27,6 +29,7 @@ const ManageOrder = () => {
     const requests = useSelector(selectInboundRequests);
     const loading = useSelector(selectInboundRequestLoading);
     const warehouses = useSelector(selectWarehouses);
+    const role = useSelector(selectRoleLoading);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -38,6 +41,7 @@ const ManageOrder = () => {
     useEffect(() => {
         dispatch(getInboundRequests());
         dispatch(getActiveWarehouses());
+        dispatch(getAllRoles());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -116,7 +120,10 @@ const ManageOrder = () => {
             title: "Approved By",
             dataIndex: "approvedBy",
             key: "approvedBy",
-            render: (text) => text || "—"
+            render: (RoleId: number) => {
+                const role = RoleId === 2 ? "Admin" : "User";
+                return <span>{role}</span>;
+            }
         },
         {
             title: "Approved At",
