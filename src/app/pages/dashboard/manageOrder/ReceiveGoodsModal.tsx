@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { receiveGoods, type InboundRequest, type InboundRequestItem } from "../../../../store/inboundRequestSlide";
 import { getAllProducts, selectProducts } from "../../../../store/productSlice";
-import { selectWarehouses } from "../../../../store/warehouseslide";
+import { getActiveWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
 
 const { Text } = Typography;
 
@@ -30,14 +30,18 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
     const warehouses = useAppSelector(selectWarehouses);
 
     useEffect(() => {
-        if (open && products.length === 0) {
-            dispatch(getAllProducts());
+        if (open) {
+            if (products.length === 0) dispatch(getAllProducts());
+            if (warehouses.length === 0) dispatch(getActiveWarehouses());
         }
-    }, [open, dispatch, products.length]);
+    }, [open, dispatch, products.length, warehouses.length]);
+
+
 
     const getProduct = (productId: number) =>
         products.find((p) => p.id === productId);
-    const getWarehouse = (warehouseId: number) => warehouses.find((w) => w.id === warehouseId);
+    const getWarehouse = (warehouseId: number) =>
+        warehouses.find((w) => w.id === warehouseId);
 
 
     const buildInitialRows = (): Record<number, ReceiveRow> => {

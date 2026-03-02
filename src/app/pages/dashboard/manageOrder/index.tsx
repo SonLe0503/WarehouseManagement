@@ -14,9 +14,11 @@ import {
     approveRejectRequest,
     selectInboundRequests,
     selectInboundRequestLoading,
+
     type InboundRequest
+
 } from "../../../../store/inboundRequestSlide";
-import { i } from "framer-motion/client";
+import { getActiveWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
 
 
 
@@ -24,6 +26,7 @@ const ManageOrder = () => {
     const dispatch = useAppDispatch();
     const requests = useSelector(selectInboundRequests);
     const loading = useSelector(selectInboundRequestLoading);
+    const warehouses = useSelector(selectWarehouses);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -34,6 +37,7 @@ const ManageOrder = () => {
 
     useEffect(() => {
         dispatch(getInboundRequests());
+        dispatch(getActiveWarehouses());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -95,9 +99,18 @@ const ManageOrder = () => {
             }
         },
         {
-            title: "Warehouse ID",
+            title: "Warehouse Name",
             dataIndex: "warehouseId",
             key: "warehouseId",
+            render: (warehouseId: number) => {
+                const warehouse = warehouses.find(w => w.id === warehouseId);
+                return warehouse ? (
+                    <div>
+                        <div className="font-medium text-gray-800">{warehouse.name}</div>
+                        <div className="text-xs text-gray-400 font-mono">{warehouse.code}</div>
+                    </div>
+                ) : (<span className="text-red-500">Unknown Warehouse (ID: {warehouseId})</span>);
+            }
         },
         {
             title: "Approved By",
