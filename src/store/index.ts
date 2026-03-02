@@ -9,6 +9,7 @@ import unitSlide from "./unitSlide";
 import productSlide from "./productSlice";
 import inboundSlide from "./inboundSlice";
 import warehouseSlide from "./warehouseslide";
+import unitConversionSlide from "./unitConversionSlice";
 
 import inboundRequestSlide from "./inboundRequestSlide";
 import inventorySlide from "./inventorySlice";
@@ -31,6 +32,7 @@ const reducers = {
   product: productSlide,
   inbound: inboundSlide,
   warehouse: warehouseSlide,
+  unitConversion: unitConversionSlide,
   inventory: inventorySlide,
 
   inboundRequest: inboundRequestSlide,

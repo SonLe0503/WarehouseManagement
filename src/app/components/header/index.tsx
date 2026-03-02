@@ -19,17 +19,23 @@ const HeaderBar = () => {
     const infoLogin = useAppSelector(selectInfoLogin);
     const [timeLeft, setTimeLeft] = useState<number>(0);
 
+    const handleLogout = () => {
+        dispatch(logout());
+        navigate(URL.Login);
+    };
+
     const pageTitle = useMemo(() => {
         const path = location.pathname;
         if (path.includes("manage-user")) return "Quản lý người dùng";
         if (path.includes("manage-category")) return "Quản lý danh mục";
         if (path.includes("manage-product")) return "Quản lý sản phẩm";
+        if (path.includes("manage-unit-conversion")) return "Quy đổi đơn vị";
         if (path.includes("manage-unit")) return "Đơn vị tính";
         if (path.includes("manage-warehouse")) return "Quản lý kho hàng";
         if (path.includes("manage-inventory")) return "Quản lý tồn kho";
         if (path.includes("profile")) return "Thông tin cá nhân";
         if (path.includes("change-password")) return "Đổi mật khẩu";
-        return "Dashboard";
+        return "Tổng quan";
     }, [location.pathname]);
 
     useEffect(() => {
@@ -49,11 +55,6 @@ const HeaderBar = () => {
 
         return () => clearInterval(timer);
     }, [infoLogin?.expiresTime]);
-
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate(URL.Login);
-    };
 
     const menuItems = [
         {
@@ -75,14 +76,12 @@ const HeaderBar = () => {
 
     return (
         <Header className="!bg-white/80 !backdrop-blur-md border-b border-gray-100 flex justify-between items-center px-8 h-16 sticky top-0 z-40 shadow-sm">
-            {/* Cột trái: Tiêu đề */}
             <div className="flex-1 flex justify-start items-center">
                 <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-0">
                     {pageTitle}
                 </h1>
             </div>
 
-            {/* Cột giữa: Bộ đếm thời gian */}
             <div className="flex-1 flex justify-center items-center">
                 {timeLeft > 0 && (
                     <Tag
@@ -98,7 +97,6 @@ const HeaderBar = () => {
                 )}
             </div>
 
-            {/* Cột phải: Profile & Actions */}
             <div className="flex-1 flex justify-end items-center gap-4">
                 <Space size={16}>
                     <Button
