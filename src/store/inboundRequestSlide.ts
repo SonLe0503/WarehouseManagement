@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
 
-// Interface cho từng item trong Inbound Request
 export interface InboundRequestItem {
     id: number;
     inboundRequestId: number;
@@ -13,7 +12,6 @@ export interface InboundRequestItem {
     lineNote: string;
 }
 
-// Interface chính cho Inbound Request
 export interface InboundRequest {
     id: number;
     requestNo: string;
