@@ -1,18 +1,22 @@
 import { Button, Tag, Table, Modal, message, Tooltip } from "antd";
-import { EyeOutlined, CheckOutlined, CloseOutlined } from "@ant-design/icons";
+import { EyeOutlined, CheckOutlined, CloseOutlined, InboxOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch } from "../../../../store"; // Adjust path if needed
+import { useAppDispatch } from "../../../../store";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import RequestDetailModal from "./RequestDetailModal";
+import ReceiveGoodsModal from "./ReceiveGoodsModal";
+
 import {
     getInboundRequests,
     approveRejectRequest,
     selectInboundRequests,
     selectInboundRequestLoading,
+
     type InboundRequest
+
 } from "../../../../store/inboundRequestSlide";
 import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
 import { getAllUsers, selectUsers } from "../../../../store/userSlide";
@@ -29,6 +33,7 @@ const ManageOrder = () => {
 
     const [selectedRequest, setSelectedRequest] = useState<InboundRequest | undefined>(undefined);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+    const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getInboundRequests());
@@ -47,6 +52,10 @@ const ManageOrder = () => {
     const handleViewDetail = (record: InboundRequest) => {
         setSelectedRequest(record);
         setIsDetailModalOpen(true);
+    };
+    const handleReceiveGoods = (record: InboundRequest) => {
+        setSelectedRequest(record);
+        setIsReceiveModalOpen(true);
     };
 
     const handleApproveReject = (id: number, action: "Approve" | "Reject") => {
@@ -149,6 +158,16 @@ const ManageOrder = () => {
                             </Tooltip>
                         </>
                     )}
+                    {record.status === "Approved" && (
+                        <Tooltip title="Nhận hàng thực tế">
+                            <Button
+                                type="primary"
+                                icon={<InboxOutlined />}
+                                onClick={() => handleReceiveGoods(record)}
+                                className="!flex !items-center !justify-center !bg-purple-600 hover:!bg-purple-500"
+                            />
+                        </Tooltip>
+                    )}
                 </div>
             )
         }
@@ -177,6 +196,15 @@ const ManageOrder = () => {
                 open={isDetailModalOpen}
                 onClose={() => setIsDetailModalOpen(false)}
                 request={selectedRequest}
+            />
+            <ReceiveGoodsModal
+                open={isReceiveModalOpen}
+                onClose={() => {
+                    setIsReceiveModalOpen(false);
+                    setSelectedRequest(undefined);
+                }}
+                request={selectedRequest}
+                onSuccess={() => dispatch(getInboundRequests())}
             />
         </div>
     );

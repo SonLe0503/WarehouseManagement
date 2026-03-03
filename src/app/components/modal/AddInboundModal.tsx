@@ -32,18 +32,19 @@ const AddInboundModal = (props: AddInboundModalProps) => {
         }
     }, [dispatch, open]);
 
+
     const handleSubmit = async () => {
         try {
             const values = await form.validateFields();
             setLoading(true);
-
             await dispatch(createInboundRequest(values)).unwrap();
-
             message.success("Tạo phiếu nhập kho thành công");
             form.resetFields();
             onClose();
         } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra khi tạo phiếu");
+            // Lỗi validateFields trả về object, không phải string
+            if (error?.errorFields) return; // validation error, antd tự hiển thị
+            message.error(typeof error === "string" ? error : "Có lỗi xảy ra khi tạo phiếu");
         } finally {
             setLoading(false);
         }
@@ -144,7 +145,14 @@ const AddInboundModal = (props: AddInboundModalProps) => {
                                         rules={[{ required: true, message: 'Nhập SL' }]}
                                         className="w-32 mb-0"
                                     >
-                                        <InputNumber min={0.1} className="w-full" placeholder="Số lượng" />
+                                        <InputNumber
+                                            min={1}
+                                            precision={0}
+                                            step={1}
+                                            parser={(value) => Math.floor(Number(value?.replace(/[^\d]/g, "") || 0)) as any}
+                                            className="w-full"
+                                            placeholder="Số lượng"
+                                        />
                                     </Form.Item>
 
                                     <Form.Item
