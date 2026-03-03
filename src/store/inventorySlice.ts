@@ -12,14 +12,7 @@ export interface IInventory {
     quantity: number;
     storagePosition: string;
     updatedAt: string;
-    product?: {
-        name: string;
-        sku: string;
-    };
-    warehouse?: {
-        name: string;
-        code: string;
-    };
+
 }
 
 type InventoryState = {
@@ -86,6 +79,7 @@ const inventorySlice = createSlice({
         builder
             .addCase(getAllInventories.pending, (state) => {
                 state.loading = true;
+                state.error = undefined;
             })
             .addCase(getAllInventories.fulfilled, (state, action) => {
                 state.inventories = action.payload;

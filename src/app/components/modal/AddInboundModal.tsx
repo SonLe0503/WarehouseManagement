@@ -144,7 +144,13 @@ const AddInboundModal = (props: AddInboundModalProps) => {
                                         rules={[{ required: true, message: 'Nhập SL' }]}
                                         className="w-32 mb-0"
                                     >
-                                        <InputNumber min={0.1} className="w-full" placeholder="Số lượng" />
+                                        <InputNumber
+                                            min={1}
+                                            precision={0}
+                                            step={1}
+                                            className="w-full"
+                                            placeholder="Số lượng"
+                                        />
                                     </Form.Item>
 
                                     <Form.Item

@@ -17,6 +17,7 @@ interface ReceiveGoodsModalProps {
 interface ReceiveRow {
     inboundItemId: number;
     receivedQuantity: number | null;
+    storagePosition: string;
     noteResult: string;
 }
 
@@ -38,10 +39,8 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
 
 
 
-    const getProduct = (productId: number) =>
-        products.find((p) => p.id === productId);
-    const getWarehouse = (warehouseId: number) =>
-        warehouses.find((w) => w.id === warehouseId);
+    const getProduct = (productId: number) => products.find((p) => p.id === productId);
+    const getWarehouse = (warehouseId: number) => warehouses.find((w) => w.id === warehouseId);
 
 
     const buildInitialRows = (): Record<number, ReceiveRow> => {
@@ -51,6 +50,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             initial[item.id] = {
                 inboundItemId: item.id,
                 receivedQuantity: null,
+                storagePosition: "",
                 noteResult: "",
             };
         });
@@ -79,6 +79,16 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         }));
     };
 
+    const handlePositionChange = (itemId: number, value: string) => {
+        setRows((prev) => ({
+            ...prev,
+            [itemId]: {
+                ...(prev[itemId] || buildInitialRows()[itemId]),
+                storagePosition: value,
+            },
+        }));
+    };
+
     const handleSubmit = async () => {
         if (!request) return;
 
@@ -89,6 +99,14 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         );
         if (missing.length > 0) {
             message.warning("Vui lòng nhập số lượng thực nhận cho tất cả sản phẩm");
+            return;
+        }
+
+        const missingPosition = Object.values(mergedRows).filter(
+            (r) => !r.storagePosition || r.storagePosition.trim() === ""
+        );
+        if (missingPosition.length > 0) {
+            message.warning("Vui lòng nhập vị trí bin cho tất cả sản phẩm");
             return;
         }
 
@@ -108,6 +126,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                 return {
                     inboundItemId: item.id,
                     receivedQuantity: row.receivedQuantity as number,
+                    storagePosition: row.storagePosition || undefined,
                     lineNote: finalNote || undefined,
                 };
             }),
@@ -205,6 +224,22 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             },
         },
         {
+            title: "Vị trí bin",
+            key: "storagePosition",
+            width: 110,
+            render: (_: any, record: InboundRequestItem) => {
+                const row = currentRows[record.id];
+                return (
+                    <Input
+                        value={row?.storagePosition ?? ""}
+                        onChange={(e) => handlePositionChange(record.id, e.target.value)}
+                        placeholder="VD: A1, B2..."
+                        status={!row?.storagePosition ? "error" : undefined}
+                    />
+                );
+            },
+        },
+        {
             title: "Yêu cầu từ đơn",
             dataIndex: "lineNote",
             key: "lineNoteOriginal",
@@ -232,6 +267,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
     ];
 
     if (!request) return null;
+    const warehouse = getWarehouse(request.warehouseId);
 
     return (
         <Modal
@@ -252,7 +288,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         >
             <div className="mb-4 grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg text-sm">
                 <div><span className="text-gray-500">Nhà cung cấp:</span> <strong>{request.supplierName}</strong></div>
-                <div><span className="text-gray-500">Kho nhập:</span> <strong>{(() => { const w = getWarehouse(request.warehouseId); return w ? `${w.name} (${w.code})` : `#${request.warehouseId}`; })()}</strong></div>
+                <div><span className="text-gray-500">Kho nhập:</span> <strong>{warehouse ? `${warehouse.name} (${warehouse.code})` : `#${request.warehouseId}`}</strong></div>
                 {request.note && (
                     <div className="col-span-2">
                         <span className="text-gray-500">Ghi chú đơn:</span> {request.note}

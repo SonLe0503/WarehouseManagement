@@ -69,7 +69,7 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
 
     return (
         <Modal
-            title={`Chi tiết phiếu nhập: ${request.requestNo}`}
+            title={`Xem thông tin đơn mua: ${request.requestNo}`}
             open={open}
             onCancel={onClose}
             footer={null}

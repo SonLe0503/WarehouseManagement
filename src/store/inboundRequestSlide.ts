@@ -8,8 +8,8 @@ export interface InboundRequestItem {
     productId: number;
     quantity: number;
     receivedQuantity: number;
-    storagePosition: string;
-    lineNote: string;
+    storagePosition?: string;
+    lineNote?: string;
 }
 
 export interface InboundRequest {
@@ -17,11 +17,11 @@ export interface InboundRequest {
     requestNo: string;
     supplierName: string;
     status: string;
-    note: string;
+    note?: string;
     warehouseId: number;
     createdBy: number;
-    approvedBy: number;
-    approvedAt: string;
+    approvedBy?: number;
+    approvedAt?: string;
     createdAt: string;
     inboundItems: InboundRequestItem[];
 }
@@ -29,6 +29,7 @@ export interface InboundRequest {
 export interface ReceiveInboundItemDto {
     inboundItemId: number;
     receivedQuantity: number;
+    storagePosition?: string;
     lineNote?: string;
 }
 
