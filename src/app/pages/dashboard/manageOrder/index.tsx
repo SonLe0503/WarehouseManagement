@@ -18,18 +18,15 @@ import {
     type InboundRequest
 
 } from "../../../../store/inboundRequestSlide";
-import { getActiveWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
-import { select } from "framer-motion/client";
-import { getAllRoles, selectRoleLoading } from "../../../../store/roleSlide";
-
-
+import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
+import { getAllUsers, selectUsers } from "../../../../store/userSlide";
 
 const ManageOrder = () => {
     const dispatch = useAppDispatch();
     const requests = useSelector(selectInboundRequests);
     const loading = useSelector(selectInboundRequestLoading);
     const warehouses = useSelector(selectWarehouses);
-    const role = useSelector(selectRoleLoading);
+    const users = useSelector(selectUsers);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -40,8 +37,8 @@ const ManageOrder = () => {
 
     useEffect(() => {
         dispatch(getInboundRequests());
-        dispatch(getActiveWarehouses());
-        dispatch(getAllRoles());
+        dispatch(getAllWarehouses());
+        dispatch(getAllUsers());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -80,65 +77,55 @@ const ManageOrder = () => {
 
     const columns: ColumnsType<InboundRequest> = [
         {
-            title: "Request No",
+            title: "Mã yêu cầu",
             dataIndex: "requestNo",
             key: "requestNo",
             render: (text) => <span className="font-semibold text-blue-600">{text}</span>
         },
         {
-            title: "Supplier",
+            title: "Nhà cung cấp",
             dataIndex: "supplierName",
             key: "supplierName",
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "status",
             key: "status",
             render: (status) => {
                 let color = "blue";
-                if (status === "Approved") color = "green";
-                if (status === "Rejected") color = "red";
-                if (status === "Pending") color = "orange";
-                return <Tag color={color}>{status}</Tag>;
+                let text = status;
+                if (status === "Approved") { color = "green"; text = "Đã duyệt"; }
+                if (status === "Rejected") { color = "red"; text = "Từ chối"; }
+                if (status === "Pending") { color = "orange"; text = "Đang chờ"; }
+                return <Tag color={color}>{text}</Tag>;
             }
         },
         {
-            title: "Warehouse Name",
+            title: "Tên kho",
             dataIndex: "warehouseId",
             key: "warehouseId",
-            render: (warehouseId: number) => {
-                const warehouse = warehouses.find(w => w.id === warehouseId);
-                return warehouse ? (
-                    <div>
-                        <div className="font-medium text-gray-800">{warehouse.name}</div>
-                        <div className="text-xs text-gray-400 font-mono">{warehouse.code}</div>
-                    </div>
-                ) : (<span className="text-red-500">Unknown Warehouse (ID: {warehouseId})</span>);
-            }
+            render: (id) => warehouses.find(w => w.id === id)?.name || id
         },
         {
-            title: "Approved By",
+            title: "Người duyệt",
             dataIndex: "approvedBy",
             key: "approvedBy",
-            render: (RoleId: number) => {
-                const role = RoleId === 2 ? "Admin" : "User";
-                return <span>{role}</span>;
-            }
+            render: (id) => users.find(u => u.id === id)?.username || id || "—"
         },
         {
-            title: "Approved At",
+            title: "Ngày duyệt",
             dataIndex: "approvedAt",
             key: "approvedAt",
             render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "—"
         },
         {
-            title: "Created At",
+            title: "Ngày tạo",
             dataIndex: "createdAt",
             key: "createdAt",
             render: (date) => dayjs(date).format("DD/MM/YYYY")
         },
         {
-            title: "Action",
+            title: "Hành động",
             key: "action",
             render: (_, record) => (
                 <div className="flex gap-2">
@@ -195,7 +182,7 @@ const ManageOrder = () => {
                 setSearchStatus={setSearchStatus}
             />
 
-            <h2 className="text-xl font-bold mb-4">Quản lý nhập kho (Inbound Requests)</h2>
+            <h2 className="text-xl font-bold mb-4">Quản lý đơn mua</h2>
 
             <Table
                 dataSource={filteredRequests}

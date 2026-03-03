@@ -14,7 +14,7 @@ const Condition = (props: ConditionProps) => {
         <div className="flex gap-2 mb-4">
             <Input
                 type="text"
-                placeholder="Tìm theo mã đơn (Request No)"
+                placeholder="Tìm theo mã yêu cầu"
                 value={searchRequestNo}
                 onChange={(e) => setSearchRequestNo(e.target.value)}
                 className="w-full"
@@ -26,9 +26,9 @@ const Condition = (props: ConditionProps) => {
                 onChange={(value) => setSearchStatus(value)}
                 options={[
                     { value: "", label: "Tất cả trạng thái" },
-                    { value: "Approved", label: "Approved" },
-                    { value: "Pending", label: "Pending" },
-                    { value: "Rejected", label: "Rejected" },
+                    { value: "Approved", label: "Đã duyệt" },
+                    { value: "Pending", label: "Đang chờ" },
+                    { value: "Rejected", label: "Từ chối" },
                 ]}
             />
         </div>

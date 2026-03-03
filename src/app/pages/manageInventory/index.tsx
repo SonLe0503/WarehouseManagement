@@ -16,9 +16,9 @@ const ManageInventory = () => {
 
     const filteredInventories = useMemo(() => {
         return inventories.filter((item) => {
-            const skuMatch = (item.sku || item.product?.sku || "").toLowerCase().includes(searchSku.toLowerCase());
-            const nameMatch = (item.productName || item.product?.name || "").toLowerCase().includes(searchProductName.toLowerCase());
-            const warehouseMatch = (item.warehouseName || item.warehouse?.name || "").toLowerCase().includes(searchWarehouse.toLowerCase());
+            const skuMatch = (item.sku || "").toLowerCase().includes(searchSku.toLowerCase());
+            const nameMatch = (item.productName || "").toLowerCase().includes(searchProductName.toLowerCase());
+            const warehouseMatch = (item.warehouseName || "").toLowerCase().includes(searchWarehouse.toLowerCase());
             return skuMatch && nameMatch && warehouseMatch;
         });
     }, [inventories, searchSku, searchProductName, searchWarehouse]);
@@ -46,9 +46,10 @@ const ManageInventory = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="grid grid-cols-6 bg-gray-50/80 font-bold text-xs uppercase tracking-wider text-gray-600 border-b border-gray-200">
+                <div className="grid grid-cols-7 bg-gray-50/80 font-bold text-xs uppercase tracking-wider text-gray-600 border-b border-gray-200">
                     <div className="px-6 py-4">Mã SKU</div>
                     <div className="px-6 py-4 col-span-2">Sản phẩm</div>
+                    <div className="px-6 py-4">Vị trí</div>
                     <div className="px-6 py-4">Kho hàng</div>
                     <div className="px-6 py-4 text-center">Số lượng tồn</div>
                     <div className="px-6 py-4 text-right">Cập nhật cuối</div>
@@ -63,22 +64,26 @@ const ManageInventory = () => {
                     filteredInventories.map((item) => (
                         <div
                             key={item.id}
-                            className="grid grid-cols-6 text-sm border-b border-gray-100 hover:bg-blue-50/30 transition-all duration-200"
+                            className="grid grid-cols-7 text-sm border-b border-gray-100 hover:bg-blue-50/30 transition-all duration-200"
                         >
                             <div className="px-6 py-4 font-mono font-bold text-blue-600">
-                                {item.sku || item.product?.sku}
+                                {item.sku}
                             </div>
                             <div className="px-6 py-4 col-span-2">
-                                <div className="font-semibold text-gray-800">{item.productName || item.product?.name}</div>
-                                {item.storagePosition && (
-                                    <div className="text-[11px] text-gray-400 mt-0.5 mt-1 border border-gray-200 rounded px-1.5 w-max bg-gray-50">
-                                        Vị trí: {item.storagePosition}
-                                    </div>
+                                <div className="font-semibold text-gray-800">{item.productName}</div>
+                            </div>
+                            <div className="px-6 py-4">
+                                {item.storagePosition ? (
+                                    <Tag color="cyan" className="font-medium mr-0">
+                                        {item.storagePosition}
+                                    </Tag>
+                                ) : (
+                                    <span className="text-gray-300">—</span>
                                 )}
                             </div>
                             <div className="px-6 py-4">
                                 <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
-                                    {item.warehouseName || item.warehouse?.name}
+                                    {item.warehouseName}
                                 </span>
                             </div>
                             <div className="px-6 py-4 text-center">

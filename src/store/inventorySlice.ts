@@ -9,10 +9,10 @@ export interface IInventory {
     sku: string;
     warehouseId: number;
     warehouseName: string;
+    warehouseCode: string;
     quantity: number;
     storagePosition: string;
     updatedAt: string;
-
 }
 
 type InventoryState = {

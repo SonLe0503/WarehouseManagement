@@ -8,9 +8,11 @@ export interface InboundRequestItem {
     productId: number;
     quantity: number;
     receivedQuantity: number;
-    storagePosition?: string;
-    lineNote?: string;
+    storagePosition: string;
+    unitId: number;
+    lineNote: string;
 }
+
 
 export interface InboundRequest {
     id: number;

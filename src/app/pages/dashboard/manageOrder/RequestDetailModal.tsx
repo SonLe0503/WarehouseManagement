@@ -1,11 +1,14 @@
 import { Modal, Tag, Table } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
+import { useSelector } from "react-redux";
+import { useEffect } from "react";
+import { useAppDispatch } from "../../../../store";
 import type { InboundRequest, InboundRequestItem } from "../../../../store/inboundRequestSlide";
 import { getAllProducts, selectProducts } from "../../../../store/productSlice";
-import { useAppDispatch, useAppSelector } from "../../../../store";
-import { selectWarehouses } from "../../../../store/warehouseslide";
-import { useEffect } from "react";
+import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
+import { getAllUsers, selectUsers } from "../../../../store/userSlide";
+import { getAllUnits, selectUnits } from "../../../../store/unitSlide";
 
 interface RequestDetailModalProps {
     open: boolean;
@@ -13,55 +16,56 @@ interface RequestDetailModalProps {
     request?: InboundRequest;
 }
 
-
 const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps) => {
-    const products = useAppSelector(selectProducts);
-    const warehouses = useAppSelector(selectWarehouses);
-
     const dispatch = useAppDispatch();
-
-    const getProduct = (productId: number) => products.find((p) => p.id === productId);
-
+    const products = useSelector(selectProducts);
+    const warehouses = useSelector(selectWarehouses);
+    const users = useSelector(selectUsers);
+    const units = useSelector(selectUnits);
 
     useEffect(() => {
-        if (open && products.length === 0) {
+        if (open) {
             dispatch(getAllProducts());
+            dispatch(getAllWarehouses());
+            dispatch(getAllUsers());
+            dispatch(getAllUnits());
         }
-    }, [open, dispatch, products.length]);
+    }, [open, dispatch]);
 
     if (!request) return null;
+
     const columns: ColumnsType<InboundRequestItem> = [
         {
-            title: "Product Name",
+            title: "Tên sản phẩm",
             dataIndex: "productId",
             key: "productId",
-            render: (productId: number) => {
-                const product = getProduct(productId);
-                return product ? (
-                    <div>
-                        <div className="font-medium text-gray-800">{product.name}</div>
-                        <div className="text-xs text-gray-400 font-mono">{product.sku}</div>
-                    </div>
-                ) : (<span className="text-red-500">Unknown Product (ID: {productId})</span>);
+            render: (id) => products.find(p => p.id === id)?.name || id
+        },
+        {
+            title: "Số lượng",
+            dataIndex: "quantity",
+            key: "quantity",
+            render: (val, record) => {
+                const unitName = units.find(u => u.id === record.unitId)?.name || "";
+                return `${val} ${unitName}`;
             }
         },
         {
-            title: "Quantity",
-            dataIndex: "quantity",
-            key: "quantity",
-        },
-        {
-            title: "Received",
+            title: "Đã nhận",
             dataIndex: "receivedQuantity",
             key: "receivedQuantity",
+            render: (val, record) => {
+                const unitName = units.find(u => u.id === record.unitId)?.name || "";
+                return `${val} ${unitName}`;
+            }
         },
         {
-            title: "Storage Position",
+            title: "Vị trí lưu kho",
             dataIndex: "storagePosition",
             key: "storagePosition",
         },
         {
-            title: "Note",
+            title: "Ghi chú",
             dataIndex: "lineNote",
             key: "lineNote",
         },
@@ -69,7 +73,7 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
 
     return (
         <Modal
-            title={`Xem thông tin đơn mua: ${request.requestNo}`}
+            title={`Chi tiết phiếu nhập: ${request.requestNo}`}
             open={open}
             onCancel={onClose}
             footer={null}
@@ -77,17 +81,19 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
         >
             <div className="mb-4 grid grid-cols-2 gap-4">
                 <div>
-                    <p><strong>Supplier:</strong> {request.supplierName}</p>
-                    <p><strong>Status:</strong> <Tag color={request.status === "Approved" ? "green" : "blue"}>{request.status}</Tag></p>
-                    <p><strong>Warehouse Name:</strong> {warehouses.find(w => w.id === request.warehouseId)?.name || "Unknown Warehouse"}</p>
+                    <p><strong>Nhà cung cấp:</strong> {request.supplierName}</p>
+                    <p><strong>Trạng thái:</strong> <Tag color={request.status === "Approved" ? "green" : (request.status === "Pending" ? "orange" : (request.status === "Rejected" ? "red" : "blue"))}>{
+                        request.status === "Approved" ? "Đã duyệt" : (request.status === "Pending" ? "Đang chờ" : (request.status === "Rejected" ? "Từ chối" : request.status))
+                    }</Tag></p>
+                    <p><strong>Tên kho:</strong> {warehouses.find(w => w.id === request.warehouseId)?.name || request.warehouseId}</p>
                 </div>
                 <div>
-                    <p><strong>Created By:</strong> {request.createdBy}</p>
-                    <p><strong>Approved By:</strong> {request.approvedBy}</p>
-                    <p><strong>Approved At:</strong> {dayjs(request.approvedAt).format("DD/MM/YYYY HH:mm")}</p>
+                    <p><strong>Người tạo:</strong> {users.find(u => u.id === request.createdBy)?.username || request.createdBy}</p>
+                    <p><strong>Người duyệt:</strong> {users.find(u => u.id === request.approvedBy)?.username || request.approvedBy || "—"}</p>
+                    <p><strong>Ngày duyệt:</strong> {request.approvedAt ? dayjs(request.approvedAt).format("DD/MM/YYYY HH:mm") : "—"}</p>
                 </div>
                 <div className="col-span-2">
-                    <p><strong>Note:</strong> {request.note}</p>
+                    <p><strong>Ghi chú:</strong> {request.note}</p>
                 </div>
             </div>
 
