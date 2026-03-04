@@ -25,6 +25,7 @@ const OutboundRequest = lazy(() => import("../app/pages/sale"))
 const ViewOutboundRequest = lazy(() => import("../app/pages/sale/view"))
 const EditOutboundRequest = lazy(() => import("../app/pages/sale/edit"))
 const ManageOrder = lazy(() => import("../app/pages/dashboard/manageOrder"))
+const ManageOutbound = lazy(() => import("../app/pages/dashboard/manageOutbound"))
 const ManageInventory = lazy(() => import("../app/pages/manageInventory"))
 const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
 const Profile = lazy(() => import("../app/pages/profile"))
@@ -137,7 +138,13 @@ const manageResourceItem = [
         element: <ManageOrder />,
         layout: DASHBOARD_LAYOUT,
         private: true,
-    }
+    },
+    {
+        key: URL.ManageOutbound,
+        element: <ManageOutbound />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
 ]
 
 const purchaseResourceItem = [

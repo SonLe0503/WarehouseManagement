@@ -12,6 +12,9 @@ export interface IOutboundRequest {
     note: string;
     rejectReason?: string;
     warehouseId?: number;
+    approvedBy?: number;
+    approvedAt?: string;
+    createdBy?: number;
     items?: IOutboundItem[];
 }
 
@@ -20,6 +23,7 @@ export interface IOutboundItem {
     productId: number;
     unitId?: number;
     quantity: number;
+    pickedQuantity?: number;
     lineNote?: string;
     unit?: {
         id: number;
@@ -45,6 +49,17 @@ export interface OutboundRequestCreateDTO {
         quantity: number;
         lineNote?: string;
     }[];
+}
+
+export interface PickedOutboundItemDTO {
+    outboundItemId: number;
+    pickedQuantity: number;
+    storagePosition?: string;
+    lineNote?: string;
+}
+
+export interface PickedOutboundRequestDTO {
+    items: PickedOutboundItemDTO[];
 }
 
 type OutboundState = {
@@ -196,6 +211,86 @@ export const deleteOutboundRequest = createAsyncThunk(
     }
 );
 
+export const getAllOutboundRequests = createAsyncThunk(
+    "outbound/get-all",
+    async (_, { rejectWithValue, getState }) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth.infoLogin?.accessToken;
+
+            if (!token) {
+                return rejectWithValue("No authentication token found");
+            }
+
+            const res = await request({
+                url: `/outbound-requests`,
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return res.data as IOutboundRequest[];
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
+export const approveRejectOutbound = createAsyncThunk(
+    "outbound/approve-reject",
+    async (
+        { id, action }: { id: number; action: "Approve" | "Reject" },
+        { rejectWithValue, getState }
+    ) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth.infoLogin?.accessToken;
+
+            if (!token) {
+                return rejectWithValue("No authentication token found");
+            }
+
+            await request({
+                url: `/outbound-requests/${id}/approval`,
+                method: "POST",
+                data: { action },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { id, action };
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
+export const shipGoods = createAsyncThunk(
+    "outbound/ship-goods",
+    async ({ id, data }: { id: number; data: PickedOutboundRequestDTO }, { rejectWithValue, getState }) => {
+        try {
+            const state = getState() as RootState;
+            const token = state.auth.infoLogin?.accessToken;
+
+            if (!token) {
+                return rejectWithValue("No authentication token found");
+            }
+
+            const res = await request({
+                url: `/outbound-requests/${id}/ship`,
+                method: "POST",
+                data,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { id, data: res.data };
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
 const outboundSlice = createSlice({
     name: "outbound",
     initialState,
@@ -258,6 +353,51 @@ const outboundSlice = createSlice({
                 state.loading = false;
             })
             .addCase(deleteOutboundRequest.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(shipGoods.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(shipGoods.fulfilled, (state, action) => {
+                state.loading = false;
+                const req = state.requests.find(r => r.id === action.payload.id);
+                if (req) {
+                    req.status = "Completed";
+                }
+                if (state.currentRequest?.id === action.payload.id) {
+                    state.currentRequest.status = "Completed";
+                }
+            })
+            .addCase(shipGoods.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(getAllOutboundRequests.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getAllOutboundRequests.fulfilled, (state, action) => {
+                state.requests = action.payload;
+                state.loading = false;
+            })
+            .addCase(getAllOutboundRequests.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(approveRejectOutbound.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(approveRejectOutbound.fulfilled, (state, action) => {
+                state.loading = false;
+                const req = state.requests.find(r => r.id === action.payload.id);
+                if (req) {
+                    req.status = action.payload.action === "Approve" ? "Approved" : "Rejected";
+                }
+            })
+            .addCase(approveRejectOutbound.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

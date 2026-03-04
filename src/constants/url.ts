@@ -9,6 +9,7 @@ const URL = {
     DashboardPurchase: '/dashboard-purchase',
     DashboardSale: '/dashboard-sale',
     ManageOrder: '/manage-order',
+    ManageOutbound: '/manage-outbound',
     ManageProduct: '/admin/manage-product',
     ManageCategory: '/admin/manage-category',
     ManageUnit: '/admin/manage-unit',
