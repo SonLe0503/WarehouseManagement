@@ -84,8 +84,11 @@ const ShipDetailModal = ({ open, onClose, request }: ShipDetailModalProps) => {
             key: "quantity",
             width: 110,
             align: "center",
-            render: (val) => (
-                <span className="font-semibold text-gray-700">{val}</span>
+            render: (val, record: IOutboundItem) => (
+                <div className="text-center">
+                    <span className="font-semibold text-gray-700">{val}</span>
+                    <span className="ml-1 text-xs text-gray-400">{getUnitName(record)}</span>
+                </div>
             ),
         },
         {
@@ -94,7 +97,7 @@ const ShipDetailModal = ({ open, onClose, request }: ShipDetailModalProps) => {
             key: "pickedQuantity",
             width: 110,
             align: "center",
-            render: (val, record) => {
+            render: (val, record: IOutboundItem) => {
                 if (val === undefined || val === null) {
                     return <span className="text-gray-300">—</span>;
                 }
@@ -102,7 +105,10 @@ const ShipDetailModal = ({ open, onClose, request }: ShipDetailModalProps) => {
                 const color = diff === 0 ? "green" : diff > 0 ? "blue" : "orange";
                 return (
                     <div className="text-center">
-                        <Tag color={color} className="font-semibold">{val}</Tag>
+                        <div>
+                            <Tag color={color} className="font-semibold mr-1">{val}</Tag>
+                            <span className="text-xs text-gray-400">{getUnitName(record)}</span>
+                        </div>
                         {diff !== 0 && (
                             <div className="text-[10px] text-orange-400 mt-0.5">
                                 {diff > 0 ? "+" : ""}{diff.toFixed(2)}
@@ -186,7 +192,7 @@ const ShipDetailModal = ({ open, onClose, request }: ShipDetailModalProps) => {
             {/* Danh sách sản phẩm */}
             <h3 className="font-bold mb-2 text-gray-700">Danh sách vật tư xuất</h3>
             <Table
-                dataSource={request.items || []}
+                dataSource={request.outboundItems || []}
                 columns={columns}
                 rowKey="id"
                 pagination={false}
@@ -201,18 +207,18 @@ const ShipDetailModal = ({ open, onClose, request }: ShipDetailModalProps) => {
             />
 
             {/* Tóm tắt nếu đã xuất */}
-            {request.status === "Completed" && request.items && request.items.length > 0 && (
+            {request.status === "Completed" && request.outboundItems && request.outboundItems.length > 0 && (
                 <div className="mt-4 p-3 bg-purple-50 border border-purple-100 rounded-lg text-sm text-purple-800 flex gap-6">
                     <span>
-                        <strong>Tổng SP:</strong> {request.items.length}
+                        <strong>Tổng SP:</strong> {request.outboundItems.length}
                     </span>
                     <span>
                         <strong>Tổng SL yêu cầu:</strong>{" "}
-                        {request.items.reduce((s, i) => s + i.quantity, 0)}
+                        {request.outboundItems.reduce((s: number, i: IOutboundItem) => s + i.quantity, 0)}
                     </span>
                     <span>
                         <strong>Tổng SL đã xuất:</strong>{" "}
-                        {request.items.reduce((s, i) => s + (i.pickedQuantity ?? 0), 0)}
+                        {request.outboundItems.reduce((s: number, i: IOutboundItem) => s + (i.pickedQuantity ?? 0), 0)}
                     </span>
                 </div>
             )}

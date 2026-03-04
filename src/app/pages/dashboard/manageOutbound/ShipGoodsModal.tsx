@@ -53,9 +53,9 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
         );
 
     const buildInitialRows = (): Record<number, ShipRow> => {
-        if (!request?.items) return {};
+        if (!request?.outboundItems) return {};
         const initial: Record<number, ShipRow> = {};
-        request.items.forEach((item) => {
+        request.outboundItems.forEach((item) => {
             initial[item.id] = {
                 outboundItemId: item.id,
                 pickedQuantity: null,
@@ -99,7 +99,7 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
     };
 
     const handleSubmit = async () => {
-        if (!request?.items) return;
+        if (!request?.outboundItems) return;
 
         const mergedRows = { ...buildInitialRows(), ...rows };
 
@@ -120,7 +120,7 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
         }
 
         const payload = {
-            items: request.items.map((item) => {
+            items: request.outboundItems.map((item) => {
                 const row = mergedRows[item.id];
                 return {
                     outboundItemId: item.id,
@@ -319,7 +319,7 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
             />
 
             <Table
-                dataSource={request.items || []}
+                dataSource={request.outboundItems || []}
                 columns={columns}
                 rowKey="id"
                 pagination={false}

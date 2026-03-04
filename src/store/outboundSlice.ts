@@ -15,7 +15,7 @@ export interface IOutboundRequest {
     approvedBy?: number;
     approvedAt?: string;
     createdBy?: number;
-    items?: IOutboundItem[];
+    outboundItems?: IOutboundItem[];
 }
 
 export interface IOutboundItem {
@@ -223,12 +223,22 @@ export const getAllOutboundRequests = createAsyncThunk(
             }
 
             const res = await request({
-                url: `/outbound-requests`,
+                url: `/OutboundRequest`,
                 method: "GET",
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
+
+            console.log("[getAllOutboundRequests] raw response:", res.data);
+
+            // Xử lý nhiều dạng response từ backend
+            if (Array.isArray(res.data)) return res.data as IOutboundRequest[];
+            if (Array.isArray(res.data?.data)) return res.data.data as IOutboundRequest[];
+            if (Array.isArray(res.data?.Data)) return res.data.Data as IOutboundRequest[];
+            if (Array.isArray(res.data?.items)) return res.data.items as IOutboundRequest[];
+            if (Array.isArray(res.data?.Items)) return res.data.Items as IOutboundRequest[];
+
             return res.data as IOutboundRequest[];
         } catch (err: any) {
             return rejectWithValue(err.response?.data || err.message);
@@ -251,7 +261,7 @@ export const approveRejectOutbound = createAsyncThunk(
             }
 
             await request({
-                url: `/outbound-requests/${id}/approval`,
+                url: `/OutboundRequest/${id}/approval`,
                 method: "POST",
                 data: { action },
                 headers: {
@@ -277,7 +287,7 @@ export const shipGoods = createAsyncThunk(
             }
 
             const res = await request({
-                url: `/outbound-requests/${id}/ship`,
+                url: `/OutboundRequest/${id}/ship`,
                 method: "POST",
                 data,
                 headers: {
