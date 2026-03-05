@@ -13,6 +13,9 @@ export interface IInventory {
     quantity: number;
     storagePosition: string;
     updatedAt: string;
+    unitId: number;
+    unitName: string;
+    unitCode: string;
 }
 
 type InventoryState = {
