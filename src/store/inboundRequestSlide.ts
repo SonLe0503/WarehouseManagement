@@ -30,13 +30,15 @@ export interface InboundRequest {
 
 export interface ReceiveInboundItemDto {
     inboundItemId: number;
-    receivedQuantity: number;
-    storagePosition?: string;
+    binQuantities: BinQuantityDto[];
     lineNote?: string;
 }
-
+export interface BinQuantityDto {
+    storagePosition: string;
+    quantity: number;
+}
 export interface ReceiveInboundRequestDto {
-    items: ReceiveInboundItemDto[];
+    items: BinQuantityDto[];
 }
 
 type InboundRequestState = {

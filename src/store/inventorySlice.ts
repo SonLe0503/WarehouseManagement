@@ -21,12 +21,14 @@ export interface IInventory {
 type InventoryState = {
     inventories: IInventory[];
     currentInventory?: IInventory;
+    bins: string[];
     loading: boolean;
     error?: string;
 };
 
 const initialState: InventoryState = {
     inventories: [],
+    bins: [],
     loading: false,
 };
 
@@ -74,6 +76,28 @@ export const getInventoryById = createAsyncThunk(
     }
 );
 
+export const getBinsByWarehouse = createAsyncThunk(
+    "inventory/get-bins",
+    async (warehouseId: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+
+            const res = await request({
+                url: `/Inventories/bins?warehouseId=${warehouseId}`,
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            return res.data as string[];
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
 const inventorySlice = createSlice({
     name: "inventory",
     initialState,
@@ -94,12 +118,24 @@ const inventorySlice = createSlice({
             })
             .addCase(getInventoryById.pending, (state) => {
                 state.loading = true;
+                state.error = undefined;
             })
             .addCase(getInventoryById.fulfilled, (state, action) => {
                 state.currentInventory = action.payload;
                 state.loading = false;
             })
             .addCase(getInventoryById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(getBinsByWarehouse.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(getBinsByWarehouse.fulfilled, (state, action) => {
+                state.bins = action.payload;
+                state.loading = false;
+            })
+            .addCase(getBinsByWarehouse.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });
@@ -109,5 +145,6 @@ const inventorySlice = createSlice({
 export const selectInventories = (state: RootState) => state.inventory.inventories;
 export const selectInventoryLoading = (state: RootState) => state.inventory.loading;
 export const selectCurrentInventory = (state: RootState) => state.inventory.currentInventory;
+export const selectBins = (state: RootState) => state.inventory.bins;
 
 export default inventorySlice.reducer;

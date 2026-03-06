@@ -14,8 +14,10 @@ import unitConversionSlide from "./unitConversionSlice";
 import inboundRequestSlide from "./inboundRequestSlide";
 import inventorySlide from "./inventorySlice";
 import outboundSlide from "./outboundSlice";
+import binSlide from "./binSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
+
 
 const persistConfig = {
   key: "auth",
@@ -37,6 +39,7 @@ const reducers = {
 
   inboundRequest: inboundRequestSlide,
   outbound: outboundSlide,
+  bin: binSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
