@@ -9,8 +9,8 @@ import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouses
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
-import AddBinModal from "../../components/modal/Addbinmodal";
-import EditBinModal from "../../components/modal/Editbinmodal";
+import AddBinModal from "../../components/modal/AddBinModal";
+import EditBinModal from "../../components/modal/EditBinModal";
 
 const ManageBin = () => {
     const dispatch = useAppDispatch();
