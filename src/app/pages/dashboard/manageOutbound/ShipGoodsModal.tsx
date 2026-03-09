@@ -1,10 +1,11 @@
-import { Modal, Table, InputNumber, Input, Tag, Typography, Alert, App } from "antd";
+import { Modal, Table, InputNumber, Input, Tag, Typography, Alert, App, Select } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import { shipGoods, type IOutboundRequest, type IOutboundItem, type PickedOutboundItemDTO } from "../../../../store/outboundSlice";
 import { getAllProducts, selectProducts } from "../../../../store/productSlice";
 import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
 import { getAllInventories, selectInventories } from "../../../../store/inventorySlice";
+import { getAvailableBins, selectAvailableBins } from "../../../../store/binSlice";
 
 const { Text } = Typography;
 
@@ -31,14 +32,16 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
     const inventories = useAppSelector(selectInventories);
+    const availableBins = useAppSelector(selectAvailableBins);
 
     useEffect(() => {
         if (open) {
             if (products.length === 0) dispatch(getAllProducts());
             if (warehouses.length === 0) dispatch(getAllWarehouses());
             dispatch(getAllInventories());
+            if (request?.warehouseId) dispatch(getAvailableBins(request.warehouseId));
         }
-    }, [open, dispatch, products.length, warehouses.length]);
+    }, [open, dispatch, products.length, warehouses.length, request?.warehouseId]);
 
     const getProduct = (productId: number) => products.find((p) => p.id === productId);
     const getWarehouse = (warehouseId: number) => warehouses.find((w) => w.id === warehouseId);
@@ -216,15 +219,23 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
         {
             title: "Vị trí xuất",
             key: "storagePosition",
-            width: 130,
+            width: 150,
             render: (_: any, record: IOutboundItem) => {
                 const row = currentRows[record.id];
+                const binOptions = availableBins.map(b => ({ label: b.code, value: b.code }));
+
                 return (
-                    <Input
-                        value={row?.storagePosition ?? ""}
-                        onChange={(e) => handlePositionChange(record.id, e.target.value)}
-                        placeholder="VD: A1, B2..."
+                    <Select
+                        showSearch
+                        className="w-full"
+                        value={row?.storagePosition || undefined}
+                        onChange={(val) => handlePositionChange(record.id, val)}
+                        placeholder="Chọn bin"
                         status={!row?.storagePosition ? "error" : undefined}
+                        options={binOptions}
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
                     />
                 );
             },
