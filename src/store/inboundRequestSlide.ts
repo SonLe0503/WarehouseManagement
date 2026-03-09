@@ -38,7 +38,7 @@ export interface BinQuantityDto {
     quantity: number;
 }
 export interface ReceiveInboundRequestDto {
-    items: BinQuantityDto[];
+    items: ReceiveInboundItemDto[];
 }
 
 type InboundRequestState = {
