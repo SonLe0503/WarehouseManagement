@@ -31,6 +31,7 @@ const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
 const Profile = lazy(() => import("../app/pages/profile"))
 const ChangePassword = lazy(() => import("../app/pages/profile/changePassword"))
 const ManageBin = lazy(() => import("../app/pages/managerBin"));
+const TransferBin = lazy(() => import("../app/pages/tranferbin"));
 
 const shareResourceItem = [
     {
@@ -149,6 +150,12 @@ const manageResourceItem = [
     {
         key: URL.ManageBin,
         element: <ManageBin />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.TransferBin,
+        element: <TransferBin />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     }

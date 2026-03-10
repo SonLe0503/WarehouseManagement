@@ -15,6 +15,7 @@ import inboundRequestSlide from "./inboundRequestSlide";
 import inventorySlide from "./inventorySlice";
 import outboundSlide from "./outboundSlice";
 import binSlide from "./binSlice";
+import stockTransferSlide from "./stockTransferSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -40,6 +41,7 @@ const reducers = {
   inboundRequest: inboundRequestSlide,
   outbound: outboundSlide,
   bin: binSlide,
+  stockTransfer: stockTransferSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({
