@@ -9,34 +9,38 @@ export interface InboundRequestItem {
     quantity: number;
     receivedQuantity: number;
     storagePosition: string;
-    unitId: number;
     lineNote: string;
+    unitId: number;
+    unitName: string;
+    unitCode: string;
 }
-
 
 export interface InboundRequest {
     id: number;
     requestNo: string;
     supplierName: string;
     status: string;
-    note?: string;
+    note: string;
     warehouseId: number;
     createdBy: number;
-    approvedBy?: number;
-    approvedAt?: string;
+    approvedBy: number;
+    approvedAt: string;
     createdAt: string;
     inboundItems: InboundRequestItem[];
 }
 
-export interface ReceiveInboundItemDto {
-    inboundItemId: number;
-    binQuantities: BinQuantityDto[];
-    lineNote?: string;
-}
 export interface BinQuantityDto {
     storagePosition: string;
     quantity: number;
 }
+
+export interface ReceiveInboundItemDto {
+    inboundItemId: number;
+    totalReceivedQuantity: number;
+    binQuantities: BinQuantityDto[];
+    lineNote?: string;
+}
+
 export interface ReceiveInboundRequestDto {
     items: ReceiveInboundItemDto[];
 }

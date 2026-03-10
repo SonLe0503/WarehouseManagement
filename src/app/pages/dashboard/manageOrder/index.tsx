@@ -1,5 +1,5 @@
-import { Button, Tag, Table, Modal, message, Tooltip } from "antd";
-import { EyeOutlined, CheckOutlined, CloseOutlined, InboxOutlined } from "@ant-design/icons";
+import { Button, Tag, Table, Modal, message, Tooltip, Badge } from "antd";
+import { EyeOutlined, CheckOutlined, CloseOutlined, InboxOutlined, WarningOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../../store";
@@ -14,12 +14,20 @@ import {
     approveRejectRequest,
     selectInboundRequests,
     selectInboundRequestLoading,
-
-    type InboundRequest
-
+    type InboundRequest,
 } from "../../../../store/inboundRequestSlide";
 import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
 import { getAllUsers, selectUsers } from "../../../../store/userSlide";
+
+
+const hasQuantityDiff = (req: InboundRequest) =>
+    req.status === "Completed" &&
+    req.inboundItems?.some(
+        (item) =>
+            item.receivedQuantity !== null &&
+            item.receivedQuantity !== undefined &&
+            item.receivedQuantity !== item.quantity
+    );
 
 const ManageOrder = () => {
     const dispatch = useAppDispatch();
@@ -53,6 +61,7 @@ const ManageOrder = () => {
         setSelectedRequest(record);
         setIsDetailModalOpen(true);
     };
+
     const handleReceiveGoods = (record: InboundRequest) => {
         setSelectedRequest(record);
         setIsReceiveModalOpen(true);
@@ -71,7 +80,7 @@ const ManageOrder = () => {
                 } catch (error: any) {
                     message.error(error || "Có lỗi xảy ra");
                 }
-            }
+            },
         });
     };
 
@@ -80,7 +89,16 @@ const ManageOrder = () => {
             title: "Mã yêu cầu",
             dataIndex: "requestNo",
             key: "requestNo",
-            render: (text) => <span className="font-semibold text-blue-600">{text}</span>
+            render: (text, record) => (
+                <div className="flex items-center gap-2">
+                    <span className="font-semibold text-blue-600">{text}</span>
+                    {hasQuantityDiff(record) && (
+                        <Tooltip title="Có chênh lệch số lượng so với đơn đặt">
+                            <WarningOutlined className="text-orange-500 text-base" />
+                        </Tooltip>
+                    )}
+                </div>
+            ),
         },
         {
             title: "Nhà cung cấp",
@@ -91,38 +109,55 @@ const ManageOrder = () => {
             title: "Trạng thái",
             dataIndex: "status",
             key: "status",
-            render: (status) => {
+            render: (status, record) => {
                 let color = "blue";
                 let text = status;
                 if (status === "Approved") { color = "green"; text = "Đã duyệt"; }
                 if (status === "Rejected") { color = "red"; text = "Từ chối"; }
                 if (status === "Pending") { color = "orange"; text = "Đang chờ"; }
-                return <Tag color={color}>{text}</Tag>;
-            }
+                if (status === "Completed") { color = "blue"; text = "Đã nhập"; }
+
+                return (
+                    <div className="flex items-center gap-1">
+                        <Tag color={color}>{text}</Tag>
+                        {/* Badge đỏ nếu Completed nhưng có chênh lệch */}
+                        {hasQuantityDiff(record) && (
+                            <Badge
+                                count="Chênh lệch"
+                                style={{
+                                    backgroundColor: "#f97316",
+                                    fontSize: 10,
+                                    padding: "0 4px",
+                                }}
+                            />
+                        )}
+                    </div>
+                );
+            },
         },
         {
             title: "Tên kho",
             dataIndex: "warehouseId",
             key: "warehouseId",
-            render: (id) => warehouses.find(w => w.id === id)?.name || id
+            render: (id) => warehouses.find((w) => w.id === id)?.name || id,
         },
         {
             title: "Người duyệt",
             dataIndex: "approvedBy",
             key: "approvedBy",
-            render: (id) => users.find(u => u.id === id)?.username || id || "—"
+            render: (id) => users.find((u) => u.id === id)?.username || id || "—",
         },
         {
             title: "Ngày duyệt",
             dataIndex: "approvedAt",
             key: "approvedAt",
-            render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "—"
+            render: (date) => (date ? dayjs(date).format("DD/MM/YYYY") : "—"),
         },
         {
             title: "Ngày tạo",
             dataIndex: "createdAt",
             key: "createdAt",
-            render: (date) => dayjs(date).format("DD/MM/YYYY")
+            render: (date) => dayjs(date).format("DD/MM/YYYY"),
         },
         {
             title: "Hành động",
@@ -169,8 +204,8 @@ const ManageOrder = () => {
                         </Tooltip>
                     )}
                 </div>
-            )
-        }
+            ),
+        },
     ];
 
     return (
@@ -184,12 +219,18 @@ const ManageOrder = () => {
 
             <h2 className="text-xl font-bold mb-4">Quản lý đơn mua</h2>
 
+
             <Table
                 dataSource={filteredRequests}
                 columns={columns}
                 rowKey="id"
                 loading={loading}
                 bordered
+                rowClassName={(record) =>
+                    hasQuantityDiff(record)
+                        ? "!bg-orange-50 hover:!bg-orange-100"
+                        : ""
+                }
             />
 
             <RequestDetailModal
@@ -208,6 +249,6 @@ const ManageOrder = () => {
             />
         </div>
     );
-}
+};
 
 export default ManageOrder;

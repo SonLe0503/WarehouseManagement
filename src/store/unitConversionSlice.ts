@@ -5,8 +5,9 @@ import type { RootState } from ".";
 export interface IUnitConversion {
     id: number;
     productId: number;
+    baseUnitId: number;
     fromUnitId: number;
-    toUnitId: number;
+    conversionFactor: number;
     rate: number;
 }
 
@@ -138,7 +139,15 @@ const unitConversionSlice = createSlice({
                 state.loading = true;
             })
             .addCase(getUnitConversionsByProduct.fulfilled, (state, action) => {
-                state.conversions = action.payload;
+                // Merge: xóa conversions cũ của productId này rồi gộp mới vào
+                // Tránh ghi đè khi đơn có nhiều sản phẩm
+                if (action.payload.length > 0) {
+                    const productId = action.payload[0].productId;
+                    state.conversions = [
+                        ...state.conversions.filter((c) => c.productId !== productId),
+                        ...action.payload,
+                    ];
+                }
                 state.loading = false;
             })
             .addCase(getUnitConversionsByProduct.rejected, (state, action) => {

@@ -51,10 +51,15 @@ export interface OutboundRequestCreateDTO {
     }[];
 }
 
+export interface ShipBinQuantityDto {
+    storagePosition: string;
+    unitId: number;
+    quantity: number;
+}
+
 export interface PickedOutboundItemDTO {
     outboundItemId: number;
-    pickedQuantity: number;
-    storagePosition?: string;
+    binQuantities: ShipBinQuantityDto[];
     lineNote?: string;
 }
 
