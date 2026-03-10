@@ -24,5 +24,6 @@ const URL = {
     EditOutboundRequest: '/sale/edit',
     Profile: '/profile',
     ChangePassword: '/change-password',
+    ManageBin: "/manage-bin",
 }
 export default URL;
