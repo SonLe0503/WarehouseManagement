@@ -8,6 +8,7 @@ import {
     InboxOutlined,
     DatabaseOutlined,
     SendOutlined,
+    ContainerOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -47,7 +48,7 @@ const Sidebar = () => {
             { key: URL.ManageInventory, icon: <DatabaseOutlined />, label: "Tồn kho" },
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
-            { key: URL.ManageBin, icon: <SendOutlined />, label: "Quản lý bin" },
+            { key: URL.ManageBin, icon: <ContainerOutlined />, label: "Quản lý bin" },
         ],
         STAFF: [
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
