@@ -7,8 +7,14 @@ import roleSlide from "./roleSlide";
 import categorySlide from "./categorySlide";
 import unitSlide from "./unitSlide";
 import productSlide from "./productSlice";
+import inboundSlide from "./inboundSlice";
+import warehouseSlide from "./warehouseslide";
+import unitConversionSlide from "./unitConversionSlice";
+
 import inboundRequestSlide from "./inboundRequestSlide";
-import outboundRequestSlide from "./outboundRequestSlide";
+import inventorySlide from "./inventorySlice";
+import outboundSlide from "./outboundSlice";
+import stockTransferSlide from "./stockTransfer2StepSlice";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -25,8 +31,14 @@ const reducers = {
   category: categorySlide,
   unit: unitSlide,
   product: productSlide,
+  inbound: inboundSlide,
+  warehouse: warehouseSlide,
+  unitConversion: unitConversionSlide,
+  inventory: inventorySlide,
+
   inboundRequest: inboundRequestSlide,
-  outboundRequest: outboundRequestSlide,
+  outbound: outboundSlide,
+  stockTransfer: stockTransferSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

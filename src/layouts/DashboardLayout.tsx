@@ -15,7 +15,7 @@ const DashboardLayout = ({ children }: DefaultLayoutProps) => {
             <Sidebar />
             <Layout>
                 <HeaderBar />
-                <Content className="m-2 bg-white shadow">
+                <Content className="m-2 bg-white shadow overflow-y-auto">
                     {children}
                 </Content>
             </Layout>

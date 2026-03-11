@@ -2,27 +2,32 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";
 
-// interface/user.ts
+
 export interface IUser {
   id: number;
   username: string;
   email: string;
   status: string;
   roles: string[];
+  warehouseId?: number | null;
+  warehouseName?: string | null;
   createdAt: string;
 }
 
 export interface CreateUserDTO {
   username: string;
   email: string;
-  status?: string;
-  roleIds?: number[];
+  status: string;
+  roleIds: number[];
+  warehouseId?: number | null;
 }
 
 export interface UpdateUserDTO {
-  email?: string;
-  status?: string;
-  roleIds?: number[];
+  username: string;
+  email: string;
+  status: string;
+  roleIds: number[];
+  warehouseId?: number | null;
 }
 
 type UserState = {
@@ -170,7 +175,7 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      /* ===== UPDATE ===== */
+
       .addCase(updateUser.pending, (state) => {
         state.loading = true;
       })
@@ -182,8 +187,10 @@ const userSlice = createSlice({
         state.error = action.payload as string;
       })
 
+
       /* ===== DEACTIVATE ===== */
       .addCase(deactivateUser.pending, (state) => {
+
         state.loading = true;
       })
       .addCase(deactivateUser.fulfilled, (state, action) => {

@@ -107,7 +107,7 @@ const ManageCategory = () => {
                 {filteredCategories.map((cat: ICategory & { level: number }) => (
                     <div
                         key={cat.id}
-                        className="grid grid-cols-4 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
+                        className="grid grid-cols-4 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors items-center"
                     >
                         <div className="px-3 py-2">{cat.id}</div>
                         <div className="px-3 py-2">

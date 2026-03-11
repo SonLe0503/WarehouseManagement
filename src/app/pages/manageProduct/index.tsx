@@ -98,7 +98,7 @@ const ManageProduct = () => {
                     filteredProducts.map((p) => (
                         <div
                             key={p.id}
-                            className="grid grid-cols-7 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
+                            className="grid grid-cols-7 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors items-center"
                         >
                             <div className="px-3 py-2 font-medium">{p.sku}</div>
                             <div className="px-3 py-2">{p.name}</div>

@@ -1,4 +1,4 @@
-import { Button, Tag, Modal, message, Tooltip } from "antd";
+import { Button, Tag, Tooltip, App } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "../../../store";
 import { activateUser, deactivateUser, getAllUsers, selectUsers, type IUser } from "../../../store/userSlide";
@@ -11,6 +11,7 @@ import { EditOutlined, StopOutlined, CheckCircleOutlined } from "@ant-design/ico
 import ButtonAdd from "../../components/common/ButtonAdd";
 
 const ManageUser = () => {
+    const { message, modal } = App.useApp();
     const dispatch = useAppDispatch();
     const users = useSelector(selectUsers);
     const [searchEmail, setSearchEmail] = useState("");
@@ -34,7 +35,7 @@ const ManageUser = () => {
     }
     const handleToggleStatus = (id: number, currentStatus: string) => {
         const isActivating = currentStatus !== "Active";
-        Modal.confirm({
+        modal.confirm({
             title: isActivating ? "Xác nhận kích hoạt tài khoản" : "Xác nhận vô hiệu hóa tài khoản",
             content: `Bạn có chắc chắn muốn ${isActivating ? "kích hoạt" : "vô hiệu hóa"} tài khoản này không?`,
             okText: isActivating ? "Kích hoạt" : "Vô hiệu hóa",
@@ -50,7 +51,6 @@ const ManageUser = () => {
                         message.success("Vô hiệu hóa tài khoản thành công");
                     }
                 } catch (error: any) {
-                    console.error("Toggle status error:", error);
                     const errorMsg = typeof error === "string" ? error : (error?.message || error?.title || "Có lỗi xảy ra");
                     message.error(errorMsg);
                 }
@@ -88,10 +88,11 @@ const ManageUser = () => {
                 userData={selectedUser}
             />
             <div className="border-[0.05px] border-gray-300">
-                <div className="grid grid-cols-6 bg-gray-100 font-semibold text-sm text-center">
+                <div className="grid grid-cols-7 bg-gray-100 font-semibold text-sm text-center">
                     <div className="px-3 py-2">Username</div>
                     <div className="px-3 py-2">Email</div>
                     <div className="px-3 py-2">Role</div>
+                    <div className="px-3 py-2">Kho</div>
                     <div className="px-3 py-2">Status</div>
                     <div className="px-3 py-2">Created At</div>
                     <div className="px-3 py-2">Action</div>
@@ -100,7 +101,7 @@ const ManageUser = () => {
                 {filteredUsers.map((u) => (
                     <div
                         key={u.id}
-                        className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300"
+                        className="grid grid-cols-7 text-center text-sm border-b-[0.05px] border-gray-300 items-center"
                     >
                         <div className="px-3 py-2 truncate">{u.username}</div>
                         <div className="px-3 py-2 truncate">{u.email ?? "—"}</div>
@@ -111,6 +112,7 @@ const ManageUser = () => {
                                 </Tag>
                             ))}
                         </div>
+                        <div className="px-3 py-2 truncate">{u.warehouseName ?? "—"}</div>
                         <div className="px-3 py-2 flex justify-center items-center">
                             {u.status === "Active" ? (
                                 <Tag color="green">Active</Tag>

@@ -97,7 +97,7 @@ const ManageUnit = () => {
                     filteredUnits.map((u) => (
                         <div
                             key={u.id}
-                            className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors"
+                            className="grid grid-cols-6 text-center text-sm border-b-[0.05px] border-gray-300 hover:bg-gray-50 transition-colors items-center"
                         >
                             <div className="px-3 py-2 font-medium">{u.code}</div>
                             <div className="px-3 py-2">{u.name}</div>

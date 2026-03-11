@@ -9,21 +9,34 @@ export interface InboundRequestItem {
     quantity: number;
     receivedQuantity: number;
     storagePosition: string;
+    unitId: number;
     lineNote: string;
 }
+
 
 export interface InboundRequest {
     id: number;
     requestNo: string;
     supplierName: string;
     status: string;
-    note: string;
+    note?: string;
     warehouseId: number;
     createdBy: number;
-    approvedBy: number;
-    approvedAt: string;
+    approvedBy?: number;
+    approvedAt?: string;
     createdAt: string;
     inboundItems: InboundRequestItem[];
+}
+
+export interface ReceiveInboundItemDto {
+    inboundItemId: number;
+    receivedQuantity: number;
+    storagePosition?: string;
+    lineNote?: string;
+}
+
+export interface ReceiveInboundRequestDto {
+    items: ReceiveInboundItemDto[];
 }
 
 type InboundRequestState = {
@@ -37,7 +50,6 @@ const initialState: InboundRequestState = {
     loading: false,
 };
 
-// Async thunk để lấy danh sách Inbound Requests
 export const getInboundRequests = createAsyncThunk(
     "inboundRequest/get-all",
     async (_, { rejectWithValue, getState }) => {
@@ -45,7 +57,6 @@ export const getInboundRequests = createAsyncThunk(
             const state: any = getState();
             const token = state.auth.infoLogin?.accessToken;
 
-            // Giả sử API endpoint là /inbound-request. Cần điều chỉnh nếu backend khác.
             const res = await request({
                 url: `/InboundRequest`,
                 method: "GET",
@@ -60,11 +71,10 @@ export const getInboundRequests = createAsyncThunk(
     }
 );
 
-// Async thunk để duyệt/từ chối Inbound Request
 export const approveRejectRequest = createAsyncThunk(
     "inboundRequest/approve-reject",
     async (
-        { id, action, comment, rejectReason }: { id: number; action: "Approve" | "Reject"; comment?: string; rejectReason?: string },
+        { id, action }: { id: number; action: "Approve" | "Reject" },
         { rejectWithValue, getState }
     ) => {
         try {
@@ -74,12 +84,37 @@ export const approveRejectRequest = createAsyncThunk(
             await request({
                 url: `/InboundRequest/${id}/approval`,
                 method: "POST",
-                data: { action, comment, rejectReason },
+                data: { action },
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
             return { id, action };
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
+export const receiveGoods = createAsyncThunk(
+    "inboundRequest/receive-goods",
+    async (
+        { id, data }: { id: number; data: ReceiveInboundRequestDto },
+        { rejectWithValue, getState }
+    ) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+
+            await request({
+                url: `/InboundRequest/${id}/receive`,
+                method: "POST",
+                data,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            return { id };
         } catch (err: any) {
             return rejectWithValue(err.response?.data || err.message);
         }
@@ -105,20 +140,35 @@ const inboundRequestSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            /* ===== APPROVE / REJECT ===== */
             .addCase(approveRejectRequest.pending, (state) => {
                 state.loading = true;
                 state.error = undefined;
             })
             .addCase(approveRejectRequest.fulfilled, (state, action) => {
                 state.loading = false;
-                const request = state.requests.find((r) => r.id === action.payload.id);
-                if (request) {
-                    request.status = action.payload.action === "Approve" ? "Approved" : "Rejected";
-                    request.approvedAt = new Date().toISOString();
+                const req = state.requests.find((r) => r.id === action.payload.id);
+                if (req) {
+                    req.status = action.payload.action === "Approve" ? "Approved" : "Rejected";
+                    req.approvedAt = new Date().toISOString();
                 }
             })
             .addCase(approveRejectRequest.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+
+            .addCase(receiveGoods.pending, (state) => {
+                state.loading = true;
+                state.error = undefined;
+            })
+            .addCase(receiveGoods.fulfilled, (state, action) => {
+                state.loading = false;
+                const req = state.requests.find((r) => r.id === action.payload.id);
+                if (req) {
+                    req.status = "Completed";
+                }
+            })
+            .addCase(receiveGoods.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             });

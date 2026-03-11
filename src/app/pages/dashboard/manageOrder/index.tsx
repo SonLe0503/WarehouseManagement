@@ -1,38 +1,44 @@
-import { Button, Tag, Table, message } from "antd";
+import { Button, Tag, Table, Modal, message, Tooltip } from "antd";
+import { EyeOutlined, CheckOutlined, CloseOutlined, InboxOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch } from "../../../../store"; // Adjust path if needed
+import { useAppDispatch } from "../../../../store";
 import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 import Condition from "./Condition";
 import RequestDetailModal from "./RequestDetailModal";
+import ReceiveGoodsModal from "./ReceiveGoodsModal";
+
 import {
     getInboundRequests,
     approveRejectRequest,
     selectInboundRequests,
     selectInboundRequestLoading,
+
     type InboundRequest
+
 } from "../../../../store/inboundRequestSlide";
-import ApproveRejectModal from "./ApproveRejectModal";
+import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
+import { getAllUsers, selectUsers } from "../../../../store/userSlide";
 
 const ManageOrder = () => {
     const dispatch = useAppDispatch();
     const requests = useSelector(selectInboundRequests);
     const loading = useSelector(selectInboundRequestLoading);
+    const warehouses = useSelector(selectWarehouses);
+    const users = useSelector(selectUsers);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
 
     const [selectedRequest, setSelectedRequest] = useState<InboundRequest | undefined>(undefined);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-
-    // State for Approve/Reject Modal
-    const [isApproveModalOpen, setIsApproveModalOpen] = useState(false);
-    const [currentAction, setCurrentAction] = useState<"Approve" | "Reject">("Approve");
-    const [requestToProcess, setRequestToProcess] = useState<InboundRequest | undefined>(undefined);
+    const [isReceiveModalOpen, setIsReceiveModalOpen] = useState(false);
 
     useEffect(() => {
         dispatch(getInboundRequests());
+        dispatch(getAllWarehouses());
+        dispatch(getAllUsers());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -47,101 +53,120 @@ const ManageOrder = () => {
         setSelectedRequest(record);
         setIsDetailModalOpen(true);
     };
-
-    const handleApproveReject = (record: InboundRequest, action: "Approve" | "Reject") => {
-        setRequestToProcess(record);
-        setCurrentAction(action);
-        setIsApproveModalOpen(true);
+    const handleReceiveGoods = (record: InboundRequest) => {
+        setSelectedRequest(record);
+        setIsReceiveModalOpen(true);
     };
 
-    const handleProcessRequest = async (data: { action: "Approve" | "Reject"; comment?: string; rejectReason?: string }) => {
-        if (!requestToProcess) return;
-
-        try {
-            await dispatch(approveRejectRequest({
-                id: requestToProcess.id,
-                ...data
-            })).unwrap();
-            message.success(`${data.action === "Approve" ? "Duyệt" : "Từ chối"} phiếu thành công!`);
-            setIsApproveModalOpen(false);
-            setRequestToProcess(undefined);
-        } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra");
-        }
+    const handleApproveReject = (id: number, action: "Approve" | "Reject") => {
+        Modal.confirm({
+            title: `Xác nhận ${action === "Approve" ? "Duyệt" : "Từ chối"}`,
+            content: `Bạn có chắc muốn ${action === "Approve" ? "duyệt" : "từ chối"} phiếu này không?`,
+            okText: "Đồng ý",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await dispatch(approveRejectRequest({ id, action })).unwrap();
+                    message.success(`${action === "Approve" ? "Duyệt" : "Từ chối"} phiếu thành công!`);
+                } catch (error: any) {
+                    message.error(error || "Có lỗi xảy ra");
+                }
+            }
+        });
     };
 
     const columns: ColumnsType<InboundRequest> = [
         {
-            title: "Request No",
+            title: "Mã yêu cầu",
             dataIndex: "requestNo",
             key: "requestNo",
             render: (text) => <span className="font-semibold text-blue-600">{text}</span>
         },
         {
-            title: "Supplier",
+            title: "Nhà cung cấp",
             dataIndex: "supplierName",
             key: "supplierName",
         },
         {
-            title: "Status",
+            title: "Trạng thái",
             dataIndex: "status",
             key: "status",
             render: (status) => {
                 let color = "blue";
-                if (status === "Approved") color = "green";
-                if (status === "Rejected") color = "red";
-                if (status === "Pending") color = "orange";
-                return <Tag color={color}>{status}</Tag>;
+                let text = status;
+                if (status === "Approved") { color = "green"; text = "Đã duyệt"; }
+                if (status === "Rejected") { color = "red"; text = "Từ chối"; }
+                if (status === "Pending") { color = "orange"; text = "Đang chờ"; }
+                return <Tag color={color}>{text}</Tag>;
             }
         },
         {
-            title: "Warehouse ID",
+            title: "Tên kho",
             dataIndex: "warehouseId",
             key: "warehouseId",
+            render: (id) => warehouses.find(w => w.id === id)?.name || id
         },
         {
-            title: "Approved By",
+            title: "Người duyệt",
             dataIndex: "approvedBy",
             key: "approvedBy",
-            render: (text) => text || "—"
+            render: (id) => users.find(u => u.id === id)?.username || id || "—"
         },
         {
-            title: "Approved At",
+            title: "Ngày duyệt",
             dataIndex: "approvedAt",
             key: "approvedAt",
             render: (date) => date ? dayjs(date).format("DD/MM/YYYY") : "—"
         },
         {
-            title: "Created At",
+            title: "Ngày tạo",
             dataIndex: "createdAt",
             key: "createdAt",
             render: (date) => dayjs(date).format("DD/MM/YYYY")
         },
         {
-            title: "Action",
+            title: "Hành động",
             key: "action",
             render: (_, record) => (
                 <div className="flex gap-2">
-                    <Button size="small" type="default" onClick={() => handleViewDetail(record)}>
-                        Detail
-                    </Button>
+                    <Tooltip title="Xem chi tiết">
+                        <Button
+                            type="default"
+                            icon={<EyeOutlined />}
+                            onClick={() => handleViewDetail(record)}
+                            className="!flex !items-center !justify-center"
+                        />
+                    </Tooltip>
                     {record.status === "Pending" && (
                         <>
-                            <Button
-                                size="small"
-                                className="!bg-green-500 !text-white hover:!bg-green-600"
-                                onClick={() => handleApproveReject(record, "Approve")}
-                            >
-                                Approve
-                            </Button>
-                            <Button
-                                size="small"
-                                className="!bg-red-500 !text-white hover:!bg-red-600"
-                                onClick={() => handleApproveReject(record, "Reject")}
-                            >
-                                Reject
-                            </Button>
+                            <Tooltip title="Duyệt">
+                                <Button
+                                    type="primary"
+                                    icon={<CheckOutlined />}
+                                    onClick={() => handleApproveReject(record.id, "Approve")}
+                                    className="!flex !items-center !justify-center !bg-green-500 hover:!bg-green-400"
+                                />
+                            </Tooltip>
+                            <Tooltip title="Từ chối">
+                                <Button
+                                    danger
+                                    type="primary"
+                                    icon={<CloseOutlined />}
+                                    onClick={() => handleApproveReject(record.id, "Reject")}
+                                    className="!flex !items-center !justify-center"
+                                />
+                            </Tooltip>
                         </>
+                    )}
+                    {record.status === "Approved" && (
+                        <Tooltip title="Nhận hàng thực tế">
+                            <Button
+                                type="primary"
+                                icon={<InboxOutlined />}
+                                onClick={() => handleReceiveGoods(record)}
+                                className="!flex !items-center !justify-center !bg-purple-600 hover:!bg-purple-500"
+                            />
+                        </Tooltip>
                     )}
                 </div>
             )
@@ -157,7 +182,7 @@ const ManageOrder = () => {
                 setSearchStatus={setSearchStatus}
             />
 
-            <h2 className="text-xl font-bold mb-4">Quản lý nhập kho (Inbound Requests)</h2>
+            <h2 className="text-xl font-bold mb-4">Quản lý đơn mua</h2>
 
             <Table
                 dataSource={filteredRequests}
@@ -172,13 +197,14 @@ const ManageOrder = () => {
                 onClose={() => setIsDetailModalOpen(false)}
                 request={selectedRequest}
             />
-
-            <ApproveRejectModal
-                open={isApproveModalOpen}
-                onClose={() => setIsApproveModalOpen(false)}
-                onOk={handleProcessRequest}
-                action={currentAction}
-                loading={loading}
+            <ReceiveGoodsModal
+                open={isReceiveModalOpen}
+                onClose={() => {
+                    setIsReceiveModalOpen(false);
+                    setSelectedRequest(undefined);
+                }}
+                request={selectedRequest}
+                onSuccess={() => dispatch(getInboundRequests())}
             />
         </div>
     );

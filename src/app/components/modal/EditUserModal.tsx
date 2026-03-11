@@ -1,8 +1,9 @@
-import { Modal, Form, Input, Select, message } from "antd";
+import { Modal, Form, Input, Select, App } from "antd";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import { updateUser, getAllUsers } from "../../../store/userSlide";
 import { getAllRoles, selectRoles } from "../../../store/roleSlide";
+import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import type { IUser } from "../../../store/userSlide";
 
 interface EditUserModalProps {
@@ -12,20 +13,26 @@ interface EditUserModalProps {
 }
 
 const EditUserModal = (props: EditUserModalProps) => {
+    const { message } = App.useApp();
     const { open, onClose, userData } = props;
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
     const roles = useAppSelector(selectRoles);
+    const warehouses = useAppSelector(selectWarehouses);
     const [loading, setLoading] = useState(false);
+
+    const roleIdsWatch = Form.useWatch("roleIds", form);
+    const isAdmin = roleIdsWatch?.includes(1);
 
     useEffect(() => {
         if (open) {
             dispatch(getAllRoles());
+            dispatch(getActiveWarehouses());
         }
     }, [dispatch, open]);
 
     useEffect(() => {
-        if (userData && open) {
+        if (userData && open && roles.length > 0) {
             // Map role names from userData.roles back to IDs from the roles list
             const userRoleIds = userData.roles.map(roleName => {
                 const role = roles.find(r => r.name === roleName);
@@ -37,6 +44,7 @@ const EditUserModal = (props: EditUserModalProps) => {
                 email: userData.email,
                 status: userData.status,
                 roleIds: userRoleIds,
+                warehouseId: userData.warehouseId
             });
         }
     }, [userData, open, roles, form]);
@@ -47,9 +55,13 @@ const EditUserModal = (props: EditUserModalProps) => {
         try {
             const values = await form.validateFields();
             setLoading(true);
+
             const payload = {
                 id: userData.id,
-                data: values
+                data: {
+                    ...values,
+                    warehouseId: isAdmin ? null : values.warehouseId
+                }
             };
 
             await dispatch(updateUser(payload)).unwrap();
@@ -57,7 +69,6 @@ const EditUserModal = (props: EditUserModalProps) => {
             dispatch(getAllUsers());
             onClose();
         } catch (error: any) {
-            console.error("Update user error:", error);
             let errorMsg = "Có lỗi xảy ra khi cập nhật tài khoản";
             if (typeof error === "string") {
                 errorMsg = error;
@@ -129,7 +140,6 @@ const EditUserModal = (props: EditUserModalProps) => {
                         placeholder="Chọn vai trò"
                         allowClear
                         mode="multiple"
-                        disabled={userData?.roles.some((role) => role.toUpperCase() === "ADMIN")}
                     >
                         {roles.map((role) => (
                             <Select.Option key={role.id} value={role.id}>
@@ -138,6 +148,25 @@ const EditUserModal = (props: EditUserModalProps) => {
                         ))}
                     </Select>
                 </Form.Item>
+
+                {!isAdmin && (
+                    <Form.Item
+                        name="warehouseId"
+                        label="Kho quản lý"
+                        rules={[{ required: true, message: "Vui lòng chọn kho!" }]}
+                    >
+                        <Select
+                            placeholder="Chọn kho quản lý"
+                            allowClear
+                        >
+                            {warehouses.map((w) => (
+                                <Select.Option key={w.id} value={w.id}>
+                                    {w.name}
+                                </Select.Option>
+                            ))}
+                        </Select>
+                    </Form.Item>
+                )}
             </Form>
         </Modal>
     );
