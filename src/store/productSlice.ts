@@ -30,12 +30,14 @@ export interface UpdateProduct {
 
 type ProductState = {
     products: IProduct[];
+    currentProduct: IProduct | null;
     loading: boolean;
     error?: string;
 };
 
 const initialState: ProductState = {
     products: [],
+    currentProduct: null,
     loading: false,
 };
 
@@ -76,6 +78,8 @@ export const getProductById = createAsyncThunk(
                 },
             });
 
+            if (res.data.Data) return res.data.Data as IProduct;
+            if (res.data.data) return res.data.data as IProduct;
             return res.data as IProduct;
         } catch (err: any) {
             return rejectWithValue(err.response?.data || err.message);
@@ -171,6 +175,19 @@ const productSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload as string;
             })
+            /* ===== GET BY ID ===== */
+            .addCase(getProductById.pending, (state) => {
+                state.loading = true;
+                state.currentProduct = null;
+            })
+            .addCase(getProductById.fulfilled, (state, action) => {
+                state.currentProduct = action.payload;
+                state.loading = false;
+            })
+            .addCase(getProductById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
 
             /* ===== CREATE ===== */
             .addCase(createProduct.pending, (state) => {
@@ -211,6 +228,7 @@ const productSlice = createSlice({
 });
 
 export const selectProducts = (state: RootState) => state.product.products;
+export const selectCurrentProduct = (state: RootState) => state.product.currentProduct;
 export const selectProductLoading = (state: RootState) => state.product.loading;
 
 export default productSlice.reducer;

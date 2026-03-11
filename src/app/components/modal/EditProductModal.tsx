@@ -1,7 +1,7 @@
 import { Modal, Form, Input, Select, TreeSelect, message } from "antd";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
-import { getAllProducts, updateProduct, type IProduct } from "../../../store/productSlice";
+import { getAllProducts, updateProduct, getProductById, selectCurrentProduct, type IProduct } from "../../../store/productSlice";
 import { getAllCategories, selectCategories } from "../../../store/categorySlide";
 import { getAllUnits, selectUnits } from "../../../store/unitSlide";
 
@@ -17,32 +17,96 @@ const EditProductModal = (props: EditProductModalProps) => {
     const dispatch = useAppDispatch();
     const categories = useAppSelector(selectCategories);
     const units = useAppSelector(selectUnits);
+    const currentProductFromApi = useAppSelector(selectCurrentProduct);
     const [loading, setLoading] = useState(false);
 
+    // Dữ liệu hiển thị ưu tiên lấy từ API (sau khi gọi chi tiết), nếu chưa có thì dùng từ prop
+    const activeData = currentProductFromApi || productData;
+
     useEffect(() => {
-        if (open) {
+        if (open && productData?.id) {
+            dispatch(getProductById(productData.id));
             dispatch(getAllCategories());
             dispatch(getAllUnits());
         }
-    }, [open, dispatch]);
+    }, [open, productData?.id, dispatch]);
 
     useEffect(() => {
-        if (productData && open) {
+        if (activeData && open) {
+            // Logic phục hồi ID nếu API trả về thiếu (như trường hợp bạn gặp phải)
+            let recoveredCategoryId = activeData.categoryId;
+            let recoveredBaseUnitId = activeData.baseUnitId;
+
+            // 1. Phục hồi Category ID bằng cách tìm theo tên (categoryName)
+            if (!recoveredCategoryId && activeData.categoryName && categories.length > 0) {
+                const findInTree = (items: any[]): any => {
+                    for (const item of items) {
+                        if (item.name === activeData.categoryName) return item.id;
+                        if (item.children?.length) {
+                             const found = findInTree(item.children);
+                             if (found) return found;
+                        }
+                    }
+                    return null;
+                };
+                recoveredCategoryId = findInTree(categories);
+            }
+
+            // 2. Phục hồi Unit ID bằng cách tìm theo Code hoặc Tên
+            if (!recoveredBaseUnitId && activeData.baseUnitCode && units.length > 0) {
+                const matchedUnit = units.find(u => u.code === activeData.baseUnitCode || u.name === activeData.baseUnitCode);
+                if (matchedUnit) recoveredBaseUnitId = matchedUnit.id;
+            }
+
             form.setFieldsValue({
-                name: productData.name,
-                categoryId: productData.categoryId,
-                baseUnitId: productData.baseUnitId,
-                status: productData.status,
+                name: activeData.name,
+                categoryId: recoveredCategoryId,
+                baseUnitId: recoveredBaseUnitId,
+                status: activeData.status,
             });
         }
-    }, [productData, open, form]);
+    }, [activeData, open, form, categories, units]);
+
+    // Chuẩn bị dữ liệu cho Select/TreeSelect để luôn hiển thị Nhãn thay vì ID
+    const { treeData, unitOptions } = useMemo(() => {
+        const flatten = (items: any[]): any[] => {
+            let res: any[] = [];
+            items.forEach(cat => {
+                res.push({ id: cat.id, pId: cat.parentId, value: cat.id, title: cat.name });
+                if (cat.children?.length) res = [...res, ...flatten(cat.children)];
+            });
+            return res;
+        };
+
+        let flattenedCats = flatten(categories);
+        let currentUnits = [...units];
+
+        // "Mồi" dữ liệu hiện tại vào danh sách để đảm bảo khi chưa load xong API vẫn hiện được Tên
+        if (activeData?.categoryId && !flattenedCats.find(c => c.id === activeData.categoryId)) {
+            flattenedCats.push({
+                id: activeData.categoryId,
+                pId: null,
+                value: activeData.categoryId,
+                title: activeData.categoryName || `Danh mục #${activeData.categoryId}`,
+            });
+        }
+        if (activeData?.baseUnitId && !currentUnits.find(u => u.id === activeData.baseUnitId)) {
+            currentUnits.push({
+                id: activeData.baseUnitId,
+                name: activeData.baseUnitCode || 'Đơn vị hiện tại',
+                code: activeData.baseUnitCode || '',
+            } as any);
+        }
+
+        return { treeData: flattenedCats, unitOptions: currentUnits };
+    }, [categories, units, activeData]);
 
     const handleSubmit = async () => {
-        if (!productData) return;
+        if (!activeData) return;
         try {
             const values = await form.validateFields();
             setLoading(true);
-            await dispatch(updateProduct({ id: productData.id, data: values })).unwrap();
+            await dispatch(updateProduct({ id: activeData.id, data: values })).unwrap();
             message.success("Cập nhật sản phẩm thành công");
             dispatch(getAllProducts());
             onClose();
@@ -67,16 +131,11 @@ const EditProductModal = (props: EditProductModalProps) => {
             confirmLoading={loading}
             okText="Cập nhật"
             cancelText="Hủy"
-            destroyOnHidden
+            destroyOnClose
         >
-            <Form
-                form={form}
-                layout="vertical"
-            >
-                <Form.Item
-                    label="Mã SKU (Không thể sửa)"
-                >
-                    <Input value={productData?.sku} disabled />
+            <Form form={form} layout="vertical">
+                <Form.Item label="Mã SKU (Không thể sửa)">
+                    <Input value={activeData?.sku} disabled className="bg-gray-50" />
                 </Form.Item>
 
                 <Form.Item
@@ -94,17 +153,12 @@ const EditProductModal = (props: EditProductModalProps) => {
                 >
                     <TreeSelect
                         style={{ width: '100%' }}
-                        styles={{ popup: { root: { maxHeight: 400, overflow: 'auto' } } }}
+                        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
                         placeholder="Chọn danh mục"
                         allowClear
                         treeDataSimpleMode
                         showSearch
-                        treeData={categories.map(cat => ({
-                            id: cat.id,
-                            pId: cat.parentId,
-                            value: cat.id,
-                            title: cat.name,
-                        }))}
+                        treeData={treeData}
                     />
                 </Form.Item>
 
@@ -114,7 +168,7 @@ const EditProductModal = (props: EditProductModalProps) => {
                     rules={[{ required: true, message: "Vui lòng chọn đơn vị tính!" }]}
                 >
                     <Select placeholder="Chọn đơn vị tính cơ bản">
-                        {units.map((unit) => (
+                        {unitOptions.map((unit: any) => (
                             <Select.Option key={unit.id} value={unit.id}>
                                 {unit.name} ({unit.code})
                             </Select.Option>
