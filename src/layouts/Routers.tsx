@@ -10,10 +10,7 @@ import PrivateLayout from "../layouts/PrivateLayout"
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
 const ManageUser = lazy(() => import("../app/pages/manageUser"))
-const DashboardStaff = lazy(() => import("../app/pages/dashboard/DashboardStaff"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
-const DashboardPurchase = lazy(() => import("../app/pages/dashboard/DashboardPurchase"))
-const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
@@ -55,26 +52,8 @@ const privateResourceItem = [
         private: true,
     },
     {
-        key: URL.DashboardStaff,
-        element: <DashboardStaff />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
         key: URL.DashboardManage,
         element: <DashboardManage />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardPurchase,
-        element: <DashboardPurchase />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardSale,
-        element: <DashboardSale />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },

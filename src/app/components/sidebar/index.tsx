@@ -53,18 +53,15 @@ const Sidebar = () => {
             { key: URL.ManageStockCount, icon: <AuditOutlined />, label: "Kiểm kê kho" },
         ],
         STAFF: [
-            { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.ManageInventory, icon: <DatabaseOutlined />, label: "Tồn kho" },
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
             { key: URL.ManageStockCount, icon: <AuditOutlined />, label: "Kiểm kê kho" },
         ],
         PURCHASE: [
-            { key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.InboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu nhập hàng" },
         ],
         SALE: [
-            { key: URL.DashboardSale, icon: <AppstoreOutlined />, label: "Tổng quan" },
             { key: URL.OutboundRequest, icon: <FileTextOutlined />, label: "Yêu cầu xuất hàng" },
         ],
     };

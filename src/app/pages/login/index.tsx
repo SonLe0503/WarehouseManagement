@@ -37,16 +37,16 @@ const LoginPage = () => {
                     navigate(URL.DashboardAdmin);
                     break;
                 case EUserRole.STAFF:
-                    navigate(URL.DashboardStaff);
+                    navigate(URL.ManageOrder);
                     break;
                 case EUserRole.MANAGE:
                     navigate(URL.DashboardManage);
                     break;
                 case EUserRole.PURCHASE:
-                    navigate(URL.DashboardPurchase);
+                    navigate(URL.InboundRequest);
                     break;
                 case EUserRole.SALE:
-                    navigate(URL.DashboardSale);
+                    navigate(URL.OutboundRequest);
                     break;
             }
         }
