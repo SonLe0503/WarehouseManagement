@@ -226,4 +226,10 @@ const userSlice = createSlice({
 export const selectUsers = (state: RootState) => state.user.users;
 export const selectUserLoading = (state: RootState) => state.user.loading;
 
+export const selectCurrentUser = (state: RootState) => {
+    const userId = state.auth.infoLogin?.userId;
+    if (!userId) return null;
+    return state.user.users.find(u => u.id === parseInt(userId) || u.username === userId);
+};
+
 export default userSlice.reducer;

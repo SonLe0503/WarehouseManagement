@@ -25,5 +25,6 @@ const URL = {
     Profile: '/profile',
     ChangePassword: '/change-password',
     ManageBin: "/manage-bin",
+    ManageStockCount: "/manage-stock-count",
 }
 export default URL;
