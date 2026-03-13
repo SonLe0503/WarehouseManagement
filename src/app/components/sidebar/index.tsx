@@ -51,6 +51,7 @@ const Sidebar = () => {
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
             { key: URL.ManageBin, icon: <ContainerOutlined />, label: "Quản lý bin" },
             { key: URL.TransferBin, icon: <SwapOutlined />, label: "Chuyển bin" },
+            { key: URL.TransferRequest, icon: <SwapOutlined />, label: "Chuyển kho" },
         ],
         STAFF: [
             { key: URL.DashboardStaff, icon: <AppstoreOutlined />, label: "Tổng quan" },
@@ -58,6 +59,7 @@ const Sidebar = () => {
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
             { key: URL.TransferBin, icon: <SwapOutlined />, label: "Chuyển bin" },
+            { key: URL.TransferRequest, icon: <SwapOutlined />, label: "Chuyển kho" },
         ],
         PURCHASE: [
             { key: URL.DashboardPurchase, icon: <AppstoreOutlined />, label: "Tổng quan" },

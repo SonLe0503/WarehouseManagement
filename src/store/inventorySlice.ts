@@ -16,6 +16,7 @@ export interface IInventory {
     unitId: number;
     unitName: string;
     unitCode: string;
+
 }
 
 type InventoryState = {
@@ -98,6 +99,7 @@ export const getBinsByWarehouse = createAsyncThunk(
     }
 );
 
+
 const inventorySlice = createSlice({
     name: "inventory",
     initialState,
@@ -118,7 +120,9 @@ const inventorySlice = createSlice({
             })
             .addCase(getInventoryById.pending, (state) => {
                 state.loading = true;
+
                 state.error = undefined;
+
             })
             .addCase(getInventoryById.fulfilled, (state, action) => {
                 state.currentInventory = action.payload;
@@ -138,6 +142,7 @@ const inventorySlice = createSlice({
             .addCase(getBinsByWarehouse.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+
             });
     },
 });
@@ -148,3 +153,4 @@ export const selectCurrentInventory = (state: RootState) => state.inventory.curr
 export const selectBins = (state: RootState) => state.inventory.bins;
 
 export default inventorySlice.reducer;
+

@@ -1,5 +1,4 @@
 
-
 const URL = {
     Login: '/login',
     DashboardAdmin: '/dashboard-admin',
@@ -22,6 +21,9 @@ const URL = {
     OutboundRequest: '/sale',
     ViewOutboundRequest: '/sale/view',
     EditOutboundRequest: '/sale/edit',
+    TransferRequest: '/transfer',
+    ViewTransferRequest: '/transfer/view',
+    EditTransferRequest: '/transfer/edit',
     Profile: '/profile',
     ChangePassword: '/change-password',
     ManageBin: "/manage-bin",

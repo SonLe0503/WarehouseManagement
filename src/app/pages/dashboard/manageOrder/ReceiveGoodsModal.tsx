@@ -293,6 +293,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                             <div className="text-[10px] text-orange-500 mt-1 text-center flex items-center justify-center gap-1">
                                 <WarningOutlined />
                                 chênh {val - record.quantity > 0 ? "+" : ""}{val - record.quantity}
+
                             </div>
                         )}
                     </div>

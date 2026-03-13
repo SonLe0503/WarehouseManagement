@@ -9,8 +9,8 @@ export interface InboundRequestItem {
     quantity: number;
     receivedQuantity: number;
     storagePosition: string;
-    lineNote: string;
     unitId: number;
+    lineNote: string;
     unitName: string;
     unitCode: string;
 }
@@ -20,11 +20,11 @@ export interface InboundRequest {
     requestNo: string;
     supplierName: string;
     status: string;
-    note: string;
+    note?: string;
     warehouseId: number;
     createdBy: number;
-    approvedBy: number;
-    approvedAt: string;
+    approvedBy?: number;
+    approvedAt?: string;
     createdAt: string;
     inboundItems: InboundRequestItem[];
 }

@@ -16,6 +16,7 @@ export interface IOutboundRequest {
     approvedAt?: string;
     createdBy?: number;
     outboundItems?: IOutboundItem[];
+
 }
 
 export interface IOutboundItem {
@@ -24,6 +25,7 @@ export interface IOutboundItem {
     unitId?: number;
     quantity: number;
     pickedQuantity?: number;
+
     lineNote?: string;
     unit?: {
         id: number;
