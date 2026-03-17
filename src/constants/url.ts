@@ -3,10 +3,7 @@ const URL = {
     Login: '/login',
     DashboardAdmin: '/dashboard-admin',
     ManageUser: '/admin/manage-user',
-    DashboardStaff: '/dashboard-staff',
     DashboardManage: '/dashboard-manage',
-    DashboardPurchase: '/dashboard-purchase',
-    DashboardSale: '/dashboard-sale',
     ManageOrder: '/manage-order',
     ManageOutbound: '/manage-outbound',
     ManageProduct: '/admin/manage-product',
@@ -28,5 +25,6 @@ const URL = {
     ChangePassword: '/change-password',
     ManageBin: "/manage-bin",
     TransferBin: "/transfer-bin",
+    ManageStockCount: "/manage-stock-count",
 }
 export default URL;

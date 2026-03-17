@@ -123,7 +123,7 @@ const ViewOutboundRequest = () => {
 
                 <h3 className="text-lg font-semibold mb-3">Danh sách sản phẩm</h3>
                 <Table
-                    dataSource={request.items || []}
+                    dataSource={request.outboundItems || []}
                     columns={columns}
                     rowKey="id"
                     pagination={false}

@@ -10,10 +10,7 @@ import PrivateLayout from "../layouts/PrivateLayout"
 const Login = lazy(() => import("../app/pages/login"))
 const DashboardAdmin = lazy(() => import("../app/pages/dashboard/DashboardAdmin"))
 const ManageUser = lazy(() => import("../app/pages/manageUser"))
-const DashboardStaff = lazy(() => import("../app/pages/dashboard/DashboardStaff"))
 const DashboardManage = lazy(() => import("../app/pages/dashboard/DashboardManage"))
-const DashboardPurchase = lazy(() => import("../app/pages/dashboard/DashboardPurchase"))
-const DashboardSale = lazy(() => import("../app/pages/dashboard/DashboardSale"))
 const ManageCategory = lazy(() => import("../app/pages/manageCategory"))
 const ManageProduct = lazy(() => import("../app/pages/manageProduct"))
 const ManageUnit = lazy(() => import("../app/pages/manageUnit"))
@@ -35,7 +32,7 @@ const TransferBin = lazy(() => import("../app/pages/tranferbin"));
 const TransferRequest = lazy(() => import("../app/pages/transfer"))
 const ViewTransferRequest = lazy(() => import("../app/pages/transfer/view"))
 const EditTransferRequest = lazy(() => import("../app/pages/transfer/edit"))
-
+const ManageStockCount = lazy(() => import("../app/pages/manageStockCount"));
 
 const shareResourceItem = [
     {
@@ -59,26 +56,8 @@ const privateResourceItem = [
         private: true,
     },
     {
-        key: URL.DashboardStaff,
-        element: <DashboardStaff />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
         key: URL.DashboardManage,
         element: <DashboardManage />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardPurchase,
-        element: <DashboardPurchase />,
-        layout: DASHBOARD_LAYOUT,
-        private: true,
-    },
-    {
-        key: URL.DashboardSale,
-        element: <DashboardSale />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
@@ -212,6 +191,13 @@ const manageResourceItem = [
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
+    {
+        key: URL.ManageStockCount,
+        element: <ManageStockCount />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+
 ]
 
 

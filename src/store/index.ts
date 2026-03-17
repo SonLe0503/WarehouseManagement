@@ -10,12 +10,15 @@ import productSlide from "./productSlice";
 import inboundSlide from "./inboundSlice";
 import warehouseSlide from "./warehouseslide";
 import unitConversionSlide from "./unitConversionSlice";
+
+
 import inboundRequestSlide from "./inboundRequestSlide";
 import inventorySlide from "./inventorySlice";
 import outboundSlide from "./outboundSlice";
 import binSlide from "./binSlice";
 import stockTransferSlide from "./stockTransferSlice";
 import stockTransfer2StepReducer from "./stockTransfer2StepSlice";
+import stockCountSlide from "./stockCountSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -42,6 +45,7 @@ const reducers = {
   bin: binSlide,
   stockTransfer2Step: stockTransfer2StepReducer,
   stockTransfer: stockTransferSlide,
+  stockCount: stockCountSlide,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

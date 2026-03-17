@@ -42,7 +42,7 @@ const EditOutboundRequest = () => {
                 customerName: request.customerName,
                 warehouseId: request.warehouseId,
                 note: request.note,
-                items: request.items?.map(item => ({
+                items: request.outboundItems?.map(item => ({
                     productId: item.productId,
                     unitId: item.unitId,
                     quantity: item.quantity,
