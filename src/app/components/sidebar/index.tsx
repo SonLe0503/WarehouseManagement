@@ -9,6 +9,7 @@ import {
     DatabaseOutlined,
     SendOutlined,
     ContainerOutlined,
+    SwapOutlined,
     AuditOutlined,
 } from "@ant-design/icons";
 import { useAppSelector } from "../../../store";
@@ -50,12 +51,16 @@ const Sidebar = () => {
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
             { key: URL.ManageBin, icon: <ContainerOutlined />, label: "Quản lý bin" },
+            { key: URL.TransferBin, icon: <SwapOutlined />, label: "Chuyển bin" },
+            { key: URL.TransferRequest, icon: <SwapOutlined />, label: "Chuyển kho" },
             { key: URL.ManageStockCount, icon: <AuditOutlined />, label: "Kiểm kê kho" },
         ],
         STAFF: [
             { key: URL.ManageInventory, icon: <DatabaseOutlined />, label: "Tồn kho" },
             { key: URL.ManageOrder, icon: <FileTextOutlined />, label: "Quản lý nhập kho" },
             { key: URL.ManageOutbound, icon: <SendOutlined />, label: "Quản lý xuất kho" },
+            { key: URL.TransferBin, icon: <SwapOutlined />, label: "Chuyển bin" },
+            { key: URL.TransferRequest, icon: <SwapOutlined />, label: "Chuyển kho" },
             { key: URL.ManageStockCount, icon: <AuditOutlined />, label: "Kiểm kê kho" },
         ],
         PURCHASE: [

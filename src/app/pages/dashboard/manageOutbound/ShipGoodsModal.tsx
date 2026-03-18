@@ -1,13 +1,17 @@
-import { Modal, Table, InputNumber, Input, Tag, Typography, Alert, App, Select } from "antd";
+import { Modal, Table, InputNumber, Input, Tag, Alert, App, Select, Button, Tooltip } from "antd";
 import { useEffect, useState } from "react";
+import { PlusOutlined, DeleteOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
-import { shipGoods, type IOutboundRequest, type IOutboundItem, type PickedOutboundItemDTO } from "../../../../store/outboundSlice";
+import {
+    shipGoods,
+    type IOutboundRequest,
+    type IOutboundItem,
+} from "../../../../store/outboundSlice";
 import { getAllProducts, selectProducts } from "../../../../store/productSlice";
 import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
+import { getAllUnits, selectUnits } from "../../../../store/unitSlide";
 import { getAllInventories, selectInventories } from "../../../../store/inventorySlice";
-import { getAvailableBins, selectAvailableBins } from "../../../../store/binSlice";
-
-const { Text } = Typography;
+import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../../store/unitConversionSlice";
 
 interface ShipGoodsModalProps {
     open: boolean;
@@ -16,10 +20,14 @@ interface ShipGoodsModalProps {
     onSuccess: () => void;
 }
 
-interface ShipRow {
-    outboundItemId: number;
-    pickedQuantity: number | null;
+interface BinRow {
     storagePosition: string;
+    unitId: number | null;
+    quantity: number | null;
+}
+
+interface ItemRow {
+    bins: BinRow[];
     lineNote: string;
 }
 
@@ -27,27 +35,42 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
     const { message } = App.useApp();
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
-    const [rows, setRows] = useState<Record<number, ShipRow>>({});
+    const [itemRows, setItemRows] = useState<Record<number, ItemRow>>({});
 
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
+    const units = useAppSelector(selectUnits);
     const inventories = useAppSelector(selectInventories);
-    const availableBins = useAppSelector(selectAvailableBins);
+    const conversions = useAppSelector(selectUnitConversions);
 
     useEffect(() => {
         if (open) {
             if (products.length === 0) dispatch(getAllProducts());
             if (warehouses.length === 0) dispatch(getAllWarehouses());
+            if (units.length === 0) dispatch(getAllUnits());
             dispatch(getAllInventories());
-            if (request?.warehouseId) dispatch(getAvailableBins(request.warehouseId));
         }
-    }, [open, dispatch, products.length, warehouses.length, request?.warehouseId]);
+    }, [open, dispatch, products.length, warehouses.length, units.length]);
+
+    useEffect(() => {
+        if (open && request?.outboundItems) {
+            dispatch(clearUnitConversions());
+            const productIds = [...new Set(request.outboundItems.map((i) => i.productId))];
+            productIds.forEach((pid) => dispatch(getUnitConversionsByProduct(pid)));
+        }
+    }, [open, request?.outboundItems]);
+
+    useEffect(() => {
+        if (!open) {
+            setItemRows({});
+            dispatch(clearUnitConversions());
+        }
+    }, [open]);
 
     const getProduct = (productId: number) => products.find((p) => p.id === productId);
     const getWarehouse = (warehouseId: number) => warehouses.find((w) => w.id === warehouseId);
 
-    // Lấy các vị trí tồn kho khả dụng cho sản phẩm
-    const getAvailablePositions = (productId: number) =>
+    const getProductBins = (productId: number) =>
         inventories.filter(
             (inv) =>
                 inv.productId === productId &&
@@ -55,90 +78,123 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
                 inv.quantity > 0
         );
 
-    const buildInitialRows = (): Record<number, ShipRow> => {
-        if (!request?.outboundItems) return {};
-        const initial: Record<number, ShipRow> = {};
-        request.outboundItems.forEach((item) => {
-            initial[item.id] = {
-                outboundItemId: item.id,
-                pickedQuantity: null,
-                storagePosition: "",
-                lineNote: "",
-            };
-        });
-        return initial;
+    const toBaseQty = (productId: number, unitId: number, qty: number): number => {
+        const product = getProduct(productId);
+        if (!product) return qty;
+        if (unitId === product.baseUnitId) return qty;
+        const conv = conversions.find((c) => c.productId === productId && c.fromUnitId === unitId);
+        return conv ? qty * conv.rate : qty;
     };
 
-    const currentRows = Object.keys(rows).length > 0 ? rows : buildInitialRows();
+    const getItemRow = (itemId: number, defaultUnitId?: number): ItemRow =>
+        itemRows[itemId] ?? {
+            bins: [{ storagePosition: "", unitId: defaultUnitId ?? null, quantity: null }],
+            lineNote: "",
+        };
 
-    const handleQuantityChange = (itemId: number, value: number | null) => {
-        setRows((prev) => ({
-            ...prev,
-            [itemId]: {
-                ...(prev[itemId] || buildInitialRows()[itemId]),
-                pickedQuantity: value,
-            },
+    const updateItemRow = (itemId: number, updater: (row: ItemRow) => ItemRow, defaultUnitId?: number) => {
+        setItemRows((prev) => ({ ...prev, [itemId]: updater(getItemRow(itemId, defaultUnitId)) }));
+    };
+
+    const addBinRow = (itemId: number, defaultUnitId?: number) => {
+        updateItemRow(itemId, (row) => ({
+            ...row,
+            bins: [...row.bins, { storagePosition: "", unitId: defaultUnitId ?? null, quantity: null }],
+        }), defaultUnitId);
+    };
+
+    const removeBinRow = (itemId: number, binIndex: number) => {
+        updateItemRow(itemId, (row) => ({
+            ...row,
+            bins: row.bins.filter((_, i) => i !== binIndex),
         }));
     };
 
-    const handlePositionChange = (itemId: number, value: string) => {
-        setRows((prev) => ({
-            ...prev,
-            [itemId]: {
-                ...(prev[itemId] || buildInitialRows()[itemId]),
-                storagePosition: value,
-            },
+    const updateBin = (itemId: number, binIndex: number, field: keyof BinRow, value: any) => {
+        updateItemRow(itemId, (row) => ({
+            ...row,
+            bins: row.bins.map((b, i) => (i === binIndex ? { ...b, [field]: value } : b)),
         }));
     };
 
-    const handleNoteChange = (itemId: number, value: string) => {
-        setRows((prev) => ({
-            ...prev,
-            [itemId]: {
-                ...(prev[itemId] || buildInitialRows()[itemId]),
-                lineNote: value,
-            },
-        }));
+    const updateNote = (itemId: number, value: string) => {
+        updateItemRow(itemId, (row) => ({ ...row, lineNote: value }));
+    };
+
+    const getTotalBaseQty = (itemId: number, productId: number) => {
+        const row = getItemRow(itemId);
+        return row.bins.reduce((sum, b) => {
+            if (!b.unitId || !b.quantity) return sum;
+            return sum + toBaseQty(productId, b.unitId, b.quantity);
+        }, 0);
     };
 
     const handleSubmit = async () => {
         if (!request?.outboundItems) return;
 
-        const mergedRows = { ...buildInitialRows(), ...rows };
+        for (const item of request.outboundItems) {
+            const product = getProduct(item.productId);
+            const row = getItemRow(item.id, item.unitId ?? product?.baseUnitId);
 
-        const missing = Object.values(mergedRows).filter(
-            (r) => r.pickedQuantity === null || r.pickedQuantity === undefined
-        );
-        if (missing.length > 0) {
-            message.warning("Vui lòng nhập số lượng thực xuất cho tất cả sản phẩm");
-            return;
-        }
+            if (row.bins.length === 0) {
+                message.warning(`"${product?.name}": chưa có bin nào`);
+                return;
+            }
 
-        const missingPosition = Object.values(mergedRows).filter(
-            (r) => !r.storagePosition || r.storagePosition.trim() === ""
-        );
-        if (missingPosition.length > 0) {
-            message.warning("Vui lòng nhập vị trí bin cho tất cả sản phẩm");
-            return;
+            for (const bin of row.bins) {
+                if (!bin.storagePosition) {
+                    message.warning(`"${product?.name}": vui lòng chọn bin`);
+                    return;
+                }
+                if (!bin.unitId) {
+                    message.warning(`"${product?.name}": vui lòng chọn đơn vị`);
+                    return;
+                }
+                if (!bin.quantity || bin.quantity <= 0) {
+                    message.warning(`"${product?.name}": số lượng phải > 0`);
+                    return;
+                }
+
+                const invBin = getProductBins(item.productId).find(
+                    (inv) => inv.storagePosition === bin.storagePosition
+                );
+                const neededBase = toBaseQty(item.productId, bin.unitId, bin.quantity);
+                if (invBin && invBin.quantity < neededBase) {
+                    message.error(
+                        `Bin ${bin.storagePosition} - "${product?.name}": không đủ tồn (cần ${neededBase}, còn ${invBin.quantity} ${invBin.unitCode})`
+                    );
+                    return;
+                }
+            }
+
+            const binPositions = row.bins.map((b) => b.storagePosition);
+            if (binPositions.length !== new Set(binPositions).size) {
+                message.warning(`"${product?.name}": có bin bị trùng`);
+                return;
+            }
         }
 
         const payload = {
             items: request.outboundItems.map((item) => {
-                const row = mergedRows[item.id];
+                const product = getProduct(item.productId);
+                const row = getItemRow(item.id, item.unitId ?? product?.baseUnitId);
                 return {
                     outboundItemId: item.id,
-                    pickedQuantity: row.pickedQuantity as number,
-                    storagePosition: row.storagePosition || undefined,
+                    binQuantities: row.bins.map((b) => ({
+                        storagePosition: b.storagePosition,
+                        unitId: b.unitId as number,
+                        quantity: b.quantity as number,
+                    })),
                     lineNote: row.lineNote || undefined,
-                } as PickedOutboundItemDTO;
+                };
             }),
         };
 
         setLoading(true);
         try {
             await dispatch(shipGoods({ id: request.id, data: payload })).unwrap();
-            message.success(`Xuất hàng cho đơn ${request.requestNo} thành công!`);
-            setRows({});
+            message.success(`Xuất hàng đơn ${request.requestNo} thành công!`);
+            setItemRows({});
             onSuccess();
             onClose();
         } catch (error: any) {
@@ -149,129 +205,210 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
     };
 
     const handleCancel = () => {
-        setRows({});
+        setItemRows({});
+        dispatch(clearUnitConversions());
         onClose();
     };
 
     const columns = [
         {
             title: "Sản phẩm",
-            dataIndex: "productId",
-            key: "productId",
-            width: 200,
-            render: (productId: number) => {
-                const product = getProduct(productId);
+            key: "product",
+            width: 160,
+            render: (_: any, record: IOutboundItem) => {
+                const product = getProduct(record.productId);
                 return product ? (
                     <div>
                         <div className="font-medium text-gray-800">{product.name}</div>
                         <div className="text-xs text-gray-400 font-mono">{product.sku}</div>
                     </div>
                 ) : (
-                    <Tag color="blue" className="font-mono">#{productId}</Tag>
+                    <Tag>#{record.productId}</Tag>
                 );
             },
         },
         {
             title: "SL yêu cầu",
-            dataIndex: "quantity",
             key: "quantity",
-            width: 110,
+            width: 100,
             align: "center" as const,
-            render: (qty: number, record: IOutboundItem) => {
+            render: (_: any, record: IOutboundItem) => {
                 const product = getProduct(record.productId);
+                const reqUnit = record.unit
+                    ? record.unit.name
+                    : units.find((u) => u.id === record.unitId)?.name || product?.baseUnitCode || "";
                 return (
                     <div className="text-center">
-                        <Text strong className="text-gray-700">{qty}</Text>
-                        {product && (
-                            <span className="ml-1 text-xs text-gray-400">{product.baseUnitCode}</span>
-                        )}
+                        <span className="font-bold text-gray-700">{record.quantity}</span>
+                        <span className="ml-1 text-xs text-gray-400">{reqUnit}</span>
                     </div>
                 );
             },
         },
         {
-            title: "Tồn kho (bin)",
-            key: "inventory",
-            width: 160,
+            title: "Tồn theo bin",
+            key: "stock",
+            width: 170,
             render: (_: any, record: IOutboundItem) => {
-                const positions = getAvailablePositions(record.productId);
-                if (positions.length === 0) {
-                    return <span className="text-red-400 text-xs">Không có tồn</span>;
-                }
+                const bins = getProductBins(record.productId);
+                if (bins.length === 0)
+                    return <span className="text-red-400 text-xs">Không có tồn kho</span>;
+
                 return (
-                    <div className="flex flex-col gap-0.5">
-                        {positions.map((inv) => (
-                            <span
+                    <div className="flex flex-col gap-1">
+                        {bins.map((inv) => (
+                            <div
                                 key={inv.id}
-                                className="text-xs cursor-pointer text-blue-500 hover:text-blue-700"
-                                onClick={() => handlePositionChange(record.id, inv.storagePosition)}
+                                className="flex items-center gap-1 cursor-pointer group"
+                                onClick={() => {
+                                    const product = getProduct(record.productId);
+                                    updateBin(record.id, 0, "storagePosition", inv.storagePosition);
+                                    if (product) updateBin(record.id, 0, "unitId", product.baseUnitId);
+                                }}
                             >
-                                <Tag color="cyan" className="font-mono text-[10px] mr-0">
+                                <Tag color="cyan" className="font-mono text-[11px] m-0 group-hover:bg-cyan-200 cursor-pointer">
                                     {inv.storagePosition}
                                 </Tag>
-                                <span className="text-gray-500 ml-1">({inv.quantity})</span>
-                            </span>
+                                <span className="text-xs text-gray-600 font-medium">{inv.quantity}</span>
+                                <span className="text-xs text-gray-400">{inv.unitCode}</span>
+                            </div>
                         ))}
                     </div>
                 );
             },
         },
         {
-            title: "Vị trí xuất",
-            key: "storagePosition",
-            width: 150,
+            title: (
+                <span>
+                    Xuất từ bin{" "}
+                    <Tooltip title="Chọn bin → chọn đơn vị → nhập SL. Click vào bin tồn kho để điền nhanh.">
+                        <InfoCircleOutlined className="text-gray-400" />
+                    </Tooltip>
+                </span>
+            ),
+            key: "bins",
             render: (_: any, record: IOutboundItem) => {
-                const row = currentRows[record.id];
-                const binOptions = availableBins.map(b => ({ label: b.code, value: b.code }));
-
-                return (
-                    <Select
-                        showSearch
-                        className="w-full"
-                        value={row?.storagePosition || undefined}
-                        onChange={(val) => handlePositionChange(record.id, val)}
-                        placeholder="Chọn bin"
-                        status={!row?.storagePosition ? "error" : undefined}
-                        options={binOptions}
-                        filterOption={(input, option) =>
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                        }
-                    />
-                );
-            },
-        },
-        {
-            title: "SL thực xuất",
-            key: "pickedQuantity",
-            width: 160,
-            align: "center" as const,
-            render: (_: any, record: IOutboundItem) => {
-                const row = currentRows[record.id];
-                const picked = row?.pickedQuantity;
-                const isDiff = picked !== null && picked !== undefined && picked !== record.quantity;
                 const product = getProduct(record.productId);
+                const defaultUnitId = record.unitId ?? product?.baseUnitId;
+                const row = getItemRow(record.id, defaultUnitId);
+                const productBins = getProductBins(record.productId);
+                const binOptions = productBins.map((inv) => ({
+                    label: (
+                        <span>
+                            <span className="font-mono font-bold">{inv.storagePosition}</span>
+                            <span className="text-gray-400 ml-2 text-xs">({inv.quantity} {inv.unitCode})</span>
+                        </span>
+                    ),
+                    value: inv.storagePosition,
+                }));
+                const totalBaseQty = getTotalBaseQty(record.id, record.productId);
 
                 return (
-                    <div>
-                        <div className="flex items-center gap-1">
-                            <InputNumber
-                                min={0}
-                                value={row?.pickedQuantity ?? undefined}
-                                onChange={(val) => handleQuantityChange(record.id, val)}
-                                className="flex-1"
-                                placeholder="Nhập SL"
-                                status={isDiff ? "warning" : undefined}
-                            />
-                            {product && (
-                                <span className="text-xs text-gray-400 whitespace-nowrap">{product.baseUnitCode}</span>
-                            )}
+                    <div className="flex flex-col gap-2">
+                        {row.bins.map((bin, idx) => {
+                            const invBin = productBins.find((inv) => inv.storagePosition === bin.storagePosition);
+                            const baseNeeded = bin.unitId && bin.quantity
+                                ? toBaseQty(record.productId, bin.unitId, bin.quantity)
+                                : 0;
+                            const notEnough = invBin && baseNeeded > invBin.quantity;
+
+                            return (
+                                <div key={idx} className="flex flex-col gap-1">
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                        <Select
+                                            value={bin.storagePosition || undefined}
+                                            onChange={(val) => updateBin(record.id, idx, "storagePosition", val ?? "")}
+                                            placeholder="Chọn bin"
+                                            className="w-36"
+                                            status={!bin.storagePosition ? "error" : notEnough ? "warning" : undefined}
+                                            options={binOptions}
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                (option?.value as string)?.toLowerCase().includes(input.toLowerCase())
+                                            }
+                                            notFoundContent={<span className="text-gray-400 text-xs">Không có tồn kho</span>}
+                                        />
+
+                                        <Select
+                                            value={bin.unitId ?? undefined}
+                                            onChange={(val) => updateBin(record.id, idx, "unitId", val)}
+                                            placeholder="ĐVT"
+                                            className="w-28"
+                                            status={!bin.unitId ? "error" : undefined}
+                                            options={units.map((u) => {
+                                                const conv = conversions.find(
+                                                    (c) => c.productId === record.productId && c.fromUnitId === u.id
+                                                );
+                                                const isBase = u.id === product?.baseUnitId;
+                                                return {
+                                                    label: isBase
+                                                        ? `${u.name} (gốc)`
+                                                        : conv
+                                                            ? `${u.name} (×${conv.rate})`
+                                                            : u.name,
+                                                    value: u.id,
+                                                };
+                                            })}
+                                            showSearch
+                                            filterOption={(input, option) =>
+                                                String(option?.label ?? "").toLowerCase().includes(input.toLowerCase())
+                                            }
+                                        />
+
+                                        <InputNumber
+                                            min={0}
+                                            value={bin.quantity ?? undefined}
+                                            onChange={(val) => updateBin(record.id, idx, "quantity", val)}
+                                            placeholder="SL"
+                                            className="w-20"
+                                            status={!bin.quantity || notEnough ? "error" : undefined}
+                                        />
+
+                                        <Button
+                                            type="text"
+                                            danger
+                                            size="small"
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => removeBinRow(record.id, idx)}
+                                            disabled={row.bins.length === 1}
+                                        />
+                                    </div>
+
+                                    {bin.unitId && bin.quantity && bin.storagePosition && (
+                                        <div className="text-[11px] flex gap-2 ml-1">
+                                            {bin.unitId !== product?.baseUnitId && (
+                                                <span className="text-blue-500">
+                                                    = {baseNeeded} {product?.baseUnitCode}
+                                                </span>
+                                            )}
+                                            {notEnough && (
+                                                <span className="text-red-500 font-medium">
+                                                    ⚠ Không đủ tồn (còn {invBin?.quantity} {invBin?.unitCode})
+                                                </span>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        <Button
+                            type="dashed"
+                            size="small"
+                            icon={<PlusOutlined />}
+                            onClick={() => addBinRow(record.id, defaultUnitId)}
+                            className="w-fit"
+                        >
+                            Thêm bin
+                        </Button>
+
+                        <div className="text-xs mt-0.5">
+                            <span className="text-gray-500">Tổng xuất: </span>
+                            <span className={`font-bold ${totalBaseQty > 0 ? "text-purple-600" : "text-gray-400"}`}>
+                                {totalBaseQty}
+                            </span>
+                            <span className="text-gray-400 ml-1">{product?.baseUnitCode}</span>
                         </div>
-                        {isDiff && (
-                            <div className="text-[10px] text-orange-500 mt-0.5 text-center">
-                                Chênh {(picked! - record.quantity) > 0 ? "+" : ""}
-                                {(picked! - record.quantity).toFixed(2)}
-                            </div>
-                        )}
                     </div>
                 );
             },
@@ -279,13 +416,14 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
         {
             title: "Ghi chú",
             key: "lineNote",
+            width: 150,
             render: (_: any, record: IOutboundItem) => {
-                const row = currentRows[record.id];
+                const row = getItemRow(record.id);
                 return (
                     <Input
-                        value={row?.lineNote ?? ""}
-                        onChange={(e) => handleNoteChange(record.id, e.target.value)}
-                        placeholder="Ghi chú thêm..."
+                        value={row.lineNote}
+                        onChange={(e) => updateNote(record.id, e.target.value)}
+                        placeholder="Ghi chú..."
                     />
                 );
             },
@@ -309,12 +447,20 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
             confirmLoading={loading}
             okText="Xác nhận xuất hàng"
             cancelText="Hủy"
-            width={1000}
+            width={1100}
             okButtonProps={{ className: "!bg-purple-600 hover:!bg-purple-500" }}
         >
             <div className="mb-4 grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg text-sm">
-                <div><span className="text-gray-500">Khách hàng:</span> <strong>{request.customerName}</strong></div>
-                <div><span className="text-gray-500">Kho xuất:</span> <strong>{warehouse ? `${warehouse.name} (${warehouse.code})` : `#${request.warehouseId}`}</strong></div>
+                <div>
+                    <span className="text-gray-500">Khách hàng:</span>{" "}
+                    <strong>{request.customerName}</strong>
+                </div>
+                <div>
+                    <span className="text-gray-500">Kho xuất:</span>{" "}
+                    <strong>
+                        {warehouse ? `${warehouse.name} (${warehouse.code})` : `#${request.warehouseId}`}
+                    </strong>
+                </div>
                 {request.note && (
                     <div className="col-span-2">
                         <span className="text-gray-500">Ghi chú đơn:</span> {request.note}
@@ -323,7 +469,7 @@ const ShipGoodsModal = ({ open, onClose, request, onSuccess }: ShipGoodsModalPro
             </div>
 
             <Alert
-                message='Chọn vị trí bin từ danh sách tồn kho hoặc nhập thủ công. Nhập số lượng thực xuất vào cột "SL thực xuất".'
+                message="Click vào bin trong cột 'Tồn theo bin' để điền nhanh. Chọn đơn vị khác base unit sẽ tự quy đổi."
                 type="info"
                 showIcon
                 className="mb-4"

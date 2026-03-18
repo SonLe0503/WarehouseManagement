@@ -1,0 +1,249 @@
+
+> warehous-management@0.0.0 lint
+> eslint .
+
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\header\index.tsx
+  57:8  warning  React Hook useEffect has a missing dependency: 'handleLogout'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddCategoryModal.tsx
+  27:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddInboundModal.tsx
+   44:25   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  130:70   error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  152:121  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddOutboundModal.tsx
+   45:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddProductModal.tsx
+  37:25  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  50:11  error  'getTreeData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  50:33  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  50:41  error  Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddTransferModal.tsx
+   48:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  138:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddUnitModal.tsx
+  26:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddUserModal.tsx
+  48:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\AddWarehouseModal.tsx
+  27:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\EditCategoryModal.tsx
+  37:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  50:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  64:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\EditProductModal.tsx
+  49:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\EditUnitModal.tsx
+  38:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\EditUserModal.tsx
+  71:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\modal\EditWarehouseModal.tsx
+  38:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\components\sidebar\index.tsx
+  28:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\dashboard\manageOrder\ReceiveGoodsModal.tsx
+  142:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  195:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  230:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  256:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\dashboard\manageOrder\index.tsx
+  71:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\login\index.tsx
+  19:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  27:18  error  'error' is defined but never used         @typescript-eslint/no-unused-vars
+  27:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageCategory\index.tsx
+  67:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageProduct\index.tsx
+  47:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageUnitConversion\AddConversion.tsx
+  10:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageUnitConversion\index.tsx
+   87:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  145:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  170:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageUnit\index.tsx
+  47:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageUser\index.tsx
+  53:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\manageWarehouse\index.tsx
+  67:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\profile\changePassword\index.tsx
+  15:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\purchase\edit.tsx
+  55:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\purchase\index.tsx
+  56:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\purchase\view.tsx
+  41:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\sale\edit.tsx
+  55:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  62:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\sale\index.tsx
+  57:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\sale\view.tsx
+  41:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:34  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\transfer\edit.tsx
+   62:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:70  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\app\pages\transfer\index.tsx
+  59:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\interface\app.ts
+  14:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\layouts\Routers.tsx
+  214:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\authSlide.ts
+  59:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  78:29  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\categorySlide.ts
+   37:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   49:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   59:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   72:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   85:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  108:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\inboundRequestSlide.ts
+   57:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   81:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\inboundSlice.ts
+   82:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\inventorySlice.ts
+  34:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  46:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  68:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\outboundSlice.ts
+   82:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\productSlice.ts
+   46:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   90:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  129:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  139:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\roleSlide.ts
+  26:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  36:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\stockTransfer2StepSlice.ts
+   82:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\unitConversionSlice.ts
+   50:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   73:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   99:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\unitSlide.ts
+   49:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   72:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   98:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\userSlide.ts
+   48:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   58:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   79:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   92:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  133:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  143:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\SWP391_Warehouse\front-end\WarehouseManagement\src\store\warehouseslide.ts
+   45:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   68:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   76:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   86:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  104:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  113:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  132:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  150:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  160:26  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  168:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 144 problems (143 errors, 1 warning)
+
