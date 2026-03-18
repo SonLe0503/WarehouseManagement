@@ -11,8 +11,9 @@ export interface InboundRequestItem {
     storagePosition: string;
     unitId: number;
     lineNote: string;
+    unitName: string;
+    unitCode: string;
 }
-
 
 export interface InboundRequest {
     id: number;
@@ -28,15 +29,18 @@ export interface InboundRequest {
     inboundItems: InboundRequestItem[];
 }
 
-export interface ReceiveInboundItemDto {
-    inboundItemId: number;
-    binQuantities: BinQuantityDto[];
-    lineNote?: string;
-}
 export interface BinQuantityDto {
     storagePosition: string;
     quantity: number;
 }
+
+export interface ReceiveInboundItemDto {
+    inboundItemId: number;
+    totalReceivedQuantity: number;
+    binQuantities: BinQuantityDto[];
+    lineNote?: string;
+}
+
 export interface ReceiveInboundRequestDto {
     items: ReceiveInboundItemDto[];
 }

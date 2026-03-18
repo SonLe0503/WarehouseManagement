@@ -1,6 +1,6 @@
 import { Modal, Table, InputNumber, Input, Tag, Typography, Alert, App, Select, Button } from "antd";
 import { useEffect, useState } from "react";
-import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
+import { PlusOutlined, DeleteOutlined, WarningOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../../../store";
 import {
     receiveGoods,
@@ -27,12 +27,13 @@ interface BinRow {
 }
 
 interface ItemRow {
+    totalReceivedQuantity: number | null; // SL thực nhận từ NCC
     noteResult: string;
     bins: BinRow[];
 }
 
 const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsModalProps) => {
-    const { message } = App.useApp();
+    const { message, modal } = App.useApp();
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
     const [itemRows, setItemRows] = useState<Record<number, ItemRow>>({});
@@ -51,7 +52,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         }
     }, [open, dispatch, products.length, warehouses.length, units.length, request?.warehouseId]);
 
-    // Reset khi đóng modal
     useEffect(() => {
         if (!open) setItemRows({});
     }, [open]);
@@ -66,19 +66,17 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
 
     const binOptions = availableBins.map((b) => ({ label: b.code, value: b.code }));
 
-    // Lấy hoặc khởi tạo row cho item
-    const getItemRow = (itemId: number): ItemRow => {
-        return itemRows[itemId] ?? { noteResult: "", bins: [{ storagePosition: "", quantity: null }] };
-    };
+    const getItemRow = (itemId: number): ItemRow =>
+        itemRows[itemId] ?? {
+            totalReceivedQuantity: null,
+            noteResult: "",
+            bins: [{ storagePosition: "", quantity: null }],
+        };
 
     const updateItemRow = (itemId: number, updater: (row: ItemRow) => ItemRow) => {
-        setItemRows((prev) => ({
-            ...prev,
-            [itemId]: updater(getItemRow(itemId)),
-        }));
+        setItemRows((prev) => ({ ...prev, [itemId]: updater(getItemRow(itemId)) }));
     };
 
-    // Thêm bin mới cho item
     const addBinRow = (itemId: number) => {
         updateItemRow(itemId, (row) => ({
             ...row,
@@ -86,7 +84,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         }));
     };
 
-    // Xóa bin khỏi item
     const removeBinRow = (itemId: number, binIndex: number) => {
         updateItemRow(itemId, (row) => ({
             ...row,
@@ -94,55 +91,33 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         }));
     };
 
-    // Cập nhật bin
     const updateBin = (itemId: number, binIndex: number, field: keyof BinRow, value: any) => {
         updateItemRow(itemId, (row) => ({
             ...row,
-            bins: row.bins.map((b, i) => i === binIndex ? { ...b, [field]: value } : b),
+            bins: row.bins.map((b, i) => (i === binIndex ? { ...b, [field]: value } : b)),
         }));
     };
 
-    // Cập nhật note
     const updateNote = (itemId: number, value: string) => {
         updateItemRow(itemId, (row) => ({ ...row, noteResult: value }));
     };
 
-    const handleSubmit = async () => {
+    const updateTotalReceived = (itemId: number, value: number | null) => {
+        updateItemRow(itemId, (row) => ({ ...row, totalReceivedQuantity: value }));
+    };
+
+    // Tính tổng SL đã chia vào bins
+    const getTotalBins = (itemId: number) => {
+        const row = getItemRow(itemId);
+        return row.bins.reduce((s, b) => s + (b.quantity ?? 0), 0);
+    };
+
+    const doSubmit = async () => {
         if (!request) return;
-
-        // Validate tất cả items
-        for (const item of request.inboundItems) {
-            const row = getItemRow(item.id);
-
-            if (row.bins.length === 0) {
-                message.warning(`Sản phẩm "${getProduct(item.productId)?.name}" chưa có bin nào`);
-                return;
-            }
-
-            for (const bin of row.bins) {
-                if (!bin.storagePosition) {
-                    message.warning(`Vui lòng chọn bin cho tất cả sản phẩm`);
-                    return;
-                }
-                if (bin.quantity === null || bin.quantity === undefined || bin.quantity <= 0) {
-                    message.warning(`Vui lòng nhập số lượng > 0 cho tất cả bin`);
-                    return;
-                }
-            }
-
-            // Kiểm tra trùng bin trong cùng 1 item
-            const binCodes = row.bins.map((b) => b.storagePosition);
-            const hasDuplicate = binCodes.length !== new Set(binCodes).size;
-            if (hasDuplicate) {
-                message.warning(`Sản phẩm "${getProduct(item.productId)?.name}" có bin bị trùng`);
-                return;
-            }
-        }
 
         const payload = {
             items: request.inboundItems.map((item) => {
                 const row = getItemRow(item.id);
-
                 let finalNote = "";
                 if (item.lineNote && row.noteResult) {
                     finalNote = `[YC: ${item.lineNote}] | [KQ: ${row.noteResult}]`;
@@ -151,9 +126,9 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                 } else if (row.noteResult) {
                     finalNote = row.noteResult;
                 }
-
                 return {
                     inboundItemId: item.id,
+                    totalReceivedQuantity: row.totalReceivedQuantity as number,
                     binQuantities: row.bins.map((b) => ({
                         storagePosition: b.storagePosition,
                         quantity: b.quantity as number,
@@ -177,6 +152,86 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         }
     };
 
+    const handleSubmit = async () => {
+        if (!request) return;
+
+        // Validate cơ bản
+        for (const item of request.inboundItems) {
+            const row = getItemRow(item.id);
+
+            if (row.totalReceivedQuantity === null || row.totalReceivedQuantity <= 0) {
+                message.warning(`Vui lòng nhập SL thực nhận cho "${getProduct(item.productId)?.name}"`);
+                return;
+            }
+
+            if (row.bins.length === 0) {
+                message.warning(`Sản phẩm "${getProduct(item.productId)?.name}" chưa có bin nào`);
+                return;
+            }
+
+            for (const bin of row.bins) {
+                if (!bin.storagePosition) {
+                    message.warning("Vui lòng chọn bin cho tất cả dòng");
+                    return;
+                }
+                if (!bin.quantity || bin.quantity <= 0) {
+                    message.warning("Vui lòng nhập số lượng > 0 cho tất cả bin");
+                    return;
+                }
+            }
+
+            const binCodes = row.bins.map((b) => b.storagePosition);
+            if (binCodes.length !== new Set(binCodes).size) {
+                message.warning(`Sản phẩm "${getProduct(item.productId)?.name}" có bin bị trùng`);
+                return;
+            }
+
+            const totalBins = getTotalBins(item.id);
+            if (totalBins !== row.totalReceivedQuantity) {
+                message.warning(
+                    `Sản phẩm "${getProduct(item.productId)?.name}": Tổng SL bins (${totalBins}) phải bằng SL thực nhận (${row.totalReceivedQuantity})`
+                );
+                return;
+            }
+        }
+
+        // Kiểm tra có item nào chênh lệch so với SL đặt không → hỏi xác nhận
+        const diffItems = request.inboundItems.filter((item) => {
+            const row = getItemRow(item.id);
+            return row.totalReceivedQuantity !== null && row.totalReceivedQuantity !== item.quantity;
+        });
+
+        if (diffItems.length > 0) {
+            const diffText = diffItems
+                .map((item) => {
+                    const row = getItemRow(item.id);
+                    const diff = (row.totalReceivedQuantity ?? 0) - item.quantity;
+                    return `• ${getProduct(item.productId)?.name}: đặt ${item.quantity}, nhận ${row.totalReceivedQuantity} (${diff > 0 ? "+" : ""}${diff})`;
+                })
+                .join("\n");
+
+            modal.confirm({
+                title: "Có chênh lệch số lượng",
+                icon: <WarningOutlined className="text-orange-500" />,
+                content: (
+                    <div>
+                        <p className="text-gray-600 mb-2">Các sản phẩm sau có SL thực nhận khác SL đặt:</p>
+                        <pre className="bg-orange-50 border border-orange-200 rounded p-2 text-sm text-orange-700 whitespace-pre-wrap">
+                            {diffText}
+                        </pre>
+                        <p className="mt-2 text-gray-500 text-sm">Bạn có chắc muốn xác nhận nhận hàng không?</p>
+                    </div>
+                ),
+                okText: "Xác nhận dù chênh lệch",
+                okButtonProps: { danger: true },
+                cancelText: "Kiểm tra lại",
+                onOk: doSubmit,
+            });
+        } else {
+            doSubmit();
+        }
+    };
+
     const handleCancel = () => {
         setItemRows({});
         onClose();
@@ -186,7 +241,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         {
             title: "Sản phẩm",
             key: "product",
-            width: 180,
+            width: 170,
             render: (_: any, record: InboundRequestItem) => {
                 const product = getProduct(record.productId);
                 return product ? (
@@ -195,7 +250,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                         <div className="text-xs text-gray-400 font-mono">{product.sku}</div>
                     </div>
                 ) : (
-                    <Tag color="blue" className="font-mono">#{record.productId}</Tag>
+                    <Tag color="blue">#{record.productId}</Tag>
                 );
             },
         },
@@ -212,23 +267,57 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             ),
         },
         {
+            title: "SL thực nhận",
+            key: "totalReceived",
+            width: 140,
+            align: "center" as const,
+            render: (_: any, record: InboundRequestItem) => {
+                const row = getItemRow(record.id);
+                const val = row.totalReceivedQuantity;
+                const isDiff = val !== null && val !== record.quantity;
+
+                return (
+                    <div>
+                        <div className="flex items-center gap-1 justify-center">
+                            <InputNumber
+                                min={0}
+                                value={val ?? undefined}
+                                onChange={(v) => updateTotalReceived(record.id, v)}
+                                placeholder="Nhập SL"
+                                className="w-20"
+                                status={val === null ? "error" : isDiff ? "warning" : undefined}
+                            />
+                            <span className="text-xs text-gray-400">{getUnitName(record)}</span>
+                        </div>
+                        {isDiff && val !== null && (
+                            <div className="text-[10px] text-orange-500 mt-1 text-center flex items-center justify-center gap-1">
+                                <WarningOutlined />
+                                chênh {val - record.quantity > 0 ? "+" : ""}{val - record.quantity}
+
+                            </div>
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
             title: "Phân bổ vào bin",
             key: "bins",
             render: (_: any, record: InboundRequestItem) => {
                 const row = getItemRow(record.id);
-                const totalReceived = row.bins.reduce((s, b) => s + (b.quantity ?? 0), 0);
-                const isDiff = totalReceived !== record.quantity && totalReceived > 0;
+                const totalBins = getTotalBins(record.id);
+                const totalReceived = row.totalReceivedQuantity ?? 0;
+                const binsDiff = totalReceived > 0 && totalBins !== totalReceived;
 
                 return (
                     <div className="flex flex-col gap-2">
                         {row.bins.map((bin, idx) => (
                             <div key={idx} className="flex items-center gap-2">
-                                {/* Bin select */}
                                 <Select
                                     value={bin.storagePosition || undefined}
                                     onChange={(val) => updateBin(record.id, idx, "storagePosition", val ?? "")}
                                     placeholder="Chọn bin"
-                                    className="w-32"
+                                    className="w-28"
                                     status={!bin.storagePosition ? "error" : undefined}
                                     options={binOptions}
                                     showSearch
@@ -236,8 +325,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                                         (option?.value as string)?.toLowerCase().includes(input.toLowerCase())
                                     }
                                 />
-
-                                {/* Quantity input */}
                                 <InputNumber
                                     min={0}
                                     value={bin.quantity ?? undefined}
@@ -246,11 +333,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                                     className="w-20"
                                     status={!bin.quantity ? "error" : undefined}
                                 />
-                                <span className="text-xs text-gray-400 whitespace-nowrap">
-                                    {getUnitName(record)}
-                                </span>
-
-                                {/* Xóa bin — chỉ xóa được nếu có > 1 bin */}
+                                <span className="text-xs text-gray-400">{getUnitName(record)}</span>
                                 <Button
                                     type="text"
                                     danger
@@ -262,7 +345,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                             </div>
                         ))}
 
-                        {/* Thêm bin */}
                         <Button
                             type="dashed"
                             size="small"
@@ -273,17 +355,18 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
                             Thêm bin
                         </Button>
 
-                        {/* Tổng + cảnh báo chênh lệch */}
-                        <div className="text-xs mt-1">
-                            <span className="text-gray-500">Tổng: </span>
-                            <span className={`font-bold ${isDiff ? "text-orange-500" : "text-green-600"}`}>
-                                {totalReceived}
+                        {/* Tổng bins vs SL thực nhận */}
+                        <div className="text-xs">
+                            <span className="text-gray-500">Tổng bins: </span>
+                            <span className={`font-bold ${binsDiff ? "text-red-500" : "text-green-600"}`}>
+                                {totalBins}
                             </span>
-                            <span className="text-gray-400 ml-1">{getUnitName(record)}</span>
-                            {isDiff && (
-                                <span className="ml-2 text-orange-500">
-                                    (chênh {totalReceived - record.quantity > 0 ? "+" : ""}
-                                    {totalReceived - record.quantity})
+                            {totalReceived > 0 && (
+                                <span className="text-gray-400"> / {totalReceived}</span>
+                            )}
+                            {binsDiff && (
+                                <span className="ml-1 text-red-500 font-medium">
+                                    (còn thiếu {totalReceived - totalBins})
                                 </span>
                             )}
                         </div>
@@ -295,7 +378,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             title: "Yêu cầu từ đơn",
             dataIndex: "lineNote",
             key: "lineNote",
-            width: 150,
+            width: 140,
             render: (note: string) =>
                 note
                     ? <span className="text-gray-500 italic text-xs">{note}</span>
@@ -304,7 +387,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
         {
             title: "Kết quả nhận hàng",
             key: "noteResult",
-            width: 180,
+            width: 170,
             render: (_: any, record: InboundRequestItem) => {
                 const row = getItemRow(record.id);
                 return (
@@ -319,7 +402,6 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
     ];
 
     if (!request) return null;
-
     const warehouse = getWarehouse(request.warehouseId);
 
     return (
@@ -336,7 +418,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             confirmLoading={loading}
             okText="Xác nhận nhận hàng"
             cancelText="Hủy"
-            width={1000}
+            width={1100}
             okButtonProps={{ className: "!bg-green-600 hover:!bg-green-500" }}
         >
             <div className="mb-4 grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg text-sm">
@@ -358,7 +440,7 @@ const ReceiveGoodsModal = ({ open, onClose, request, onSuccess }: ReceiveGoodsMo
             </div>
 
             <Alert
-                message="Mỗi sản phẩm có thể phân bổ vào nhiều bin khác nhau. Nhấn '+ Thêm bin' để chia nhỏ."
+                message="Nhập SL thực nhận từ NCC → phân bổ vào bin. Tổng SL các bin phải bằng SL thực nhận."
                 type="info"
                 showIcon
                 className="mb-4"

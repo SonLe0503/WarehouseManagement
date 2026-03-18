@@ -16,6 +16,7 @@ export interface IOutboundRequest {
     approvedAt?: string;
     createdBy?: number;
     outboundItems?: IOutboundItem[];
+
 }
 
 export interface IOutboundItem {
@@ -24,6 +25,7 @@ export interface IOutboundItem {
     unitId?: number;
     quantity: number;
     pickedQuantity?: number;
+
     lineNote?: string;
     unit?: {
         id: number;
@@ -51,10 +53,15 @@ export interface OutboundRequestCreateDTO {
     }[];
 }
 
+export interface ShipBinQuantityDto {
+    storagePosition: string;
+    unitId: number;
+    quantity: number;
+}
+
 export interface PickedOutboundItemDTO {
     outboundItemId: number;
-    pickedQuantity: number;
-    storagePosition?: string;
+    binQuantities: ShipBinQuantityDto[];
     lineNote?: string;
 }
 

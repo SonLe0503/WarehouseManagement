@@ -30,6 +30,7 @@ const Condition = (props: ConditionProps) => {
                     { value: "Pending", label: "Đang chờ" },
                     { value: "Rejected", label: "Từ chối" },
                     { value: "Completed", label: "Đã nhập " },
+
                 ]}
             />
         </div>

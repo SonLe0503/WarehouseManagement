@@ -163,7 +163,7 @@ const productSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
-            /* ===== GET ALL ===== */
+
             .addCase(getAllProducts.pending, (state) => {
                 state.loading = true;
             })
@@ -189,7 +189,7 @@ const productSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            /* ===== CREATE ===== */
+
             .addCase(createProduct.pending, (state) => {
                 state.loading = true;
             })
@@ -201,7 +201,7 @@ const productSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            /* ===== UPDATE ===== */
+
             .addCase(updateProduct.pending, (state) => {
                 state.loading = true;
             })
@@ -213,7 +213,6 @@ const productSlice = createSlice({
                 state.error = action.payload as string;
             })
 
-            /* ===== DELETE ===== */
             .addCase(deleteProduct.pending, (state) => {
                 state.loading = true;
             })

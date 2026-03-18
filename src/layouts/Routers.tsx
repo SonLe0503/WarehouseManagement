@@ -28,6 +28,10 @@ const ManageWarehouse = lazy(() => import("../app/pages/manageWarehouse"))
 const Profile = lazy(() => import("../app/pages/profile"))
 const ChangePassword = lazy(() => import("../app/pages/profile/changePassword"))
 const ManageBin = lazy(() => import("../app/pages/managerBin"));
+const TransferBin = lazy(() => import("../app/pages/tranferbin"));
+const TransferRequest = lazy(() => import("../app/pages/transfer"))
+const ViewTransferRequest = lazy(() => import("../app/pages/transfer/view"))
+const EditTransferRequest = lazy(() => import("../app/pages/transfer/edit"))
 const ManageStockCount = lazy(() => import("../app/pages/manageStockCount"));
 
 const shareResourceItem = [
@@ -127,8 +131,63 @@ const manageResourceItem = [
         private: true,
     },
     {
+        key: URL.ManageWarehouse,
+        element: <ManageWarehouse />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditInboundRequest,
+        element: <EditInboundRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ManageInventory,
+        element: <ManageInventory />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.Profile,
+        element: <Profile />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ChangePassword,
+        element: <ChangePassword />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
         key: URL.ManageBin,
         element: <ManageBin />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.TransferBin,
+        element: <TransferBin />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    // ── Cross-warehouse transfer (Manager duyệt phiếu) ──────────────────
+    {
+        key: URL.TransferRequest,
+        element: <TransferRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewTransferRequest,
+        element: <ViewTransferRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditTransferRequest,
+        element: <EditTransferRequest />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },
@@ -137,8 +196,11 @@ const manageResourceItem = [
         element: <ManageStockCount />,
         layout: DASHBOARD_LAYOUT,
         private: true,
-    }
+    },
+
 ]
+
+
 
 const purchaseResourceItem = [
     {
@@ -176,11 +238,35 @@ const saleResourceItem = [
     },
 ]
 
+
+const transferResourceItem = [
+    {
+        key: URL.TransferRequest,
+        element: <TransferRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewTransferRequest,
+        element: <ViewTransferRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.EditTransferRequest,
+        element: <EditTransferRequest />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+]
+
+
 const menus = [...shareResourceItem,
 ...privateResourceItem,
 ...manageResourceItem,
 ...purchaseResourceItem,
-...saleResourceItem]
+...saleResourceItem,
+...transferResourceItem]
 
 export default function Routers() {
     return (
