@@ -1,4 +1,3 @@
-// components/modal/AddOutboundModal.tsx
 import { Modal, Form, Input, Select, Button, InputNumber, Divider, App } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -6,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "../../../store";
 import { createOutboundRequest } from "../../../store/outboundSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
-import { getAllUnits, selectUnits } from "../../../store/unitSlide";
+import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../store/unitConversionSlice";
 
 interface AddOutboundModalProps {
     open: boolean;
@@ -21,16 +20,59 @@ const AddOutboundModal = (props: AddOutboundModalProps) => {
 
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
-    const units = useAppSelector(selectUnits);
+    const conversions = useAppSelector(selectUnitConversions);
     const [loading, setLoading] = useState(false);
+    const [loadedProducts, setLoadedProducts] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         if (open) {
             dispatch(getAllProducts());
             dispatch(getActiveWarehouses());
-            dispatch(getAllUnits());
+        } else {
+            dispatch(clearUnitConversions());
+            setLoadedProducts(new Set());
         }
     }, [dispatch, open]);
+
+    const handleProductChange = (productId: number, fieldName: number) => {
+        const product = products.find(p => p.id === productId);
+
+        // Reset unitId về base unit khi đổi sản phẩm
+        const items = form.getFieldValue("items");
+        items[fieldName] = {
+            ...items[fieldName],
+            productId,
+            unitId: product?.baseUnitId,
+            quantity: undefined,
+        };
+        form.setFieldsValue({ items });
+
+        if (!loadedProducts.has(productId)) {
+            dispatch(getUnitConversionsByProduct(productId));
+            setLoadedProducts(prev => new Set(prev).add(productId));
+        }
+    };
+
+    const getUnitsForProduct = (productId: number) => {
+        const product = products.find(p => p.id === productId);
+        if (!product) return [];
+
+        const base = [{
+            value: product.baseUnitId,
+            label: `${product.baseUnitCode} (gốc)`,
+        }];
+
+        const convs = conversions
+            .filter(c => c.productId === productId)
+            .map(c => ({
+                value: c.fromUnitId,
+                label: c.fromUnitName
+                    ? `${c.fromUnitName} (×${c.conversionFactor ?? c.rate} ${product.baseUnitCode})`
+                    : `${product.baseUnitCode}`,
+            }));
+
+        return [...base, ...convs];
+    };
 
     const handleSubmit = async () => {
         try {
@@ -43,7 +85,8 @@ const AddOutboundModal = (props: AddOutboundModalProps) => {
             form.resetFields();
             onClose();
         } catch (error: any) {
-            message.error(error || "Có lỗi xảy ra khi tạo phiếu");
+            if (error?.errorFields) return;
+            message.error(typeof error === "string" ? error : "Có lỗi xảy ra khi tạo phiếu");
         } finally {
             setLoading(false);
         }
@@ -101,87 +144,99 @@ const AddOutboundModal = (props: AddOutboundModalProps) => {
 
                 <Form.List
                     name="items"
-                    rules={[
-                        {
-                            validator: async (_, names) => {
-                                if (!names || names.length < 1) {
-                                    return Promise.reject(new Error("Phải có ít nhất 1 sản phẩm"));
-                                }
-                            },
+                    rules={[{
+                        validator: async (_, names) => {
+                            if (!names || names.length < 1)
+                                return Promise.reject(new Error("Phải có ít nhất 1 sản phẩm"));
                         },
-                    ]}
+                    }]}
                 >
                     {(fields, { add, remove }) => (
                         <>
-                            {fields.map(({ key, name, ...restField }) => (
-                                <div key={key} className="flex gap-3 items-start mb-2 bg-gray-50 p-3 rounded">
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'productId']}
-                                        label="Sản phẩm"
-                                        rules={[{ required: true, message: 'Chọn SP' }]}
-                                        className="flex-[2] mb-0"
-                                    >
-                                        <Select
-                                            placeholder="Chọn sản phẩm"
-                                            showSearch
-                                            filterOption={(input, option) =>
-                                                (option?.children as any).toLowerCase().includes(input.toLowerCase())
-                                            }
+                            {fields.map(({ key, name, ...restField }) => {
+                                const productId = form.getFieldValue(["items", name, "productId"]);
+                                const unitOptions = productId ? getUnitsForProduct(productId) : [];
+
+                                return (
+                                    <div key={key} className="flex gap-3 items-start mb-2 bg-gray-50 p-3 rounded">
+
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, "productId"]}
+                                            label="Sản phẩm"
+                                            rules={[{ required: true, message: "Chọn SP" }]}
+                                            className="flex-[2] mb-0"
                                         >
-                                            {products.map((p) => (
-                                                <Select.Option key={p.id} value={p.id}>
-                                                    {p.name} - {p.sku}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
+                                            <Select
+                                                placeholder="Chọn sản phẩm"
+                                                showSearch
+                                                filterOption={(input, option) =>
+                                                    (option?.children as any)?.toLowerCase().includes(input.toLowerCase())
+                                                }
+                                                onChange={(v) => handleProductChange(v, name)}
+                                            >
+                                                {products.map((p) => (
+                                                    <Select.Option key={p.id} value={p.id}>
+                                                        {p.name} - {p.sku}
+                                                    </Select.Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
 
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'quantity']}
-                                        label="Số lượng"
-                                        rules={[{ required: true, message: 'Nhập SL' }]}
-                                        className="w-32 mb-0"
-                                    >
-                                        <InputNumber min={0.1} className="w-full" placeholder="Số lượng" />
-                                    </Form.Item>
 
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'unitId']}
-                                        label="Đơn vị"
-                                        rules={[{ required: true, message: 'Chọn đơn vị' }]}
-                                        className="w-40 mb-0"
-                                    >
-                                        <Select placeholder="Chọn đơn vị">
-                                            {units.map((unit) => (
-                                                <Select.Option key={unit.id} value={unit.id}>
-                                                    {unit.name} ({unit.code})
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </Form.Item>
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, "quantity"]}
+                                            label="Số lượng"
+                                            rules={[{ required: true, message: "Nhập SL" }]}
+                                            className="w-32 mb-0"
+                                        >
+                                            <InputNumber
+                                                min={1}
+                                                precision={0}
+                                                step={1}
+                                                parser={(value) => Math.floor(Number(value?.replace(/[^\d]/g, "") || 0)) as any}
+                                                className="w-full"
+                                                placeholder="Số lượng"
+                                            />
+                                        </Form.Item>
 
-                                    <Form.Item
-                                        {...restField}
-                                        name={[name, 'lineNote']}
-                                        label="Ghi chú dòng"
-                                        className="flex-[1.5] mb-0"
-                                    >
-                                        <Input placeholder="Ghi chú cho SP này" />
-                                    </Form.Item>
 
-                                    <Button
-                                        type="text"
-                                        danger
-                                        icon={<DeleteOutlined />}
-                                        onClick={() => remove(name)}
-                                        className="mt-8"
-                                        disabled={fields.length === 1}
-                                    />
-                                </div>
-                            ))}
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, "unitId"]}
+                                            label="Đơn vị"
+                                            rules={[{ required: true, message: "Chọn đơn vị" }]}
+                                            className="w-44 mb-0"
+                                        >
+                                            <Select
+                                                placeholder={productId ? "Chọn đơn vị" : "Chọn SP trước"}
+                                                disabled={!productId}
+                                                options={unitOptions}
+                                            />
+                                        </Form.Item>
+
+
+                                        <Form.Item
+                                            {...restField}
+                                            name={[name, "lineNote"]}
+                                            label="Ghi chú dòng"
+                                            className="flex-[1.5] mb-0"
+                                        >
+                                            <Input placeholder="Ghi chú cho SP này" />
+                                        </Form.Item>
+
+                                        <Button
+                                            type="text"
+                                            danger
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => remove(name)}
+                                            className="mt-8"
+                                            disabled={fields.length === 1}
+                                        />
+                                    </div>
+                                );
+                            })}
                             <Form.Item className="mt-4">
                                 <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
                                     Thêm sản phẩm

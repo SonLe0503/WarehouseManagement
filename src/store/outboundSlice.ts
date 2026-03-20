@@ -1,4 +1,3 @@
-// store/outboundSlice.ts
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "../utils/request";
 import type { RootState } from "./index";

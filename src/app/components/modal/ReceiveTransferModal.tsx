@@ -1,4 +1,3 @@
-// app/pages/dashboard/manageOrder/ReceiveTransferModal.tsx
 import { Modal, InputNumber, Input, Tag, App, Select, Button, Spin } from "antd";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -51,12 +50,14 @@ const ReceiveTransferModal = ({ open, transferId, onClose, onSuccess }: ReceiveT
     }, [transfer?.toWarehouseId, dispatch]);
 
     // Init itemRows khi transfer load xong
+    // Dùng shippedQuantity (SL thực xuất) để pre-fill, fallback về quantity (SL phiếu) nếu chưa có
     useEffect(() => {
         if (transfer?.items) {
             const rows: Record<number, ItemRow> = {};
             transfer.items.forEach((item: IStockTransferItem) => {
+                const prefilledQty = item.shippedQuantity ?? item.quantity;
                 rows[item.id] = {
-                    bins: [{ storagePosition: "", quantity: item.quantity }],
+                    bins: [{ storagePosition: "", quantity: prefilledQty }],
                     lineNote: "",
                 };
             });
@@ -179,8 +180,10 @@ const ReceiveTransferModal = ({ open, transferId, onClose, onSuccess }: ReceiveT
                     {(transfer.items || []).map((item) => {
                         const row = itemRows[item.id];
                         if (!row) return null;
+
+                        const shippedQty = item.shippedQuantity ?? item.quantity;
                         const totalReceived = row.bins.reduce((s, b) => s + (b.quantity || 0), 0);
-                        const isDiff = totalReceived !== item.quantity;
+                        const isDiff = totalReceived !== shippedQty;
 
                         return (
                             <div key={item.id} className="mb-4 border rounded p-3 bg-gray-50">
@@ -191,11 +194,19 @@ const ReceiveTransferModal = ({ open, transferId, onClose, onSuccess }: ReceiveT
                                         <span className="text-gray-400 text-xs ml-2">{item.product?.sku}</span>
                                         <Tag color="blue" className="ml-2 text-xs">{item.unitCode || item.unitName || "—"}</Tag>
                                     </div>
-                                    <div className="text-sm">
-                                        SL chuyển: <strong>{item.quantity}</strong>
+                                    <div className="text-sm flex items-center gap-2">
+                                        {/* SL phiếu gốc */}
+                                        <span className="text-gray-400">
+                                            SL phiếu: <strong>{item.quantity}</strong>
+                                        </span>
+                                        {/* SL thực xuất */}
+                                        <Tag color={item.shippedQuantity != null && item.shippedQuantity !== item.quantity ? "orange" : "blue"}>
+                                            Thực xuất: {shippedQty}
+                                        </Tag>
+                                        {/* SL đang nhập so với thực xuất */}
                                         {isDiff && totalReceived > 0 && (
-                                            <Tag color="orange" className="ml-2">
-                                                Nhận: {totalReceived} ({totalReceived > item.quantity ? "+" : ""}{totalReceived - item.quantity})
+                                            <Tag color="orange">
+                                                Nhận: {totalReceived} ({totalReceived > shippedQty ? "+" : ""}{totalReceived - shippedQty})
                                             </Tag>
                                         )}
                                     </div>

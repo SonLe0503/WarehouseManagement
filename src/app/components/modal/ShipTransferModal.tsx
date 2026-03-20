@@ -1,4 +1,3 @@
-// components/modal/ShipTransferModal.tsx
 import { Modal, Select, InputNumber, App, Tag, Spin } from "antd";
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
