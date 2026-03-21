@@ -237,6 +237,8 @@ export const getAllOutboundRequests = createAsyncThunk(
                 },
             });
 
+            console.log("[getAllOutboundRequests] raw response:", res.data);
+
             // Xử lý nhiều dạng response từ backend
             if (Array.isArray(res.data)) return res.data as IOutboundRequest[];
             if (Array.isArray(res.data?.data)) return res.data.data as IOutboundRequest[];
