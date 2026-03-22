@@ -148,8 +148,9 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
             onCancel={onClose}
             footer={null}
             width={900}
+            style={{ top: 20 }}
         >
-            {/* Thông tin chung */}
+
             <Descriptions
                 bordered
                 size="small"
@@ -207,7 +208,7 @@ const RequestDetailModal = ({ open, onClose, request }: RequestDetailModalProps)
                 }}
             />
 
-            {/* Tóm tắt nếu đã nhập */}
+
             {request.status === "Completed" && request.inboundItems && request.inboundItems.length > 0 && (
                 <div className="mt-4 p-3 bg-blue-50 border border-blue-100 rounded-lg text-sm text-blue-800 flex gap-6">
                     <span>

@@ -29,6 +29,7 @@ export interface IStockTransferItem {
     unitName?: string;
     unitCode?: string;
     quantity: number;
+    shippedQuantity?: number;
     receivedQuantity?: number;
     fromStoragePosition?: string;
     toStoragePosition?: string;

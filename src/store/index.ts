@@ -19,6 +19,8 @@ import binSlide from "./binSlice";
 import stockTransferSlide from "./stockTransferSlice";
 import stockTransfer2StepReducer from "./stockTransfer2StepSlice";
 import stockCountSlide from "./stockCountSlide";
+import dashboardAdminReducer from "./dashboardAdminSlice";
+import dashboardManagerReducer from "./dashboardManagerSlide";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 
@@ -46,6 +48,8 @@ const reducers = {
   stockTransfer2Step: stockTransfer2StepReducer,
   stockTransfer: stockTransferSlide,
   stockCount: stockCountSlide,
+  dashboardAdmin: dashboardAdminReducer,
+  dashboardManager: dashboardManagerReducer,
 }
 const rootReducer = combineReducers(reducers);
 export const store = configureStore({

@@ -7,6 +7,7 @@ export interface IUnitConversion {
     productId: number;
     baseUnitId: number;
     fromUnitId: number;
+    fromUnitName?: string;
     conversionFactor: number;
 
     rate: number;

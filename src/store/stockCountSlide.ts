@@ -22,6 +22,8 @@ export interface IStockCountItem {
     reasonId?: number;
     note?: string;
     product?: IProduct;
+    baseUnitId: number;
+    baseUnitName: string;
 }
 
 export interface ICreateStockCountSession {

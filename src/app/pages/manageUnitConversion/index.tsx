@@ -156,7 +156,7 @@ const ManageUnitConversion = () => {
     const handleDeactivate = (record: IUnitConversion) => {
         Modal.confirm({
             title: "Xác nhận ngưng sử dụng quy đổi",
-            content: `Bạn có chắc chắn muốn xóa quy đổi từ ${unitMap.get(record.fromUnitId)?.name} sang ${unitMap.get(selectedProduct?.baseUnitId || record.toUnitId)?.name}?`,
+            content: `Bạn có chắc chắn muốn xóa quy đổi từ ${unitMap.get(record.fromUnitId)?.name} sang ${unitMap.get(selectedProduct?.baseUnitId || record.baseUnitId)?.name}?`,
             okText: "Xác nhận",
             okType: "danger",
             cancelText: "Hủy",
@@ -189,8 +189,8 @@ const ManageUnitConversion = () => {
             key: "formula",
             render: (_: any, record: IUnitConversion) => {
                 const fromUnit = unitMap.get(record.fromUnitId);
-                const toUnitId = record.toUnitId || selectedProduct?.baseUnitId;
-                const toUnit = toUnitId ? unitMap.get(toUnitId) : undefined;
+                const baseUnitIdValue = record.baseUnitId || selectedProduct?.baseUnitId;
+                const toUnit = baseUnitIdValue ? unitMap.get(baseUnitIdValue) : undefined;
                 return (
                     <Space>
                         <Text strong>1</Text> {fromUnit?.code || "Unit"}
@@ -203,8 +203,8 @@ const ManageUnitConversion = () => {
         },
         {
             title: "Đơn vị gốc",
-            dataIndex: "toUnitId",
-            key: "toUnitId",
+            dataIndex: "baseUnitId",
+            key: "baseUnitId",
             render: (id: number) => {
                 const targetId = id || selectedProduct?.baseUnitId;
                 const u = targetId ? unitMap.get(targetId) : undefined;

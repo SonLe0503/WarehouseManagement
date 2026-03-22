@@ -92,7 +92,12 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
             dataIndex: "systemQuantity",
             key: "systemQuantity",
             align: "center" as const,
-            render: (val: number) => <Text strong>{val}</Text>
+            render: (val: number, record: any) => (
+                <Space size="small">
+                    <Text strong>{val}</Text>
+                    <Text type="secondary" className="text-xs">{record.baseUnitName}</Text>
+                </Space>
+            )
         },
         {
             title: "SL Thực tế",
@@ -102,17 +107,27 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
                 const isEditing = editingId === record.id;
                 if (isEditing) {
                     return (
-                        <InputNumber
-                            min={0}
-                            value={editValues.actualQuantity ?? record.actualQuantity ?? 0}
-                            onChange={(val) => setEditValues({ ...editValues, actualQuantity: val })}
-                            className="w-20"
-                        />
+                        <div className="flex items-center gap-1 justify-center">
+                            <InputNumber
+                                min={0}
+                                value={editValues.actualQuantity ?? record.actualQuantity ?? 0}
+                                onChange={(val) => setEditValues({ ...editValues, actualQuantity: val })}
+                                className="w-20"
+                            />
+                            <Text type="secondary" className="text-xs">{record.baseUnitName}</Text>
+                        </div>
                     );
                 }
-                return <Text strong className={record.actualQuantity !== undefined && record.actualQuantity !== null ? "text-blue-600" : "text-gray-400"}>
-                    {record.actualQuantity ?? "—"}
-                </Text>;
+                return (
+                    <Space size="small">
+                        <Text strong className={record.actualQuantity !== undefined && record.actualQuantity !== null ? "text-blue-600" : "text-gray-400"}>
+                            {record.actualQuantity ?? "—"}
+                        </Text>
+                        {record.actualQuantity !== undefined && record.actualQuantity !== null && (
+                            <Text type="secondary" className="text-xs">{record.baseUnitName}</Text>
+                        )}
+                    </Space>
+                );
             }
         },
         {
@@ -123,9 +138,12 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
                 const diff = record.difference ?? 0;
                 if (record.actualQuantity === undefined || record.actualQuantity === null) return "—";
                 return (
-                    <Tag color={diff === 0 ? "green" : diff > 0 ? "blue" : "red"}>
-                        {diff > 0 ? `+${diff}` : diff}
-                    </Tag>
+                    <Space size="small">
+                        <Tag color={diff === 0 ? "green" : diff > 0 ? "blue" : "red"}>
+                            {diff > 0 ? `+${diff}` : diff}
+                        </Tag>
+                        <Text type="secondary" className="text-xs">{record.baseUnitName}</Text>
+                    </Space>
                 );
             }
         },
