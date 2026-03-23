@@ -249,7 +249,7 @@ const DashboardManage: React.FC = () => {
                 {/* Chart and Pending Breakdown */}
                 <Col xs={24} lg={16}>
                     <motion.div variants={itemVariants} className="mb-6">
-                        <Card 
+                        <Card
                             title={<span className="font-bold flex items-center"><SwapOutlined className="mr-2 text-blue-500" /> Inbound vs Outbound (Last 7 Days)</span>}
                             className="rounded-2xl shadow-md border-0 h-[380px]"
                         >
@@ -261,7 +261,7 @@ const DashboardManage: React.FC = () => {
                                                 <div className="flex items-end gap-1 w-full justify-center group">
                                                     {/* Inbound Bar */}
                                                     <Tooltip title={`Inbound: ${point.purchases}`}>
-                                                        <motion.div 
+                                                        <motion.div
                                                             className="bg-blue-400 w-3 rounded-t-sm"
                                                             initial={{ height: 0 }}
                                                             animate={{ height: `${Math.min(point.purchases * 2, 200)}px` }}
@@ -270,7 +270,7 @@ const DashboardManage: React.FC = () => {
                                                     </Tooltip>
                                                     {/* Outbound Bar */}
                                                     <Tooltip title={`Outbound: ${point.sales}`}>
-                                                        <motion.div 
+                                                        <motion.div
                                                             className="bg-orange-400 w-3 rounded-t-sm"
                                                             initial={{ height: 0 }}
                                                             animate={{ height: `${Math.min(point.sales * 2, 200)}px` }}
@@ -302,14 +302,14 @@ const DashboardManage: React.FC = () => {
                     </motion.div>
 
                     <motion.div variants={itemVariants}>
-                        <Card 
+                        <Card
                             title={<span className="font-bold flex items-center"><HistoryOutlined className="mr-2 text-indigo-500" /> Recent Activity</span>}
                             className="rounded-2xl shadow-md border-0"
                             extra={<a href="/transactions" className="text-blue-500 text-xs hover:underline">View All</a>}
                         >
-                            <Table 
-                                columns={transactionColumns} 
-                                dataSource={recentTransactions} 
+                            <Table
+                                columns={transactionColumns}
+                                dataSource={recentTransactions}
                                 pagination={false}
                                 size="middle"
                                 className="custom-table"
@@ -322,7 +322,7 @@ const DashboardManage: React.FC = () => {
                 {/* Right Sidebar: Pending & Low Stock */}
                 <Col xs={24} lg={8}>
                     <motion.div variants={itemVariants} className="mb-6">
-                        <Card 
+                        <Card
                             title={<span className="font-bold flex items-center"><ClockCircleOutlined className="mr-2 text-emerald-500" /> Pending Approval</span>}
                             className="rounded-2xl shadow-md border-0"
                         >
@@ -368,14 +368,14 @@ const DashboardManage: React.FC = () => {
                     </motion.div>
 
                     <motion.div variants={itemVariants}>
-                        <Card 
+                        <Card
                             title={<span className="font-bold flex items-center"><WarningOutlined className="mr-2 text-amber-500" /> Low Stock Alerts</span>}
                             className="rounded-2xl shadow-md border-0"
                             extra={<Tag color="warning" className="m-0 font-bold">{lowStock.length}</Tag>}
                         >
-                            <Table 
-                                columns={lowStockColumns} 
-                                dataSource={lowStock} 
+                            <Table
+                                columns={lowStockColumns}
+                                dataSource={lowStock}
                                 pagination={false}
                                 size="small"
                                 rowKey="productId"
