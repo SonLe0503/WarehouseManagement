@@ -6,6 +6,8 @@ import { createInboundRequest } from "../../../store/inboundSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../store/unitConversionSlice";
+import { getAllUnits, selectUnits } from "../../../store/unitSlide";
+import { getAllUsers, selectCurrentUser } from "../../../store/userSlide";
 
 interface AddInboundModalProps {
     open: boolean;
@@ -21,6 +23,8 @@ const AddInboundModal = (props: AddInboundModalProps) => {
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
     const conversions = useAppSelector(selectUnitConversions);
+    const allUnits = useAppSelector(selectUnits);
+    const currentUser = useAppSelector(selectCurrentUser);
     const [loading, setLoading] = useState(false);
     const [loadedProducts, setLoadedProducts] = useState<Set<number>>(new Set());
 
@@ -28,11 +32,19 @@ const AddInboundModal = (props: AddInboundModalProps) => {
         if (open) {
             dispatch(getAllProducts());
             dispatch(getActiveWarehouses());
+            dispatch(getAllUsers());
+            dispatch(getAllUnits());
         } else {
             dispatch(clearUnitConversions());
             setLoadedProducts(new Set());
         }
     }, [dispatch, open]);
+
+    useEffect(() => {
+        if (open && currentUser?.warehouseId) {
+            form.setFieldsValue({ warehouseId: currentUser.warehouseId });
+        }
+    }, [open, currentUser, form]);
 
     const handleProductChange = (productId: number, fieldName: number) => {
         const product = products.find(p => p.id === productId);
@@ -58,22 +70,23 @@ const AddInboundModal = (props: AddInboundModalProps) => {
         const product = products.find(p => p.id === productId);
         if (!product) return [];
 
-        const base = [{
-            value: product.baseUnitId,
-            label: `${product.baseUnitCode} (gốc)`,
-        }];
+        // Trả về tất cả các đơn vị có trong hệ thống
+        return allUnits.map(unit => {
+            const isBase = unit.id === product.baseUnitId;
+            const conv = conversions.find(c => c.productId === productId && c.fromUnitId === unit.id);
+            
+            let label = unit.name;
+            if (isBase) {
+                label += " (gốc)";
+            } else if (conv) {
+                label += ` (×${conv.conversionFactor ?? conv.rate} ${product.baseUnitCode})`;
+            }
 
-        const convs = conversions
-            .filter(c => c.productId === productId)
-            .map(c => ({
-                value: c.fromUnitId,
-                label: c.fromUnitName
-                    ? `${c.fromUnitName} (×${c.conversionFactor ?? c.rate} ${product.baseUnitCode})`
-                    : `${product.baseUnitCode}`,
-
-            }));
-
-        return [...base, ...convs];
+            return {
+                value: unit.id,
+                label: label
+            };
+        });
     };
 
     const handleSubmit = async () => {
@@ -108,7 +121,10 @@ const AddInboundModal = (props: AddInboundModalProps) => {
                 <div className="grid grid-cols-2 gap-4">
                     <Form.Item name="warehouseId" label="Kho nhập"
                         rules={[{ required: true, message: "Vui lòng chọn kho!" }]}>
-                        <Select placeholder="Chọn kho nhận hàng">
+                        <Select 
+                            placeholder="Chọn kho nhận hàng"
+                            disabled={!!currentUser?.warehouseId}
+                        >
                             {warehouses.map((w) => (
                                 <Select.Option key={w.id} value={w.id}>
                                     {w.name} ({w.code})

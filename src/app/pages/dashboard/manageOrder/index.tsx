@@ -24,6 +24,7 @@ import {
     getMyStockTransfers,
     selectStockTransfers,
 } from "../../../../store/stockTransfer2StepSlice";
+import { selectCurrentUser } from "../../../../store/userSlide";
 
 const hasQuantityDiff = (req: InboundRequest) =>
     req.status === "Completed" &&
@@ -41,6 +42,7 @@ const ManageOrder = () => {
     const warehouses = useSelector(selectWarehouses);
     const users = useSelector(selectUsers);
     const allTransfers = useAppSelector(selectStockTransfers);
+    const currentUser = useAppSelector(selectCurrentUser);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -60,19 +62,21 @@ const ManageOrder = () => {
         dispatch(getMyStockTransfers());
     }, [dispatch]);
 
-    // Lọc phiếu chuyển kho đang InTransit (chờ nhận hàng)
-    const inTransitTransfers = useMemo(() =>
-        (allTransfers || []).filter(t => t.status === "InTransit"),
-        [allTransfers]
-    );
+    // Lọc phiếu chuyển kho đang InTransit (chờ nhận hàng) và kho đích là kho của user hiện tại
+    const inTransitTransfers = useMemo(() => {
+        const transfers = (allTransfers || []).filter(t => t.status === "InTransit");
+        if (!currentUser?.warehouseId) return transfers;
+        return transfers.filter(t => t.toWarehouseId === currentUser.warehouseId);
+    }, [allTransfers, currentUser]);
 
     const filteredRequests = useMemo(() => {
         return requests.filter((req) => {
             const noMatch = req.requestNo.toLowerCase().includes(searchRequestNo.toLowerCase());
             const statusMatch = searchStatus === "" || req.status === searchStatus;
-            return noMatch && statusMatch;
+            const warehouseMatch = !currentUser?.warehouseId || req.warehouseId === currentUser.warehouseId;
+            return noMatch && statusMatch && warehouseMatch;
         });
-    }, [requests, searchRequestNo, searchStatus]);
+    }, [requests, searchRequestNo, searchStatus, currentUser]);
 
     const handleViewDetail = (record: InboundRequest) => {
         setSelectedRequest(record);
