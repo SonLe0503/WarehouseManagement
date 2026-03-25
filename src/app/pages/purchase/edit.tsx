@@ -7,6 +7,8 @@ import { getInboundRequestById, updateInboundRequest, selectCurrentRequest, sele
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import { getAllUnits, selectUnits } from "../../../store/unitSlide";
+import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../store/unitConversionSlice";
+import { getUnitsForProduct } from "../../../constants/app";
 import { getAllUsers, selectCurrentUser } from "../../../store/userSlide";
 import URL from "../../../constants/url";
 
@@ -23,7 +25,9 @@ const EditInboundRequest = () => {
     const units = useAppSelector(selectUnits);
     const loading = useAppSelector(selectInboundLoading);
     const currentUser = useAppSelector(selectCurrentUser);
+    const conversions = useAppSelector(selectUnitConversions);
     const [submitting, setSubmitting] = useState(false);
+    const [loadedProducts, setLoadedProducts] = useState<Set<number>>(new Set());
 
     useEffect(() => {
         dispatch(getAllProducts());
@@ -35,6 +39,7 @@ const EditInboundRequest = () => {
         }
         return () => {
             dispatch(clearCurrentRequest());
+            dispatch(clearUnitConversions());
         };
     }, [dispatch, id]);
 
@@ -44,12 +49,18 @@ const EditInboundRequest = () => {
                 supplierName: request.supplierName,
                 warehouseId: request.warehouseId,
                 note: request.note,
-                items: request.items?.map(item => ({
-                    productId: item.productId,
-                    unitId: item.unitId,
-                    quantity: item.quantity,
-                    lineNote: item.lineNote,
-                })) || [{}],
+                items: request.items?.map(item => {
+                    if (!loadedProducts.has(item.productId)) {
+                        dispatch(getUnitConversionsByProduct(item.productId));
+                        setLoadedProducts(prev => new Set(prev).add(item.productId));
+                    }
+                    return {
+                        productId: item.productId,
+                        unitId: item.unitId,
+                        quantity: item.quantity,
+                        lineNote: item.lineNote,
+                    };
+                }) || [{}],
             });
         }
     }, [request, form]);
@@ -66,6 +77,23 @@ const EditInboundRequest = () => {
             message.error(error || "Không thể cập nhật phiếu");
         } finally {
             setSubmitting(false);
+        }
+    };
+
+    const handleProductChange = (productId: number, fieldName: number) => {
+        const product = products.find(p => p.id === productId);
+        const items = form.getFieldValue("items");
+        items[fieldName] = {
+            ...items[fieldName],
+            productId,
+            unitId: product?.baseUnitId,
+            quantity: undefined,
+        };
+        form.setFieldsValue({ items });
+
+        if (!loadedProducts.has(productId)) {
+            dispatch(getUnitConversionsByProduct(productId));
+            setLoadedProducts(prev => new Set(prev).add(productId));
         }
     };
 
@@ -155,7 +183,12 @@ const EditInboundRequest = () => {
                                             rules={[{ required: true, message: "Vui lòng chọn sản phẩm" }]}
                                             className="flex-1"
                                         >
-                                            <Select showSearch optionFilterProp="label" placeholder="Chọn sản phẩm">
+                                            <Select 
+                                                showSearch 
+                                                optionFilterProp="label" 
+                                                placeholder="Chọn sản phẩm"
+                                                onChange={(v) => handleProductChange(v, name)}
+                                            >
                                                 {products.map(p => (
                                                     <Select.Option key={p.id} value={p.id} label={`${p.sku} ${p.name}`}>
                                                         <span className="font-bold">[{p.sku}]</span> {p.name}
@@ -177,15 +210,14 @@ const EditInboundRequest = () => {
                                             {...restField}
                                             label="Đơn vị"
                                             name={[name, "unitId"]}
-                                            rules={[{ required: true, message: "Vui long chon don vi" }]}
+                                            rules={[{ required: true, message: "Vui lòng chọn đơn vị" }]}
                                         >
-                                            <Select placeholder="Chọn đơn vị">
-                                                {units.map(unit => (
-                                                    <Select.Option key={unit.id} value={unit.id}>
-                                                        {unit.name} ({unit.code})
-                                                    </Select.Option>
-                                                ))}
-                                            </Select>
+                                            <Select 
+                                                placeholder="Chọn đơn vị"
+                                                options={form.getFieldValue(["items", name, "productId"]) 
+                                                    ? getUnitsForProduct(form.getFieldValue(["items", name, "productId"]), products, units, conversions) 
+                                                    : []}
+                                            />
                                         </Form.Item>
 
                                         <Form.Item
