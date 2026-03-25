@@ -7,6 +7,7 @@ import { getInboundRequestById, updateInboundRequest, selectCurrentRequest, sele
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import { getAllUnits, selectUnits } from "../../../store/unitSlide";
+import { getAllUsers, selectCurrentUser } from "../../../store/userSlide";
 import URL from "../../../constants/url";
 
 const EditInboundRequest = () => {
@@ -21,12 +22,14 @@ const EditInboundRequest = () => {
     const warehouses = useAppSelector(selectWarehouses);
     const units = useAppSelector(selectUnits);
     const loading = useAppSelector(selectInboundLoading);
+    const currentUser = useAppSelector(selectCurrentUser);
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         dispatch(getAllProducts());
         dispatch(getActiveWarehouses());
         dispatch(getAllUnits());
+        dispatch(getAllUsers());
         if (id) {
             dispatch(getInboundRequestById(parseInt(id)));
         }
@@ -112,7 +115,10 @@ const EditInboundRequest = () => {
                         </Form.Item>
 
                         <Form.Item label="Kho nhập" name="warehouseId" rules={[{ required: true, message: "Vui lòng chọn kho" }]}>
-                            <Select placeholder="Chọn kho">
+                            <Select 
+                                placeholder="Chọn kho"
+                                disabled={!!currentUser?.warehouseId}
+                            >
                                 {warehouses.map(wh => (
                                     <Select.Option key={wh.id} value={wh.id}>{wh.name}</Select.Option>
                                 ))}
