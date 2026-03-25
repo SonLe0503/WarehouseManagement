@@ -8,6 +8,7 @@ import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouses
 import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../store/unitConversionSlice";
 import { getAllUnits, selectUnits } from "../../../store/unitSlide";
 import { getAllUsers, selectCurrentUser } from "../../../store/userSlide";
+import { getUnitsForProduct } from "../../../constants/app";
 
 interface AddInboundModalProps {
     open: boolean;
@@ -64,29 +65,6 @@ const AddInboundModal = (props: AddInboundModalProps) => {
             dispatch(getUnitConversionsByProduct(productId));
             setLoadedProducts(prev => new Set(prev).add(productId));
         }
-    };
-
-    const getUnitsForProduct = (productId: number) => {
-        const product = products.find(p => p.id === productId);
-        if (!product) return [];
-
-        // Trả về tất cả các đơn vị có trong hệ thống
-        return allUnits.map(unit => {
-            const isBase = unit.id === product.baseUnitId;
-            const conv = conversions.find(c => c.productId === productId && c.fromUnitId === unit.id);
-            
-            let label = unit.name;
-            if (isBase) {
-                label += " (gốc)";
-            } else if (conv) {
-                label += ` (×${conv.conversionFactor ?? conv.rate} ${product.baseUnitCode})`;
-            }
-
-            return {
-                value: unit.id,
-                label: label
-            };
-        });
     };
 
     const handleSubmit = async () => {
@@ -155,7 +133,7 @@ const AddInboundModal = (props: AddInboundModalProps) => {
                         <>
                             {fields.map(({ key, name, ...restField }) => {
                                 const productId = form.getFieldValue(["items", name, "productId"]);
-                                const unitOptions = productId ? getUnitsForProduct(productId) : [];
+                                const unitOptions = productId ? getUnitsForProduct(productId, products, allUnits, conversions) : [];
 
                                 return (
                                     <div key={key} className="flex gap-3 items-start mb-2 bg-gray-50 p-3 rounded">
