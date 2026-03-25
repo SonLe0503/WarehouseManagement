@@ -15,7 +15,7 @@ import {
     type IOutboundRequest,
 } from "../../../../store/outboundSlice";
 import { getAllWarehouses, selectWarehouses } from "../../../../store/warehouseslide";
-import { getAllUsers, selectUsers } from "../../../../store/userSlide";
+import { getAllUsers, selectUsers, selectCurrentUser } from "../../../../store/userSlide";
 
 const ManageOutbound = () => {
     const dispatch = useAppDispatch();
@@ -23,6 +23,7 @@ const ManageOutbound = () => {
     const loading = useAppSelector(selectOutboundLoading);
     const warehouses = useAppSelector(selectWarehouses);
     const users = useAppSelector(selectUsers);
+    const currentUser = useAppSelector(selectCurrentUser);
 
     const [searchRequestNo, setSearchRequestNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -41,9 +42,10 @@ const ManageOutbound = () => {
         return requests.filter((req) => {
             const noMatch = req.requestNo.toLowerCase().includes(searchRequestNo.toLowerCase());
             const statusMatch = searchStatus === "" || req.status === searchStatus;
-            return noMatch && statusMatch;
+            const warehouseMatch = !currentUser?.warehouseId || req.warehouseId === currentUser.warehouseId;
+            return noMatch && statusMatch && warehouseMatch;
         });
-    }, [requests, searchRequestNo, searchStatus]);
+    }, [requests, searchRequestNo, searchStatus, currentUser]);
 
     const handleShipGoods = (record: IOutboundRequest) => {
         setSelectedRequest(record);
