@@ -11,6 +11,8 @@ import ApproveTransferModal from "../../components/modal/ApproveTransferModal";
 import ShipTransferModal from "../../components/modal/ShipTransferModal";
 import URL from "../../../constants/url";
 import type { RootState } from "../../../store";
+import { EUserRole } from "../../../interface/app";
+import { selectCurrentUser, getAllUsers } from "../../../store/userSlide";
 
 const ManageTransferRequest = () => {
     const { message: messageApi } = App.useApp();
@@ -19,6 +21,7 @@ const ManageTransferRequest = () => {
     const requests = useAppSelector(selectStockTransfers);
     const loading = useAppSelector((state: RootState) => (state as any).stockTransfer2Step?.loading || false);
     const userRole = useAppSelector((state: RootState) => state.auth.infoLogin?.role);
+    const currentUser = useAppSelector(selectCurrentUser);
 
     const [searchNo, setSearchNo] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
@@ -28,10 +31,12 @@ const ManageTransferRequest = () => {
     const [shipModal, setShipModal] = useState<{ open: boolean; id: number | null }>
         ({ open: false, id: null });
 
-    const isManager = userRole === "MANAGE";
+    const isManager = userRole === EUserRole.MANAGE;
+    const isStaff = userRole === EUserRole.STAFF;
 
     useEffect(() => {
         dispatch(getMyStockTransfers());
+        dispatch(getAllUsers());
     }, [dispatch]);
 
     const filteredRequests = useMemo(() => {
@@ -85,11 +90,13 @@ const ManageTransferRequest = () => {
                     <Button icon={<ReloadOutlined />} onClick={refresh}
                         className="!flex !items-center !justify-center" />
                 </Tooltip>
-                <Button type="primary" icon={<PlusOutlined />}
-                    onClick={() => setIsAddModalOpen(true)}
-                    className="!flex !items-center !justify-center h-10 px-6 font-semibold shadow-md">
-                    Tạo phiếu mới
-                </Button>
+                {isManager && (
+                    <Button type="primary" icon={<PlusOutlined />}
+                        onClick={() => setIsAddModalOpen(true)}
+                        className="!flex !items-center !justify-center h-10 px-6 font-semibold shadow-md">
+                        Tạo phiếu mới
+                    </Button>
+                )}
             </div>
 
             <AddTransferModal open={isAddModalOpen}
@@ -146,8 +153,8 @@ const ManageTransferRequest = () => {
                                         className="!flex !items-center !justify-center" />
                                 </Tooltip>
 
-                                {/* Duyệt — chỉ Manager, chỉ khi Pending */}
-                                {isManager && req.status === "Pending" && (
+                                {/* Duyệt — chỉ Manager của kho đích, chỉ khi Pending */}
+                                {isManager && currentUser?.warehouseId === req.toWarehouseId && req.status === "Pending" && (
                                     <Tooltip title="Duyệt / Từ chối">
                                         <Button size="small" type="primary" icon={<CheckCircleOutlined />}
                                             onClick={() => setApproveModal({ open: true, id: req.id, transferNo: req.transferNo })}
@@ -155,8 +162,8 @@ const ManageTransferRequest = () => {
                                     </Tooltip>
                                 )}
 
-                                {/* Xuất hàng — chỉ khi Approved */}
-                                {req.status === "Approved" && (
+                                {/* Xuất hàng — Chỉ STAFF của kho nguồn, chỉ khi Approved */}
+                                {isStaff && currentUser?.warehouseId === req.fromWarehouseId && req.status === "Approved" && (
                                     <Tooltip title="Xuất hàng">
                                         <Button size="small" type="primary" icon={<SendOutlined />}
                                             onClick={() => setShipModal({ open: true, id: req.id })}

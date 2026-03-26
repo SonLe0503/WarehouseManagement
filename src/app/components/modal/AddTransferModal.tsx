@@ -7,6 +7,7 @@ import { createStockTransfer } from "../../../store/stockTransfer2StepSlice";
 import { getAllProducts, selectProducts } from "../../../store/productSlice";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import { getUnitConversionsByProduct, selectUnitConversions, clearUnitConversions } from "../../../store/unitConversionSlice";
+import { getAllUsers, selectCurrentUser } from "../../../store/userSlide";
 
 interface AddTransferModalProps {
     open: boolean;
@@ -21,6 +22,7 @@ const AddTransferModal = ({ open, onClose }: AddTransferModalProps) => {
     const products = useAppSelector(selectProducts);
     const warehouses = useAppSelector(selectWarehouses);
     const conversions = useAppSelector(selectUnitConversions);
+    const currentUser = useAppSelector(selectCurrentUser);
     const [loading, setLoading] = useState(false);
     const [loadedProducts, setLoadedProducts] = useState<Set<number>>(new Set());
 
@@ -28,11 +30,18 @@ const AddTransferModal = ({ open, onClose }: AddTransferModalProps) => {
         if (open) {
             dispatch(getAllProducts());
             dispatch(getActiveWarehouses());
+            dispatch(getAllUsers());
         } else {
             dispatch(clearUnitConversions());
             setLoadedProducts(new Set());
         }
     }, [open, dispatch]);
+
+    useEffect(() => {
+        if (open && currentUser?.warehouseId) {
+            form.setFieldsValue({ fromWarehouseId: currentUser.warehouseId });
+        }
+    }, [open, currentUser, form]);
 
     const handleProductChange = (productId: number, fieldName: number) => {
         const product = products.find(p => p.id === productId);
@@ -94,6 +103,8 @@ const AddTransferModal = ({ open, onClose }: AddTransferModalProps) => {
         }
     };
 
+    const fromWarehouseId = Form.useWatch("fromWarehouseId", form);
+
     return (
         <Modal
             title="Tạo yêu cầu chuyển kho"
@@ -110,7 +121,7 @@ const AddTransferModal = ({ open, onClose }: AddTransferModalProps) => {
                 <div className="grid grid-cols-2 gap-4">
                     <Form.Item name="fromWarehouseId" label="Kho nguồn (xuất)"
                         rules={[{ required: true, message: "Vui lòng chọn kho nguồn!" }]}>
-                        <Select placeholder="Chọn kho nguồn">
+                        <Select placeholder="Chọn kho nguồn" disabled={!!currentUser?.warehouseId}>
                             {warehouses.map(w => (
                                 <Select.Option key={w.id} value={w.id}>{w.name} ({w.code})</Select.Option>
                             ))}
@@ -119,9 +130,11 @@ const AddTransferModal = ({ open, onClose }: AddTransferModalProps) => {
                     <Form.Item name="toWarehouseId" label="Kho đích (nhập)"
                         rules={[{ required: true, message: "Vui lòng chọn kho đích!" }]}>
                         <Select placeholder="Chọn kho đích">
-                            {warehouses.map(w => (
-                                <Select.Option key={w.id} value={w.id}>{w.name} ({w.code})</Select.Option>
-                            ))}
+                            {warehouses
+                                .filter(w => w.id !== fromWarehouseId)
+                                .map(w => (
+                                    <Select.Option key={w.id} value={w.id}>{w.name} ({w.code})</Select.Option>
+                                ))}
                         </Select>
                     </Form.Item>
                 </div>
