@@ -101,8 +101,7 @@ export const updateBin = createAsyncThunk(
             const token = state.auth.infoLogin?.accessToken;
             const res = await request({
                 url: `/Bins/${id}`,
-                method: "PUT",
-                data,
+                method: "GET",
                 headers: { Authorization: `Bearer ${token}` },
             });
             return res.data as IBin;
@@ -124,6 +123,24 @@ export const deleteBin = createAsyncThunk(
                 headers: { Authorization: `Bearer ${token}` },
             });
             return id;
+        } catch (err: any) {
+            return rejectWithValue(err.response?.data || err.message);
+        }
+    }
+);
+
+export const getBinById = createAsyncThunk(
+    "bin/get-by-id",
+    async (id: number, { rejectWithValue, getState }) => {
+        try {
+            const state: any = getState();
+            const token = state.auth.infoLogin?.accessToken;
+            const res = await request({
+                url: `/Bins/${id}`,
+                method: "GET",
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return res.data as IBin;
         } catch (err: any) {
             return rejectWithValue(err.response?.data || err.message);
         }

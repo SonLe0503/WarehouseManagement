@@ -26,5 +26,6 @@ const URL = {
     ManageBin: "/manage-bin",
     TransferBin: "/transfer-bin",
     ManageStockCount: "/manage-stock-count",
+    ViewBin: "/manager-bin/view",
 }
 export default URL;
