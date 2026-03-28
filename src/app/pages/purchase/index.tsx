@@ -47,7 +47,7 @@ const ManagePurchaseRequest = () => {
             content: "Bạn có chắc chắn muốn xóa phiếu này?",
             okText: "Xóa",
             cancelText: "Hủy",
-            okType: "danger",
+            okType: "danger", 
             onOk: async () => {
                 try {
                     await dispatch(deleteInboundRequest(id)).unwrap();

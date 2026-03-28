@@ -5,12 +5,12 @@ interface ConditionProps {
     setSearchSku: (value: string) => void;
     searchProductName: string;
     setSearchProductName: (value: string) => void;
-    searchWarehouse: string;
-    setSearchWarehouse: (value: string) => void;
+    searchBin: string;
+    setSearchBin: (value: string) => void;
 }
 
 const Condition = (props: ConditionProps) => {
-    const { searchSku, setSearchSku, searchProductName, setSearchProductName, searchWarehouse, setSearchWarehouse } = props;
+    const { searchSku, setSearchSku, searchProductName, setSearchProductName, searchBin, setSearchBin } = props;
 
     return (
         <div className="flex gap-2 mb-4">
@@ -27,9 +27,9 @@ const Condition = (props: ConditionProps) => {
                 className="rounded-md"
             />
             <Input
-                placeholder="Tìm kiếm theo tên kho..."
-                value={searchWarehouse}
-                onChange={(e) => setSearchWarehouse(e.target.value)}
+                placeholder="Tìm kiếm theo vị trí bin..."
+                value={searchBin}
+                onChange={(e) => setSearchBin(e.target.value)}
                 className="rounded-md"
             />
         </div>

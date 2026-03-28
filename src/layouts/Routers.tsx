@@ -33,6 +33,7 @@ const TransferRequest = lazy(() => import("../app/pages/transfer"))
 const ViewTransferRequest = lazy(() => import("../app/pages/transfer/view"))
 const EditTransferRequest = lazy(() => import("../app/pages/transfer/edit"))
 const ManageStockCount = lazy(() => import("../app/pages/manageStockCount"));
+const ViewBin = lazy(() => import("../app/pages/managerBin/view"));
 
 const shareResourceItem = [
     {
@@ -194,6 +195,12 @@ const manageResourceItem = [
     {
         key: URL.ManageStockCount,
         element: <ManageStockCount />,
+        layout: DASHBOARD_LAYOUT,
+        private: true,
+    },
+    {
+        key: URL.ViewBin,
+        element: <ViewBin />,
         layout: DASHBOARD_LAYOUT,
         private: true,
     },

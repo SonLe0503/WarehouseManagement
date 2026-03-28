@@ -2,13 +2,14 @@ import { Button, Tag, Modal, message, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
-    getAllBins, deleteBin, selectBins,
+    getAllBins, deleteBin, selectBins, getBinById,
     type IBin
 } from "../../../store/binSlice";
+import { useNavigate } from "react-router-dom";
 import { getActiveWarehouses, selectWarehouses } from "../../../store/warehouseslide";
 import dayjs from "dayjs";
 import Condition from "./Condition";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import AddBinModal from "../../components/modal/AddBinModal";
 import EditBinModal from "../../components/modal/EditBinModal";
 
@@ -16,13 +17,14 @@ const ManageBin = () => {
     const dispatch = useAppDispatch();
     const bins = useAppSelector(selectBins);
     const warehouses = useAppSelector(selectWarehouses);
-
+    const navigate = useNavigate();
     const [searchCode, setSearchCode] = useState("");
     const [searchWarehouse, setSearchWarehouse] = useState("");
     const [searchStatus, setSearchStatus] = useState("");
 
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [selectedBin, setSelectedBin] = useState<IBin | undefined>(undefined);
 
     useEffect(() => {
@@ -42,6 +44,10 @@ const ManageBin = () => {
     const handleEdit = (bin: IBin) => {
         setSelectedBin(bin);
         setIsEditModalOpen(true);
+    };
+
+    const handleView = async (id: number) => {
+        navigate(`/manager-bin/view?id=${id}`);
     };
 
     const handleDelete = (bin: IBin) => {
@@ -135,6 +141,14 @@ const ManageBin = () => {
                                 {b.createdAt ? dayjs(b.createdAt).format("DD/MM/YYYY") : "—"}
                             </div>
                             <div className="px-3 py-2 flex gap-2 justify-center">
+                                <Tooltip title="Xem chi tiết">
+                                    <Button
+                                        type="primary"
+                                        icon={<EyeOutlined />}
+                                        onClick={() => handleView(b.id)}
+                                        className="!flex !items-center !justify-center !bg-green-500 hover:!bg-green-400"
+                                    />
+                                </Tooltip>
                                 <Tooltip title="Sửa">
                                     <Button
                                         type="primary"
