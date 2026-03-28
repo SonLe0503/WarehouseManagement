@@ -1,4 +1,4 @@
-import { Modal, Button, message, Tag, Space, Typography, Tooltip, InputNumber, Input, Progress } from "antd";
+import { Modal, Button, message, Tag, Space, Tooltip, InputNumber, Input, Progress } from "antd";
 import { useEffect, useState, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store";
 import {
@@ -20,8 +20,6 @@ import {
     RightOutlined,
     EnvironmentOutlined
 } from "@ant-design/icons";
-
-const { Text } = Typography;
 
 interface StockCountItemModalProps {
     open: boolean;
@@ -191,7 +189,14 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
                         {binItems.map((record, idx) => {
                             const isEditing = editingId === record.id;
                             const productInfo = record.product || products.find((p: any) => p.id === record.productId);
-                            const diff = record.difference ?? 0;
+                            
+                            // Auto calculate difference for UI feedback
+                            const currentActual = isEditing 
+                                ? (editValues.actualQuantity ?? record.actualQuantity ?? 0) 
+                                : record.actualQuantity;
+                            
+                            const hasValue = currentActual !== null && currentActual !== undefined;
+                            const diff = hasValue ? (currentActual - record.systemQuantity) : 0;
                             const hasCounted = record.actualQuantity !== null && record.actualQuantity !== undefined;
 
                             return (
@@ -228,6 +233,7 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
                                                     onChange={(val) => setEditValues({ ...editValues, actualQuantity: val })}
                                                     className="w-20"
                                                     size="small"
+                                                    autoFocus
                                                 />
                                                 <Input
                                                     size="small"
@@ -251,7 +257,7 @@ const StockCountItemModal = ({ open, onClose, session }: StockCountItemModalProp
 
                                     {/* Diff */}
                                     <div className="col-span-2 text-center">
-                                        {hasCounted && !isEditing ? (
+                                        {hasValue ? (
                                             <Tag
                                                 color={diff === 0 ? "success" : diff > 0 ? "blue" : "error"}
                                                 className="font-semibold"

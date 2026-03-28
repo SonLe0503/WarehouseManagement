@@ -297,7 +297,7 @@ const ManageOrder = () => {
             )}
 
             {/* ── Section 2: Phiếu nhập hàng từ NCC ── */}
-            <h2 className="text-xl font-bold mb-4">Quản lý đơn mua</h2>
+            <h2 className="text-xl font-bold mb-4">Quản lý đơn nhập kho</h2>
 
             <Table
                 dataSource={filteredRequests}
